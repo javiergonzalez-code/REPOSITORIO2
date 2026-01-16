@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -16,12 +18,12 @@ class AuthController extends Controller
         return view('login');
     }
 
-    // AQUÍ VA EL CÓDIGO QUE PREGUNTASTE (El que procesa el formulario)
+
     public function login(Request $request)
     {
         $credentials = $request->validate([
             'email' => 'required|email',
-            'password' => 'required',
+            'password' => 'required|min:8',
         ]);
 
         if (Auth::attempt($credentials)) {
@@ -43,6 +45,6 @@ class AuthController extends Controller
             return view('logeados');
         }
 
-        return redirect("/")->withErrors('No tienes acceso, por favor inicia sesión');
+        return redirect("/")->withErrors(['access' => 'No tienes acceso, por favor inicia sesión']);
     }
 }
