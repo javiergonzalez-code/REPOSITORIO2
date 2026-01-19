@@ -13,7 +13,7 @@ class AuthController extends Controller
     public function index()
     {
         if (Auth::check()) {
-            return redirect()->route('logeados');
+            return redirect()->route('home');
         }
         return view('login');
     }
@@ -30,7 +30,7 @@ class AuthController extends Controller
             // Esto guarda la sesión en el navegador
             $request->session()->regenerate();
 
-            // Redirigimos al NOMBRE de la ruta definido en web.php
+            // Redirigimos al nombre de la ruta definido en web.php
             return redirect()->route('logeados');
         }
 

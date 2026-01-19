@@ -10,6 +10,6 @@ Route::get('/', [AuthController::class, 'index'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 
 // Ruta para la página interna
-Route::get('/logeados', [AuthController::class, 'logeados'])->name('logeados');
+Route::get('/logeados', [AuthController::class, 'home'])->name('home');
 
 Route::post('/logout', [Logoutcontroller::class, 'destroy'])->middleware('auth');
