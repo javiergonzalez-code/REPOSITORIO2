@@ -10,6 +10,8 @@
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
+
+
 /* --- Variables Globales --- */
 :root {
     --primary-color: #3182ce;
@@ -197,4 +199,171 @@ body {
 .dashboard-card h3 {
     font-size: 1.25rem;
     margin: 0;
+}
+
+/* --- Variables de Marca Ragon --- */
+:root {
+    --ragon-primary: #1a202c;    /* Azul Marino */
+    --ragon-accent: #3182ce;     /* Azul Brillante */
+    --ragon-bg: #e2e8f0;         /* Gris Fondo */
+    --white: #ffffff;
+}
+
+.login-wrapper {
+    background: radial-gradient(circle at top left, #f8fafc, #cbd5e1);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+}
+
+/* Tarjeta Estilo Elevado */
+.login-card {
+    border: none !important;
+    border-radius: 24px !important;
+    background: var(--white);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+    overflow: hidden;
+}
+
+/* Header Moderno */
+.login-header-modern {
+    background: var(--ragon-primary);
+    padding: 3rem 1rem;
+    text-align: center;
+    color: var(--white);
+    border: none !important;
+}
+
+.brand-icon-wrapper {
+    background: rgba(255,255,255,0.1);
+    width: 60px;
+    height: 60px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 18px;
+    font-size: 1.8rem;
+    color: var(--ragon-accent);
+}
+
+.bg-blue-ragon {
+    background-color: var(--ragon-accent) !important;
+    font-size: 0.65rem;
+    padding: 0.5em 1.2em;
+    letter-spacing: 1px;
+}
+
+/* Inputs con Iconos Integrados (Sin el cuadro gris de Bootstrap) */
+.input-group-modern {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-group-modern .icon {
+    position: absolute;
+    left: 15px;
+    color: #94a3b8;
+    z-index: 10;
+}
+
+.form-input {
+    width: 100%;
+    padding: 12px 12px 12px 45px;
+    border: 2px solid #f1f5f9;
+    border-radius: 12px;
+    background: #f8fafc;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+
+.form-input:focus {
+    border-color: var(--ragon-accent);
+    background: var(--white);
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(49, 130, 206, 0.1);
+}
+
+.form-label-custom {
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: #64748b;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+}
+
+/* Botón de Acción */
+.btn-ragon-modern {
+    width: 100%;
+    background: var(--ragon-primary);
+    color: var(--white);
+    border: none;
+    padding: 15px;
+    border-radius: 12px;
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+    letter-spacing: 1px;
+}
+
+.btn-ragon-modern:hover {
+    background: var(--ragon-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(49, 130, 206, 0.3);
+}
+
+/* Footer */
+.card-footer-custom {
+    padding: 1.5rem;
+    text-align: center;
+    background: #f8fafc;
+    border-top: 1px solid #f1f5f9;
+    color: #64748b;
+    font-size: 0.8rem;
+}
+
+.error-msg {
+    color: #ef4444;
+    font-size: 0.75rem;
+    margin-top: 5px;
+}
+
+/* Contenedor principal para centrado total */
+.login-wrapper {
+    background: radial-gradient(circle at top left, #f8fafc, #cbd5e1);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;      /* Centrado vertical */
+    justify-content: center;   /* Centrado horizontal */
+    padding: 20px;
+}
+
+/* Ajustar la tarjeta para que no se estire demasiado */
+.login-card {
+    width: 100%;
+    max-width: 400px; /* Ancho ideal para login */
+    border: none !important;
+    border-radius: 24px !important;
+    background: #ffffff;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+    overflow: hidden;
+}
+
+/* Centrar textos internos del header */
+.login-header-modern {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+/* Centrar el botón y su contenido */
+.btn-ragon-modern {
+    display: flex;
+    justify-content: center; /* Centra el texto "INICIAR SESIÓN" */
+    align-items: center;
+    gap: 10px;
 }

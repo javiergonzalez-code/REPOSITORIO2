@@ -6,15 +6,20 @@ use App\Http\Controllers\LogoutController;
 use App\Http\Controllers\ErroresController;
 use App\Http\Controllers\InputController;
 use App\Http\Controllers\OcController;
+use App\Http\Controllers\LogController;
 
 
 
-
-Route::get('/', [AuthController::class, 'index'])->name('login');
+Route::post('/', [AuthController::class, 'index'])->name('login');
 
 // Ruta para recibir los datos del formulario (POST)
+Route::get('/login', [AuthController::class, 'index'])->name('login');
+
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 
+Route::get('/', function () {
+    return redirect()->route('login');
+});
 // Ruta para la página interna
 Route::get('/home', [AuthController::class, 'home'])->name('home');
 
@@ -29,13 +34,13 @@ Route::get('/errores', [ErroresController::class, 'index'])
     ->name('errores.index');
 
 Route::get('/inputs', [InputController::class, 'index'])
-    ->middleware('auth') 
+    ->middleware('auth')
     ->name('input.index');
 
 Route::get('/logs', [LogController::class, 'index'])
-    ->middleware('auth') 
+    ->middleware('auth')
     ->name('logs.index');
 
 Route::get('/oc', [OcController::class, 'index'])
-    ->middleware('auth') 
+    ->middleware('auth')
     ->name('oc.index');

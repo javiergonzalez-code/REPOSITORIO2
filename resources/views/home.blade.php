@@ -25,7 +25,7 @@
 
             {{-- Tarjeta para Input --}}
             <a href="{{ route('input.index') }}" class="dashboard-card">
-                <i class="fas fa-keyboard fa-2x"></i>
+            <i class="fas fa-file-upload fa-2x"></i>
                 <h3 class="fw-bold">Input</h3>  
             </a>
 
@@ -40,7 +40,12 @@
                 <i class="fas fa-file-invoice-dollar fa-2x"></i>
                 <h3 class="fw-bold">OC</h3>    
             </a>
-
+            
+            {{-- Tarjeta para Manejo de usuarios y privilegios --}}
+            <a href="{{ route('oc.index') }}" class="dashboard-card">
+            <i class="fas fa-user fa-2x"></i>
+                <h3 class="fw-bold">Usuarios</h3>    
+            </a>
         </div>
     </div>
 </main>
