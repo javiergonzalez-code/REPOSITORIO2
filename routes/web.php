@@ -37,6 +37,8 @@ Route::get('/inputs', [InputController::class, 'index'])
     ->middleware('auth')
     ->name('input.index');
 
+    Route::post('/inputs/store', [InputController::class, 'store'])->name('input.store');
+
 Route::get('/logs', [LogController::class, 'index'])
     ->middleware('auth')
     ->name('logs.index');
