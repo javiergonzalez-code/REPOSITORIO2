@@ -31,7 +31,7 @@ class AuthController extends Controller
             $request->session()->regenerate();
 
             // Redirigimos al nombre de la ruta definido en web.php
-            return redirect()->route('logeados');
+            return redirect()->route('home');
         }
 
         // Si falla, regresa con error
@@ -39,10 +39,10 @@ class AuthController extends Controller
     }
 
     // Este método muestra la vista de éxito
-    public function logeados()
+    public function home()
     {
         if (Auth::check()) {
-            return view('logeados');
+            return view('home');
         }
 
         return redirect("/")->withErrors(['access' => 'No tienes acceso, por favor inicia sesión']);
