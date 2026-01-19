@@ -19,7 +19,9 @@ Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::get('/home', [AuthController::class, 'home'])->name('home');
 
 // Ruta para deslogearse
-Route::post('/logout', [LogoutController::class, 'destroy'])->middleware('auth');
+Route::post('/logout', [LogoutController::class, 'destroy'])
+    ->middleware('auth')
+    ->name('logout');
 
 
 Route::get('/errores', [ErroresController::class, 'index'])

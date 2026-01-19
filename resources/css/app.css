@@ -9,3 +9,192 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+/* --- Variables Globales --- */
+:root {
+    --primary-color: #3182ce;
+    --bg-light: #f7fafc;
+    --text-main: #2d3748;
+}
+
+body {
+    background-color: var(--bg-light);
+    color: var(--text-main);
+    font-family: 'Nunito', sans-serif;
+}
+
+/* --- Navbar Personalizada --- */
+.navbar-custom {
+    background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%) !important;
+    padding: 0.8rem 1rem;
+    border-bottom: 3px solid #3182ce;
+    min-height: 60px;
+}
+
+.navbar-custom .navbar-brand {
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    font-size: 1.4rem;
+    color: #ffffff !important;
+    text-transform: uppercase;
+}
+
+.navbar-custom .nav-link {
+    color: #e2e8f0 !important;
+    font-weight: 500;
+    transition: color 0.3s ease;
+    padding: 0.5rem 1rem;
+}
+
+.navbar-custom .nav-link:hover {
+    color: #63b3ed !important;
+}
+
+/* Asegura que el texto a la derecha sea visible */
+.navbar-nav .nav-link {
+    display: block !important;
+    visibility: visible !important;
+}
+
+.navbar-collapse {
+    flex-grow: 1;
+    display: flex !important;
+    justify-content: flex-end;
+}
+
+/* Corrección de alineación para la Navbar */
+.navbar-custom .container {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+}
+
+.navbar-collapse {
+    justify-content: flex-end !important;
+}
+
+.navbar-nav {
+    flex-direction: row !important; /* Evita que el nombre se ponga debajo del icono */
+}
+
+.nav-link.dropdown-toggle {
+    display: flex !important;
+    align-items: center !important;
+    white-space: nowrap; /* Evita que el nombre se rompa en dos líneas */
+}
+
+/* --- Ajustes de Alineación Navbar --- */
+.navbar-custom .container-fluid {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* El nombre del usuario no debe romperse */
+.navbar-custom .nav-link span {
+    white-space: nowrap;
+    font-size: 0.95rem;
+}
+
+/* Espaciado del Dropdown para que no pegue al borde */
+.dropdown-menu-end {
+    right: 0;
+    left: auto;
+    margin-top: 15px !important;
+}
+
+/* Hover suave para el nombre del usuario */
+.navbar-custom .nav-link:hover {
+    opacity: 0.8;
+    color: var(--primary-color) !important;
+}
+
+/* --- Menú Desplegable (Dropdown) --- */
+.dropdown-menu {
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+    padding: 0;
+    margin-top: 10px;
+    background-color: #ffffff;
+}
+
+.dropdown-item {
+    padding: 12px 20px;
+    font-weight: 500;
+    color: #4a5568;
+    transition: all 0.2s;
+}
+
+.dropdown-item-danger {
+    color: #e53e3e !important;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dropdown-item-danger:hover {
+    background-color: #fff5f5;
+    color: #c53030 !important;
+}
+
+.shadow-lg {
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* --- Dashboard Grid --- */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 25px;
+    margin-top: 40px;
+}
+
+/* --- Tarjetas del Dashboard --- */
+.dashboard-card {
+    background: #ffffff;
+    border: none;
+    border-radius: 16px;
+    padding: 40px 20px;
+    text-align: center;
+    text-decoration: none !important;
+    color: var(--text-main);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-12px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+    background: linear-gradient(145deg, #ffffff, #f0f4f8);
+}
+
+.dashboard-card:hover h3 {
+    color: var(--primary-color);
+}
+
+/* --- Iconos de las Tarjetas --- */
+.dashboard-card i {
+    background: #ebf8ff;
+    color: var(--primary-color);
+    width: 80px;
+    height: 80px;
+    line-height: 80px;
+    border-radius: 50%;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+}
+
+.dashboard-card:hover i {
+    background: var(--primary-color);
+    color: #ffffff;
+    transform: rotate(5deg);
+}
+
+.dashboard-card h3 {
+    font-size: 1.25rem;
+    margin: 0;
+}
