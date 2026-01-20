@@ -1,0 +1,530 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+
+
+/* --- Variables Globales --- */
+:root {
+    --primary-color: #3182ce;
+    --bg-light: #f7fafc;
+    --text-main: #2d3748;
+}
+
+body {
+    background-color: var(--bg-light);
+    color: var(--text-main);
+    font-family: 'Nunito', sans-serif;
+}
+
+/* --- Navbar Personalizada --- */
+.navbar-custom {
+    background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%) !important;
+    padding: 0.8rem 1rem;
+    border-bottom: 3px solid #3182ce;
+    min-height: 60px;
+}
+
+.navbar-custom .navbar-brand {
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    font-size: 1.4rem;
+    color: #ffffff !important;
+    text-transform: uppercase;
+}
+
+.navbar-custom .nav-link {
+    color: #e2e8f0 !important;
+    font-weight: 500;
+    transition: color 0.3s ease;
+    padding: 0.5rem 1rem;
+}
+
+.navbar-custom .nav-link:hover {
+    color: #63b3ed !important;
+}
+
+/* Asegura que el texto a la derecha sea visible */
+.navbar-nav .nav-link {
+    display: block !important;
+    visibility: visible !important;
+}
+
+.navbar-collapse {
+    flex-grow: 1;
+    display: flex !important;
+    justify-content: flex-end;
+}
+
+/* Corrección de alineación para la Navbar */
+.navbar-custom .container {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+}
+
+.navbar-collapse {
+    justify-content: flex-end !important;
+}
+
+.navbar-nav {
+    flex-direction: row !important; /* Evita que el nombre se ponga debajo del icono */
+}
+
+.nav-link.dropdown-toggle {
+    display: flex !important;
+    align-items: center !important;
+    white-space: nowrap; /* Evita que el nombre se rompa en dos líneas */
+}
+
+/* --- Ajustes de Alineación Navbar --- */
+.navbar-custom .container-fluid {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* El nombre del usuario no debe romperse */
+.navbar-custom .nav-link span {
+    white-space: nowrap;
+    font-size: 0.95rem;
+}
+
+/* Espaciado del Dropdown para que no pegue al borde */
+.dropdown-menu-end {
+    right: 0;
+    left: auto;
+    margin-top: 15px !important;
+}
+
+/* Hover suave para el nombre del usuario */
+.navbar-custom .nav-link:hover {
+    opacity: 0.8;
+    color: var(--primary-color) !important;
+}
+
+/* --- Menú Desplegable (Dropdown) --- */
+.dropdown-menu {
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+    padding: 0;
+    margin-top: 10px;
+    background-color: #ffffff;
+}
+
+.dropdown-item {
+    padding: 12px 20px;
+    font-weight: 500;
+    color: #4a5568;
+    transition: all 0.2s;
+}
+
+.dropdown-item-danger {
+    color: #e53e3e !important;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dropdown-item-danger:hover {
+    background-color: #fff5f5;
+    color: #c53030 !important;
+}
+
+.shadow-lg {
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* --- Dashboard Grid --- */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 25px;
+    margin-top: 40px;
+}
+
+/* --- Tarjetas del Dashboard --- */
+.dashboard-card {
+    background: #ffffff;
+    border: none;
+    border-radius: 16px;
+    padding: 40px 20px;
+    text-align: center;
+    text-decoration: none !important;
+    color: var(--text-main);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-12px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+    background: linear-gradient(145deg, #ffffff, #f0f4f8);
+}
+
+.dashboard-card:hover h3 {
+    color: var(--primary-color);
+}
+
+/* --- Iconos de las Tarjetas --- */
+.dashboard-card i {
+    background: #ebf8ff;
+    color: var(--primary-color);
+    width: 80px;
+    height: 80px;
+    line-height: 80px;
+    border-radius: 50%;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+}
+
+.dashboard-card:hover i {
+    background: var(--primary-color);
+    color: #ffffff;
+    transform: rotate(5deg);
+}
+
+.dashboard-card h3 {
+    font-size: 1.25rem;
+    margin: 0;
+}
+
+/* --- Variables de Marca Ragon --- */
+:root {
+    --ragon-primary: #1a202c;    /* Azul Marino */
+    --ragon-accent: #3182ce;     /* Azul Brillante */
+    --ragon-bg: #e2e8f0;         /* Gris Fondo */
+    --white: #ffffff;
+}
+
+.login-wrapper {
+    background: radial-gradient(circle at top left, #f8fafc, #cbd5e1);
+    min-height: 200vh;
+    display: flex;
+    align-items: center;
+}
+
+/* Tarjeta Estilo Elevado */
+.login-card {
+    border: none !important;
+    border-radius: 24px !important;
+    background: var(--white);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+    overflow: hidden;
+}
+
+/* Header Moderno */
+.login-header-modern {
+    background: var(--ragon-primary);
+    padding: 3rem 1rem;
+    text-align: center;
+    color: var(--white);
+    border: none !important;
+}
+
+.brand-icon-wrapper {
+    background: rgba(255,255,255,0.1);
+    width: 60px;
+    height: 60px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 18px;
+    font-size: 1.8rem;
+    color: var(--ragon-accent);
+}
+
+.bg-blue-ragon {
+    background-color: var(--ragon-accent) !important;
+    font-size: 0.65rem;
+    padding: 0.5em 1.2em;
+    letter-spacing: 1px;
+}
+
+/* Inputs con Iconos Integrados (Sin el cuadro gris de Bootstrap) */
+.input-group-modern {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-group-modern .icon {
+    position: absolute;
+    left: 15px;
+    color: #94a3b8;
+    z-index: 10;
+}
+
+.form-input {
+    width: 100%;
+    padding: 12px 12px 12px 45px;
+    border: 2px solid #f1f5f9;
+    border-radius: 12px;
+    background: #f8fafc;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+
+.form-input:focus {
+    border-color: var(--ragon-accent);
+    background: var(--white);
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(49, 130, 206, 0.1);
+}
+
+.form-label-custom {
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: #64748b;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+}
+
+/* Botón de Acción */
+.btn-ragon-modern {
+    width: 100%;
+    background: var(--ragon-primary);
+    color: var(--white);
+    border: none;
+    padding: 15px;
+    border-radius: 12px;
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+    letter-spacing: 1px;
+}
+
+.btn-ragon-modern:hover {
+    background: var(--ragon-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(49, 130, 206, 0.3);
+}
+
+/* Footer */
+.card-footer-custom {
+    padding: 1.5rem;
+    text-align: center;
+    background: #f8fafc;
+    border-top: 1px solid #f1f5f9;
+    color: #64748b;
+    font-size: 0.8rem;
+}
+
+.error-msg {
+    color: #ef4444;
+    font-size: 0.75rem;
+    margin-top: 5px;
+}
+
+/* Contenedor principal para centrado total */
+.login-wrapper {
+    background: radial-gradient(circle at top left, #f8fafc, #cbd5e1);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;      /* Centrado vertical */
+    justify-content: center;   /* Centrado horizontal */
+    padding: 20px;
+}
+
+/* Ajustar la tarjeta para que no se estire demasiado */
+.login-card {
+    width: 100%;
+    max-width: 400px; /* Ancho ideal para login */
+    border: none !important;
+    border-radius: 24px !important;
+    background: #ffffff;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+    overflow: hidden;
+}
+
+/* Centrar textos internos del header */
+.login-header-modern {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+/* Centrar el botón y su contenido */
+.btn-ragon-modern {
+    display: flex;
+    justify-content: center; /* Centra el texto "INICIAR SESIÓN" */
+    align-items: center;
+    gap: 10px;
+}
+
+/* --- Estilos para el Módulo de Carga (Input) --- */
+
+/* Contenedor de la zona de carga */
+.upload-zone {
+    border: 2px dashed #cbd5e1; /* Borde punteado profesional */
+    border-radius: 20px;
+    padding: 40px;
+    background-color: #f8fafc;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.upload-zone:hover {
+    border-color: var(--ragon-accent); /* Azul brillante al pasar el mouse */
+    background-color: #f1f5f9;
+}
+
+/* Icono animado */
+.upload-icon {
+    color: var(--ragon-accent);
+    margin-bottom: 20px;
+    transition: transform 0.3s ease;
+}
+
+.upload-zone:hover .upload-icon {
+    transform: translateY(-10px); /* El icono "flota" al pasar el mouse */
+}
+
+/* Personalización del input de archivo (estilo Bootstrap mejorado) */
+.form-control-file-custom {
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    padding: 10px;
+    background: white;
+}
+
+/* Botón de carga con los colores de Ragon */
+.btn-upload-ragon {
+    background-color: var(--ragon-primary);
+    color: white;
+    font-weight: 700;
+    padding: 12px;
+    border-radius: 12px;
+    border: none;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+}
+
+.btn-upload-ragon:hover {
+    background-color: var(--ragon-accent);
+    box-shadow: 0 5px 15px rgba(49, 130, 206, 0.4);
+    color: white;
+}
+
+/* Estilo Base para Alertas */
+.alert-custom {
+    display: flex;
+    align-items: center;
+    border: none;
+    border-radius: 0; /* Para que ocupen el ancho superior de la tarjeta si deseas */
+    padding: 1rem 1.5rem;
+    margin-bottom: 0;
+}
+
+/* Alerta Verde (Éxito) - Tono Ragon Saludable */
+.alert-success-ragon {
+    background-color: #d1fae5;
+    color: #065f46;
+    border-bottom: 3px solid #10b981;
+}
+
+/* Alerta Roja (Error) - Tono Ragon Alerta */
+.alert-error-ragon {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border-bottom: 3px solid #ef4444;
+}
+
+/* Animación de entrada (Requiere Animate.css o puedes usar esta simple) */
+.animate__fadeInDown {
+    animation: fadeInDown 0.5s both;
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translate3d(0, -20%, 0);
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+/* Aumentamos el ancho máximo de la tarjeta */
+.card-large {
+    max-width: 650px !important; /* Más ancho que el login estándar */
+    width: 95%;
+}
+
+/* Zona de carga estilo "Drag & Drop" */
+.upload-zone {
+    position: relative;
+    border: 2px dashed #cbd5e1;
+    border-radius: 15px;
+    background-color: #f8fafc;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.upload-zone:hover {
+    border-color: var(--ragon-accent);
+    background-color: #eff6ff;
+}
+
+.upload-label {
+    display: block;
+    padding: 50px 20px;
+    cursor: pointer;
+}
+
+/* Ocultamos el input feo por defecto */
+.file-input-hidden {
+    position: absolute;
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+/* Ajustes adicionales de espaciado */
+.login-header-modern .brand-icon-wrapper {
+    width: 80px;
+    height: 80px;
+    font-size: 2.2rem;
+}
+
+/* Estado normal */
+.upload-zone {
+    border: 3px dashed #cbd5e1;
+    background-color: #f8fafc;
+    transition: all 0.2s ease-in-out;
+}
+
+/* Estado cuando se está arrastrando un archivo encima */
+.upload-zone-active {
+    border-color: var(--ragon-accent) !important;
+    background-color: #e0f2fe !important;
+    transform: scale(1.02);
+}
+
+/* Animación sutil para el icono */
+.icon-bounce {
+    transition: transform 0.3s ease;
+}
+
+.upload-zone-active .icon-bounce {
+    transform: translateY(-10px);
+}
