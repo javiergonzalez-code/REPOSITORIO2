@@ -528,3 +528,227 @@ body {
 .upload-zone-active .icon-bounce {
     transform: translateY(-10px);
 }
+
+/* Colores suaves para badges */
+.bg-success-light { background-color: #d1fae5; }
+.bg-info-light { background-color: #e0f2fe; }
+.bg-danger-light { background-color: #fee2e2; }
+
+/* Efecto de la tabla */
+.table thead th {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+    color: #64748b;
+    border-top: none;
+}
+
+.table tbody tr {
+    transition: background-color 0.2s;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+/* --- Tipografía y Estructura --- */
+.tracking-tight { letter-spacing: -1px; }
+.fw-black { font-weight: 900; }
+.x-small { font-size: 0.7rem; }
+
+/* --- Avatares --- */
+.avatar-pill {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+}
+
+/* --- Indicadores de Estado (Dot Indicators) --- */
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.status-indicator .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.status-upload { background: #ecfdf5; color: #065f46; }
+.status-upload .dot { background: #10b981; box-shadow: 0 0 8px #10b981; }
+
+.status-error { background: #fef2f2; color: #991b1b; }
+.status-error .dot { background: #ef4444; box-shadow: 0 0 8px #ef4444; }
+
+.status-general { background: #f1f5f9; color: #475569; }
+.status-general .dot { background: #64748b; }
+
+/* --- Badges y Direcciones IP --- */
+.badge-outline {
+    border: 1px solid #e2e8f0;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    color: #64748b;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.ip-address {
+    background: #f8fafc;
+    color: #6366f1;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+}
+
+/* --- Botones y Filas --- */
+.btn-action-icon {
+    background: none;
+    border: none;
+    color: #cbd5e1;
+    transition: all 0.2s;
+}
+
+.btn-action-icon:hover {
+    color: #1e3a8a;
+    transform: scale(1.1);
+}
+
+.log-row:hover {
+    background-color: #fcfdfe !important;
+}
+
+.bg-white { background-color: #ffffff; }
+
+/* Centrar y dar espacio a las columnas */
+.table th, .table td {
+    padding: 1.25rem 1rem !important; /* Más espacio vertical */
+    vertical-align: middle;
+}
+
+/* Evitar que "Dirección IP" y "Acción" se junten */
+th:nth-last-child(2), td:nth-last-child(2) {
+    padding-right: 2rem !important;
+    text-align: center;
+}
+
+/* Estilo para el Badge del Módulo */
+.badge-outline {
+    border: 1px solid #e2e8f0;
+    padding: 5px 12px;
+    border-radius: 8px;
+    font-size: 0.7rem;
+    color: #64748b;
+    background: #f8fafc;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
+
+/* Ajuste del Avatar */
+.avatar-pill {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    font-weight: bold;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Animación del punto de estado */
+.status-indicator .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 10px;
+}
+
+/* Contenedor del Icono Izquierdo */
+.header-icon-box {
+    width: 60px;
+    height: 60px;
+    background: #0f172a;
+    color: #3b82f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    border-radius: 16px;
+    box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.2);
+}
+
+/* Título con tracking ajustado */
+.audit-title {
+    font-weight: 900;
+    color: #1e293b;
+    letter-spacing: -1.5px;
+    margin-bottom: 2px;
+    font-size: 1.75rem;
+}
+
+/* Subtítulo con indicador de pulso */
+.audit-subtitle {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    letter-spacing: 1px;
+}
+
+.pulse-indicator {
+    width: 8px;
+    height: 8px;
+    background: #10b981;
+    border-radius: 50%;
+    margin-right: 10px;
+    display: inline-block;
+    animation: pulse-green 2s infinite;
+}
+
+@keyframes pulse-green {
+    0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+/* Botón estilizado */
+.btn-ragon-outline {
+    background: #ffffff;
+    border: 2px solid #e2e8f0;
+    color: #475569;
+    padding: 10px 24px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-ragon-outline:hover {
+    background: #f8fafc;
+    border-color: #3b82f6;
+    color: #3b82f6;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
