@@ -587,14 +587,39 @@ body {
     margin-right: 8px;
 }
 
-.status-upload { background: #ecfdf5; color: #065f46; }
-.status-upload .dot { background: #10b981; box-shadow: 0 0 8px #10b981; }
+/* --- ESTADO: ÉXITO / SUBIDA (Verde Esmeralda) --- */
+.status-upload { 
+    background: #dcfce7; 
+    color: #14532d; 
+    border: 1px solid #bbf7d0;
+}
+.status-upload .dot { 
+    background: #22c55e; 
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.5); 
+}
 
-.status-error { background: #fef2f2; color: #991b1b; }
-.status-error .dot { background: #ef4444; box-shadow: 0 0 8px #ef4444; }
+/* --- ESTADO: ERROR / FALLO (Rojo Carmesí) --- */
+.status-error { 
+    background: #fee2e2; 
+    color: #7f1d1d; 
+    border: 1px solid #fecaca;
+}
+.status-error .dot { 
+    background: #ef4444; 
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); 
+}
 
-.status-general { background: #f1f5f9; color: #475569; }
-.status-general .dot { background: #64748b; }
+/* --- ESTADO: GENERAL / INFO (Azul Slate / Indigo) --- */
+/* Cambiamos el rojo por un azul profesional para que no parezca error */
+.status-general { 
+    background: #e0e7ff; 
+    color: #312e81; 
+    border: 1px solid #c7d2fe;
+}
+.status-general .dot { 
+    background: #6366f1; 
+    box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+}
 
 /* --- Badges y Direcciones IP --- */
 .badge-outline {
