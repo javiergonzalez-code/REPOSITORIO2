@@ -145,61 +145,95 @@ body {
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2) !important;
 }
 
-/* --- Dashboard Grid --- */
+/* --- Dashboard Grid Centrado --- */
 .dashboard-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 25px;
-    margin-top: 40px;
+    /* Mantenemos el auto-fit pero con un max-width para que no se pegue a los bordes */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 320px)); 
+    gap: 35px;
+    margin-top: 60px;
+    
+    /* EL SECRETO DEL CENTRADO: */
+    justify-content: center; /* Centra las tarjetas dentro del grid */
+    max-width: 1200px;       /* Evita que las tarjetas se estiren demasiado en pantallas 4K */
+    margin-left: auto;       /* Margen izquierdo automático */
+    margin-right: auto;      /* Margen derecho automático */
+    padding: 0 20px;         /* Espacio de seguridad para móviles */
 }
 
-/* --- Tarjetas del Dashboard --- */
+/* --- Ajuste extra para los títulos del Panel --- */
+.panel-header {
+    text-align: center;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+/* --- Tarjeta Estilo Premium --- */
 .dashboard-card {
     background: #ffffff;
-    border: none;
-    border-radius: 16px;
-    padding: 40px 20px;
+    border: 1px solid rgba(0, 0, 0, 0.03);
+    border-radius: 28px;
+    padding: 60px 30px;
     text-align: center;
     text-decoration: none !important;
-    color: var(--text-main);
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    color: #334155;
+    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.05);
     display: flex;
     flex-direction: column;
     align-items: center;
+    position: relative;
+    z-index: 1;
 }
 
+/* Efecto de elevación y color al Hover */
 .dashboard-card:hover {
-    transform: translateY(-12px);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
-    background: linear-gradient(145deg, #ffffff, #f0f4f8);
+    transform: translateY(-15px);
+    box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.12);
+    background: #ffffff;
 }
 
-.dashboard-card:hover h3 {
-    color: var(--primary-color);
+/* --- Contenedor de Iconos con Glow --- */
+.icon-wrapper {
+    width: 90px;
+    height: 90px;
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2rem;
+    margin-bottom: 25px;
+    transition: all 0.4s ease;
+    position: relative;
 }
 
-/* --- Iconos de las Tarjetas --- */
-.dashboard-card i {
-    background: #ebf8ff;
-    color: var(--primary-color);
-    width: 80px;
-    height: 80px;
-    line-height: 80px;
-    border-radius: 50%;
-    margin-bottom: 20px;
-    transition: all 0.3s ease;
+/* Colores Dinámicos con Efecto Neón Suave */
+.card-errors .icon-wrapper { background: #fff1f2; color: #f43f5e; box-shadow: 0 10px 20px -5px rgba(244, 63, 94, 0.2); }
+.card-input .icon-wrapper  { background: #f0fdf4; color: #22c55e; box-shadow: 0 10px 20px -5px rgba(34, 197, 94, 0.2); }
+.card-logs .icon-wrapper   { background: #f0f9ff; color: #0ea5e9; box-shadow: 0 10px 20px -5px rgba(14, 165, 233, 0.2); }
+.card-oc .icon-wrapper     { background: #fffbeb; color: #f59e0b; box-shadow: 0 10px 20px -5px rgba(245, 158, 11, 0.2); }
+.card-users .icon-wrapper  { background: #f5f3ff; color: #8b5cf6; box-shadow: 0 10px 20px -5px rgba(139, 92, 246, 0.2); }
+
+/* Animación cuando el usuario pasa el mouse */
+.dashboard-card:hover .icon-wrapper {
+    transform: scale(1.15) rotate(8deg);
+    filter: brightness(1.05);
 }
 
-.dashboard-card:hover i {
-    background: var(--primary-color);
-    color: #ffffff;
-    transform: rotate(5deg);
-}
-
+/* --- Tipografía Refinada --- */
 .dashboard-card h3 {
-    font-size: 1.25rem;
-    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 8px;
+    transition: color 0.3s ease;
+}
+
+.dashboard-card p {
+    font-size: 0.95rem;
+    color: #64748b;
+    max-width: 80%;
+    margin: 0 auto;
 }
 
 /* --- Variables de Marca Ragon --- */
