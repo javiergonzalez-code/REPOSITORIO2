@@ -41,6 +41,22 @@
                 <span class="badge bg-blue-ragon mt-2 px-3">SISTEMA DE GESTIÓN RAGON</span>
             </div>
 
+<div class="w-162 mt-7 text-center mb-4">
+    <div class="format-notice-pill">
+        <div class="d-flex align-items-center justify-content-center">
+            <span class="pulse-icon">
+                <i class="fas fa-info-circle"></i>
+            </span>
+            <p class="mb-0 mx-2">
+                Formatos permitidos: 
+                <span class="badge-format">CSV</span> 
+                <span class="badge-format">XML</span>
+            </p>
+            <div class="divider-v"></div>
+            <span class="size-limit">MÁX. 5MB</span>
+        </div>
+    </div>
+</div>
             <div class="card-body p-5">
                 <form action="{{ route('input.store') }}" method="POST" enctype="multipart/form-data" id="upload-form">
                     @csrf

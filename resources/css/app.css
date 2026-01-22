@@ -777,3 +777,55 @@ th:nth-last-child(2), td:nth-last-child(2) {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
 }
+
+.format-notice-pill {
+    display: inline-block; /* Importante: permite que el text-center del padre lo mueva */
+    background: #ffffff;
+    border: 1px dashed #cbd5e1;
+    padding: 12px 30px;
+    border-radius: 50px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+/* Texto y Tipografía */
+.format-notice- pill p {
+    color: #475569;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+/* Badges de Formato */
+.badge-format {
+    background: #e0e7ff; /* Azul suave */
+    color: #3730a3;
+    padding: 2px 10px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    margin-left: 4px;
+}
+
+/* Efecto de pulso en el icono */
+.pulse-icon {
+    color: #6366f1;
+    animation: pulse-blue 2s infinite;
+}
+
+@keyframes pulse-blue {
+    0% { transform: scale(0.95); opacity: 0.7; }
+    70% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(0.95); opacity: 0.7; }
+}
+
+/* Divisor Vertical */
+.divider-v {
+    width: 1px;
+    height: 20px;
+    background: #e2e8f0;
+    margin: 0 15px;
+}
+
+.size-limit {
+    color: #94a3b8;
+    font-size: 0.7rem;
+    font-weight: 800;
+}

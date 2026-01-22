@@ -3,6 +3,32 @@
 @section('content')
 <div class="container-fluid py-4">
     <div class="card shadow-lg border-0 rounded-4">
+        {{-- Header con Buscador --}}
+        <div class="card-header bg-white py-4">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h4 class="fw-bold mb-0 text-dark">
+                        <i class="fas fa-file-invoice-dollar me-2 text-primary"></i>Gestión de Órdenes de Compra
+                    </h4>
+                </div>
+                <div class="col-md-6">
+                    <form action="{{ route('oc.index') }}" method="GET" class="d-flex">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-0"><i class="fas fa-search text-muted"></i></span>
+                            <input type="text" name="search" class="form-control bg-light border-0" 
+                                   placeholder="Buscar por proveedor o nombre de archivo..." 
+                                   value="{{ $search }}">
+                            <button type="submit" class="btn btn-primary px-4">Buscar</button>
+                            @if($search)
+                                <a href="{{ route('oc.index') }}" class="btn btn-outline-secondary">Limpiar</a>
+                            @endif
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+<div class="container-fluid py-4">
+    <div class="card shadow-lg border-0 rounded-4">
         <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
             <h4 class="fw-bold mb-0 text-dark">
                 <i class="fas fa-file-invoice-dollar me-2 text-primary"></i>Gestión de Órdenes de Compra

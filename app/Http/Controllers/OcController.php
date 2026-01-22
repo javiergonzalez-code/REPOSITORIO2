@@ -7,14 +7,20 @@ use Illuminate\Http\Request;
 
 class OcController extends Controller
 {
-    public function index()
+    public function index(Request $request)
 {
-    //Obtenemo todas las OC con la información del usuario (Proveedor)
-    // Usamos 'with' para cargar los archivos asociados de una vez
-    $ordenes= \App\Models\Archivo::with('user')
-        ->select('nombre_original', 'user_id', 'created_at', 'nombre_sistema')
+    $search = $request->input('search');
+
+    $ordenes = \App\Models\Archivo::with('user')
+        ->when($search, function ($query, $search) {
+            return $query->where('nombre_original', 'like', "%{$search}%")
+                         ->orWhereHas('user', function ($q) use ($search) {
+                             $q->where('name', 'like', "%{$search}%");
+                         });
+        })
         ->latest()
         ->get();
-    return view('oc.index',compact ('ordenes')); 
+
+    return view('oc.index', compact('ordenes', 'search'));
 }
 }

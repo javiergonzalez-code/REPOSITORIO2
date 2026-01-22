@@ -23,7 +23,7 @@ class InputController extends Controller
 
         // Validación extra por extensión manual si el MIME falla
         $extension = $request->file('archivo')?->getClientOriginalExtension();
-        $allowedExtensions = ['csv', 'xlsx', 'xls', 'txt'];
+        $allowedExtensions = ['csv', 'xlsx', 'xls', 'xml'];
 
         if ($validator->fails() || !in_array(strtolower($extension), $allowedExtensions)) {
             Log::create([
