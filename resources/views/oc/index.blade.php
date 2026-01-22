@@ -99,12 +99,12 @@
                             </div>
                         </div>
                     </div>
-@if(session('error'))
-    <div class="alert alert-danger alert-dismissible fade show rounded-4 mb-4" role="alert">
-        <i class="fas fa-exclamation-circle me-2"></i> {{ session('error') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-@endif
+                    @if (session('error'))
+                        <div class="alert alert-danger alert-dismissible fade show rounded-4 mb-4" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i> {{ session('error') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
                     <div class="card-body p-0">
                         <div class="table-responsive">
                             <table class="table table-hover align-middle mb-0">
@@ -160,6 +160,16 @@
                                                         <i class="fas fa-download me-2"></i>Descargar
                                                     </a>
                                                 </div>
+                                            </td>
+                                            {{-- Reemplaza el botón del ojo por este --}}
+                                            <td class="text-end pe-4">
+                                                <div class="d-inline-flex gap-2">
+                                            <a href="{{ route('oc.preview', $oc->id) }}"
+                                                class="btn btn-outline-light btn-sm text-dark border shadow-sm"
+                                                title="Previsualizar Contenido">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            </div>
                                             </td>
                                         </tr>
                                     @empty

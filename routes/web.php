@@ -30,4 +30,5 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/logs', [LogsController::class, 'index'])->name('logs.index');
     Route::get('/oc', [OcController::class, 'index'])->name('oc.index');
     Route::get('/oc/download/{id}', [App\Http\Controllers\OcController::class, 'download'])->name('oc.download');
+    Route::get('/oc/preview/{id}', [App\Http\Controllers\OcController::class, 'preview'])->name('oc.preview');
 });
