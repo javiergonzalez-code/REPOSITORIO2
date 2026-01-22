@@ -29,4 +29,5 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/inputs/store', [InputController::class, 'store'])->name('input.store');
     Route::get('/logs', [LogsController::class, 'index'])->name('logs.index');
     Route::get('/oc', [OcController::class, 'index'])->name('oc.index');
+    Route::get('/oc/download/{id}', [App\Http\Controllers\OcController::class, 'download'])->name('oc.download');
 });
