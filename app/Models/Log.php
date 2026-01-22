@@ -7,19 +7,25 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Log extends Model
 {
-    // Esta línea autoriza a Laravel a escribir en estas columnas
+    /**
+     * Define la "lista blanca" de campos que pueden ser llenados masivamente.
+     * Esto permite usar Log::create([...]) de forma segura.
+     */
     protected $fillable = [
-        'user_id', 
-        'accion', 
-        'modulo', 
-        'ip'
+        'user_id', // ID del usuario que realizó la acción
+        'accion',  // Descripción de lo que pasó (ej: "Subió un archivo")
+        'modulo',  // Área del sistema donde ocurrió (ej: "INPUTS", "AUTH")
+        'ip'       // Dirección IP desde donde se realizó la petición
     ];
 
     /**
-     * Relación con el usuario
+     * Define la relación inversa de pertenencia.
+     * Indica que cada registro de log pertenece a un usuario específico.
+     * * @return BelongsTo
      */
     public function user(): BelongsTo
     {
+        // Esto permite obtener los datos del usuario desde el log: $log->user->name
         return $this->belongsTo(User::class);
     }
 }
