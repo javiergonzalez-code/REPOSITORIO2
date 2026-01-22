@@ -41,7 +41,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="header-actions">
+                <div class="header-actions mt-5">
                     <a href="{{ route('home') }}" class="btn-ragon-outline">
                         <i class="fas fa-th-large me-2"></i> PANEL DE CONTROL
                     </a>

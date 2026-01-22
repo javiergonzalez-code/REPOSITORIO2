@@ -80,6 +80,12 @@
                                     {{ $ordenes->count() }} Registros encontrados
                                 </span>
                             </div>
+
+                            <div class="header-actions mt-5">
+                                <a href="{{ route('home') }}" class="btn-ragon-outline">
+                                    <i class="fas fa-th-large me-2"></i> PANEL DE CONTROL
+                                </a>
+                            </div>
                         </div>
 
                         {{-- Buscador --}}
@@ -164,12 +170,12 @@
                                             {{-- Reemplaza el botón del ojo por este --}}
                                             <td class="text-end pe-4">
                                                 <div class="d-inline-flex gap-2">
-                                            <a href="{{ route('oc.preview', $oc->id) }}"
-                                                class="btn btn-outline-light btn-sm text-dark border shadow-sm"
-                                                title="Previsualizar Contenido">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                            </div>
+                                                    <a href="{{ route('oc.preview', $oc->id) }}"
+                                                        class="btn btn-outline-light btn-sm text-dark border shadow-sm"
+                                                        title="Previsualizar Contenido">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                </div>
                                             </td>
                                         </tr>
                                     @empty
