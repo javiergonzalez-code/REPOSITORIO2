@@ -7,6 +7,9 @@ use App\Http\Controllers\ErroresController;
 use App\Http\Controllers\InputController;
 use App\Http\Controllers\OcController;
 use App\Http\Controllers\LogsController;
+use App\Http\Controllers\Usercontroller;
+use App\Models\User;
+
 
 /**
  * REDIRECCIÓN INICIAL
@@ -57,4 +60,6 @@ Route::middleware(['auth'])->group(function () {
     
     // Previsualización de archivos (CSV/XML) mediante ID
     Route::get('/oc/preview/{id}', [OcController::class, 'preview'])->name('oc.preview');
+
+    Route::get('/users', [Usercontroller::class, 'index'])->name('users.index');
 });

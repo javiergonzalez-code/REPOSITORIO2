@@ -42,7 +42,7 @@
             </a>
             
             {{-- Tarjeta para Manejo de usuarios y privilegios --}}
-            <a href="{{ route('oc.index') }}" class="dashboard-card">
+            <a href="{{ route('users.index') }}" class="dashboard-card">
             <i class="fas fa-user fa-2x"></i>
                 <h3 class="fw-bold">Usuarios</h3>    
             </a>
