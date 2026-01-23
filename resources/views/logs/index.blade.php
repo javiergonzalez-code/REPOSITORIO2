@@ -27,7 +27,7 @@
     <div class="custom-max-width py-5 px-3">
         
         {{-- Encabezado --}}
-        <div class="audit-header-wrapper mb-5">
+        <div class="audit-header-wrapper mb-5 border-radius-5">
             <div class="d-flex justify-content-between align-items-center p-4 bg-white shadow-sm rounded-4 border-0">
                 <div class="d-flex align-items-center">
                     <div class="header-icon-box me-4">

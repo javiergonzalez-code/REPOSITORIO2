@@ -4,21 +4,27 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
     // DEFINIR LOS ROLES
     private $roles = ['Administrador', 'Proveedor'];
+
     public function index(Request $request)
     {
         $search = $request->input('search');
         $users = User::when($search, function ($query, $search) {
             return $query->where('name', 'like', "%{$search}%")
-                ->orWhere('email', 'like', "%{$search}%");
+                ->orWhere('email', 'like', "%{$search}%")
+                ->orWhere('codigo', 'like', "%{$search}%")
+                ->orWhere('rfc', 'like', "%{$search}%");
         })
-            ->orderby('name')
-            ->paginate(15)
-            ->withQueryString();
+        ->orderBy('name', 'asc') // Opcional: para que salgan ordenados
+        ->paginate(15)
+        ->withQueryString(); // Mantiene la búsqueda al cambiar de página
+
         return view('users.index', compact('users', 'search'));
     }
 
@@ -31,22 +37,28 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'name'     => ['required', 'string', 'max:255'],
+            'codigo'   => ['required', 'string', 'unique:users'],
+            'rfc'      => ['nullable', 'string', 'max:13', 'unique:users'],
+            'email'    => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'telefono' => ['nullable', 'string', 'max:20'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'role' => ['required', Rule::in($this->roles)],
+            'role'     => ['required', Rule::in($this->roles)],
         ]);
 
         User::create([
-            'name' => $validatedData['name'],
-            'email' => $validatedData['email'],
+            'name'     => $validatedData['name'],
+            'codigo'   => $validatedData['codigo'],
+            'rfc'      => $validatedData['rfc'],
+            'email'    => $validatedData['email'],
+            'telefono' => $validatedData['telefono'],
             'password' => Hash::make($validatedData['password']),
-            'role' => $validatedData['role'],
+            'role'     => $validatedData['role'],
         ]);
 
-        return redirect()->route('users.index')
-            ->with('success', 'Colaborador registrado correctamente.');
+        return redirect()->route('users.index')->with('success', 'Usuario creado correctamente.');
     }
+
     public function edit(User $user)
     {
         $roles = $this->roles;
@@ -56,10 +68,12 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $validatedData = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'role' => ['required', Rule::in($this->roles)],
-            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+            'name'     => ['required', 'string', 'max:255'],
+            'codigo'   => ['required', Rule::unique('users')->ignore($user->id)],
+            'rfc'      => ['nullable', Rule::unique('users')->ignore($user->id)],
+            'email'    => ['required', 'email', Rule::unique('users')->ignore($user->id)],
+            'role'     => ['required', Rule::in($this->roles)],
+            'password' => ['nullable', 'min:8', 'confirmed'],
         ]);
 
         $user->fill($request->except('password'));
@@ -70,19 +84,16 @@ class UserController extends Controller
 
         $user->save();
 
-        return redirect()->route('users.index')
-                         ->with('success', 'Datos del colaborador actualizados.');
+        return redirect()->route('users.index')->with('success', 'Usuario actualizado.');
     }
 
     public function destroy(User $user)
     {
-        // Seguridad: No permitir que el usuario actual se borre a sí mismo
         if (auth()->id() === $user->id) {
             return back()->with('error', 'Operación no permitida: No puedes eliminar tu propio acceso.');
         }
 
         $user->delete();
-        return redirect()->route('users.index')
-                         ->with('success', 'Acceso revocado y usuario eliminado.');
+        return redirect()->route('users.index')->with('success', 'Usuario eliminado.');
     }
 }
