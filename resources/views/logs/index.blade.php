@@ -28,7 +28,7 @@
         
         {{-- Encabezado --}}
         <div class="audit-header-wrapper mb-5">
-            <div class="d-flex justify-content-between align-items-center p-4 bg-white shadow-sm rounded-4 border">
+            <div class="d-flex justify-content-between align-items-center p-4 bg-white shadow-sm rounded-4 border-0">
                 <div class="d-flex align-items-center">
                     <div class="header-icon-box me-4">
                         <i class="fas fa-shield-check"></i>

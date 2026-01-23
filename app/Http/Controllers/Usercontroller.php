@@ -70,7 +70,7 @@ class UserController extends Controller
 
         $user->save();
 
-        return redirect()->route('usuarios.index')
+        return redirect()->route('users.index')
                          ->with('success', 'Datos del colaborador actualizados.');
     }
 
@@ -82,7 +82,7 @@ class UserController extends Controller
         }
 
         $user->delete();
-        return redirect()->route('usuarios.index')
+        return redirect()->route('users.index')
                          ->with('success', 'Acceso revocado y usuario eliminado.');
     }
 }
