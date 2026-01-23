@@ -76,7 +76,7 @@
                                 <p class="text-muted mb-0">Visualiza y gestiona los archivos cargados al sistema</p>
                             </div>
                             <div class="col-md-5 text-md-end">
-                                <span class="badge bg-blue-ragon px-3 py-2 rounded-pill shadow-sm">
+                                <span class="badge bg-blue-ragon px-3 py-2 rounded-pill ">
                                     {{ $ordenes->count() }} Registros encontrados
                                 </span>
                             </div>
@@ -88,18 +88,24 @@
                             </div>
                         </div>
 
-                        {{-- Buscador --}}
-                        <div class="row mt-4">
-                            <div class="col-12">
+                        <div class="row justify-content-center mb-5">
+                            <div class="col-md-10 col-lg-9">
                                 <form action="{{ route('oc.index') }}" method="GET">
-                                    <div class="input-group input-group-lg shadow-sm rounded-pill overflow-hidden border">
-                                        <span class="input-group-text bg-white border-0 ps-4">
-                                            <i class="fas fa-search text-muted"></i>
-                                        </span>
-                                        <input type="text" name="search" class="form-control border-0 px-3"
-                                            placeholder="Buscar por proveedor o nombre de archivo..."
-                                            value="{{ $search }}">
-                                        <button type="submit" class="btn btn-primary px-5 fw-bold">Buscar</button>
+                                    <div class="d-flex align-items-center gap-3">
+
+
+                                        <div class="search-container flex-grow-1 mt-2.5 mb-2.5">
+                                            <i class="fas fa-search text-muted  "></i>
+                                            <input type="text" name="search" class="search-input"
+                                                placeholder="¿Qué documento buscas hoy?" value="{{ $search }}"
+                                                autocomplete="off">
+                                        </div>
+
+
+                                        <button type="submit" class="btn btn-gradient shadow-sm px-5 py-3 text-nowrap ">
+                                            Buscar
+                                        </button>
+
                                     </div>
                                 </form>
                             </div>
@@ -161,7 +167,7 @@
                                                 <div class="d-inline-flex gap-2">
                                                     {{-- Busca esta línea en tu archivo index.blade.php y cámbiala por esta --}}
                                                     <a href="{{ route('oc.download', $oc->id) }}"
-                                                        class="btn btn-primary btn-sm px-4 rounded-pill shadow-sm fw-bold"
+                                                        class="btn btn-primary btn-sm px-4 rounded-pill fw-bold"
                                                         target="_blank"> {{-- El target="_blank" ayuda a ver si hay un error oculto --}}
                                                         <i class="fas fa-download me-2"></i>Descargar
                                                     </a>
@@ -171,9 +177,9 @@
                                             <td class="text-end pe-4">
                                                 <div class="d-inline-flex gap-2">
                                                     <a href="{{ route('oc.preview', $oc->id) }}"
-                                                        class="btn btn-outline-light btn-sm text-dark border shadow-sm"
+                                                        class="btn btn-outline-light btn-sm text-dark border-0"
                                                         title="Previsualizar Contenido">
-                                                        <i class="fas fa-eye"></i>
+                                                        <i class="fas fa-eye border-0"></i>
                                                     </a>
                                                 </div>
                                             </td>

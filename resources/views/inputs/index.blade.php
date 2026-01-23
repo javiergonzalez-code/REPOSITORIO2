@@ -60,7 +60,7 @@
                             <span class="badge-format">CSV</span>
                             <span class="badge-format">XML</span>
                         </p>
-                        <div class="divider-v"></div>
+
                         <span class="size-limit">MÁX. 5MB</span>
                     </div>
                 </div>
