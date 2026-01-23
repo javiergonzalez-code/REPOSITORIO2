@@ -35,10 +35,10 @@ Route::post('/login', [AuthController::class, 'login'])->name('login.post');
  * Si alguien intenta entrar sin sesión, Laravel lo expulsará al 'login'.
  */
 Route::middleware(['auth'])->group(function () {
-    
+
     // Dashboard o página de inicio tras el login
     Route::get('/home', [AuthController::class, 'home'])->name('home');
-    
+
     // Cierre de sesión (se usa POST por seguridad para evitar cierres accidentales)
     Route::post('/logout', [LogoutController::class, 'destroy'])->name('logout');
 
@@ -54,12 +54,21 @@ Route::middleware(['auth'])->group(function () {
 
     // Módulo de Órdenes de Compra (OC)
     Route::get('/oc', [OcController::class, 'index'])->name('oc.index');
-    
+
     // Descarga de archivos mediante ID
     Route::get('/oc/download/{id}', [OcController::class, 'download'])->name('oc.download');
-    
+
     // Previsualización de archivos (CSV/XML) mediante ID
     Route::get('/oc/preview/{id}', [OcController::class, 'preview'])->name('oc.preview');
 
-    Route::get('/users', [Usercontroller::class, 'index'])->name('users.index');
+    Route::resource('users', UserController::class)->names([
+        'index'   => 'users.index',
+        'create'  => 'users.create',
+        'store'   => 'users.store',
+        'edit'    => 'users.edit',
+        'update'  => 'users.update',
+        'destroy' => 'users.destroy',
+    ])->parameters([
+        'users' => 'user' // Esto mantiene el parámetro como {user} para el controlador
+    ]);
 });
