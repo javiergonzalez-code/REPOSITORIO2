@@ -21,7 +21,7 @@ class UserController extends Controller
                 ->orWhere('codigo', 'like', "%{$search}%")
                 ->orWhere('rfc', 'like', "%{$search}%");
         })
-        ->orderBy('name', 'asc') // Opcional: para que salgan ordenados
+        ->orderBy('name', 'asc') 
         ->paginate(15)
         ->withQueryString(); // Mantiene la búsqueda al cambiar de página
 

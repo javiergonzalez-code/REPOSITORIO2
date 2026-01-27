@@ -52,6 +52,12 @@ class OcController extends Controller
 
         // Descarga el archivo usando el nombre original que tenía cuando se subió
         return response()->download($path, $oc->nombre_original);
+
+        Log::create([
+        'user_id' => auth()->id(),
+        'accion'  => 'Descargó archivo ID: #'.$id,
+        'modulo'  => 'ORDENES DE COMPRA'
+    ]);
     }
 
     /**

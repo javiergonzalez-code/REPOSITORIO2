@@ -14,8 +14,8 @@ class Log extends Model
     protected $fillable = [
         'user_id', // ID del usuario que realizó la acción
         'accion',  // Descripción de lo que pasó (ej: "Subió un archivo")
-        'modulo',  // Área del sistema donde ocurrió (ej: "INPUTS", "AUTH")
-        'ip'       // Dirección IP desde donde se realizó la petición
+        'modulo'  // Área del sistema donde ocurrió (ej: "INPUTS", "AUTH")
+
     ];
 
     /**

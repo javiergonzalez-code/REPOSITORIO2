@@ -19,7 +19,7 @@ class AuthController extends Controller
         if (Auth::check()) {
             return redirect()->route('home');
         }
-        
+
         // Si no está autenticado, muestra la vista 'login.blade.php'
         return view('login');
     }
@@ -38,13 +38,18 @@ class AuthController extends Controller
         // 2. Intento de autenticación: Auth::attempt busca al usuario por email 
         // y compara la contraseña (hashing automático)
         if (Auth::attempt($credentials)) {
-            
+
             // 3. Seguridad: Si el login es correcto, regenera el ID de la sesión
             // para evitar ataques de "Session Fixation".
             $request->session()->regenerate();
 
             // 4. Redirección: Envía al usuario a la ruta protegida 'home'
             return redirect()->route('home');
+            Log::create([
+                'user_id' => auth()->id(),
+                'accion'  => 'Inicio de sesión exitoso',
+                'modulo'  => 'AUTH'
+            ]);
         }
 
         // 5. Error: Si las credenciales no coinciden, regresa a la página anterior

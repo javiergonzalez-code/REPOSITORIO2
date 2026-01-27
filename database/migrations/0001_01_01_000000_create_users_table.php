@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('rfc', 13)->unique()->nullable(); // Campo solicitado
-            $table->string('telefono')->nullable(); // Campo solicitado
+            $table->string('rfc', 13)->unique()->nullable();
+            $table->string('telefono')->nullable(); 
             $table->string('role')->default('Proveedor'); 
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
