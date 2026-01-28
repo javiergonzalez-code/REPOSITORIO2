@@ -1010,3 +1010,35 @@ th:nth-last-child(2), td:nth-last-child(2) {
         color: #a0aec0;
         opacity: 1; 
     }
+
+    /* --- Variables Globales y Modo Oscuro --- */
+:root {
+    --primary-color: #3182ce;
+    --bg-light: #f7fafc;
+    --text-main: #2d3748;
+    --navbar-bg: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+    --card-bg: #ffffff;
+}
+
+/* Variables para Modo Oscuro */
+body.dark-mode {
+    --bg-light: #1a202c;
+    --text-main: #f7fafc;
+    --navbar-bg: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    --card-bg: #2d3748;
+}
+
+body {
+    background-color: var(--bg-light); /* */
+    color: var(--text-main); /* */
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.navbar-custom {
+    background: var(--navbar-bg) !important; /* */
+}
+
+.dashboard-card, .login-card, .custom-card {
+    background: var(--card-bg) !important; /* */
+    color: var(--text-main) !important;
+}

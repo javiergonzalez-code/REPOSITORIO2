@@ -23,6 +23,11 @@
             REPOSITORIO
         </a>
 
+        {{-- Botón de Modo Oscuro --}}
+            <button id="dark-mode-toggle" class="btn btn-link text-white me-3" style="text-decoration: none;">
+                <i class="fas fa-moon" id="dark-mode-icon"></i>
+            </button>
+
         <div class="ms-auto d-flex align-items-center"> {{-- Contenedor derecho directo --}}
             @auth
                 <div class="dropdown">
