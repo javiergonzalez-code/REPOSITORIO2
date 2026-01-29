@@ -18,7 +18,7 @@ class UserController extends Controller
         $users = User::when($search, function ($query, $search) {
             return $query->where('name', 'like', "%{$search}%")
                 ->orWhere('email', 'like', "%{$search}%")
-                ->orWhere('codigo', 'like', "%{$search}%")
+                ->orWhere('id', 'like', "%{$search}%")
                 ->orWhere('rfc', 'like', "%{$search}%");
         })
         ->orderBy('name', 'asc') 
@@ -38,7 +38,7 @@ class UserController extends Controller
     {
         $validatedData = $request->validate([
             'name'     => ['required', 'string', 'max:255'],
-            'codigo'   => ['required', 'string', 'unique:users'],
+            'id'   => ['required', 'string', 'unique:users'],
             'rfc'      => ['nullable', 'string', 'max:13', 'unique:users'],
             'email'    => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'telefono' => ['nullable', 'string', 'max:20'],
@@ -48,7 +48,7 @@ class UserController extends Controller
 
         User::create([
             'name'     => $validatedData['name'],
-            'codigo'   => $validatedData['codigo'],
+            'id'   => $validatedData['id'],
             'rfc'      => $validatedData['rfc'],
             'email'    => $validatedData['email'],
             'telefono' => $validatedData['telefono'],
@@ -69,7 +69,7 @@ class UserController extends Controller
     {
         $validatedData = $request->validate([
             'name'     => ['required', 'string', 'max:255'],
-            'codigo'   => ['required', Rule::unique('users')->ignore($user->id)],
+            'id'   => ['required', Rule::unique('users')->ignore($user->id)],
             'rfc'      => ['nullable', Rule::unique('users')->ignore($user->id)],
             'email'    => ['required', 'email', Rule::unique('users')->ignore($user->id)],
             'role'     => ['required', Rule::in($this->roles)],
