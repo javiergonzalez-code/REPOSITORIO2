@@ -18,40 +18,47 @@
     <div id="app">
         {{-- Navbar con clases de Bootstrap y tu clase personalizada --}}
         <nav class="navbar navbar-expand-md navbar-dark navbar-custom shadow-lg">
-    <div class="container-fluid px-4"> {{-- Usamos fluid y padding para dar aire a los lados --}}
-        <a class="navbar-brand" href="{{ url('/home') }}">
-            REPOSITORIO
-        </a>
+            <div class="container-fluid px-4"> {{-- Usamos fluid y padding para dar aire a los lados --}}
+                <a class="navbar-brand" href="{{ url('/home') }}">
+                    REPOSITORIO
+                </a>
 
-        {{-- Botón de Modo Oscuro --}}
-            <button id="dark-mode-toggle" class="btn btn-link text-white me-3" style="text-decoration: none;">
-                <i class="fas fa-moon" id="dark-mode-icon"></i>
-            </button>
 
-        <div class="ms-auto d-flex align-items-center"> {{-- Contenedor derecho directo --}}
-            @auth
-                <div class="dropdown">
-                    <a class="nav-link dropdown-toggle d-flex align-items-center text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-user-circle fa-lg me-2"></i>
-                        <span class="d-none d-sm-inline">{{ Auth::user()->name }}</span>
-                    </a>
 
-                    <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0">
-                        <li>
-                            <a class="dropdown-item dropdown-item-danger d-flex align-items-center" href="{{ route('logout') }}"
-                               onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                <i class="fas fa-sign-out-alt me-2"></i> Cerrar Sesión
+                <div class="ms-auto d-flex align-items-center gap-3"> {{-- gap-3 asegura el espacio a un lado --}}
+                    @auth
+                        {{-- Botón de Modo Oscuro --}}
+                        <a id="dark-mode-toggle" href="javascript:void(0)" class="text-white d-flex align-items-center"
+                            style="text-decoration: none;">
+                            <i class="fas fa-moon" id="dark-mode-icon" style="font-size: 1.1rem;"></i>
+                        </a>
+
+                        {{-- Dropdown de Usuario --}}
+                        <div class="dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center text-white p-0" href="#"
+                                role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user-circle fa-lg me-2"></i>
+                                <span class="d-none d-sm-inline">{{ Auth::user()->name }}</span>
                             </a>
-                        </li>
-                    </ul>
+
+                            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0">
+                                <li>
+                                    <a class="dropdown-item dropdown-item-danger d-flex align-items-center"
+                                        href="{{ route('logout') }}"
+                                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                        <i class="fas fa-sign-out-alt me-2"></i> Cerrar Sesión
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                            @csrf
+                        </form>
+                    @endauth
                 </div>
-                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                    @csrf
-                </form>
-            @endauth
-        </div>
-    </div>
-</nav>
+            </div>
+        </nav>
 
         {{-- Espaciado para el contenido --}}
         <main class="py-4">
@@ -59,4 +66,5 @@
         </main>
     </div>
 </body>
+
 </html>
