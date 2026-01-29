@@ -1064,3 +1064,16 @@ body {
 body.dark-mode #dark-mode-icon.fa-sun {
     color: #fbd38d !important; /* Amarillo suave */
 }
+
+    /* Pequeños ajustes para suavizar Bootstrap */
+    .card { border: none; }
+    .form-control:focus, .form-select:focus {
+        border-color: #86b7fe; /* Ajusta este color al de tu marca si quieres */
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+    }
+    .form-floating > label { color: #6c757d; }
+    .form-floating > .form-control:focus ~ label,
+    .form-floating > .form-control:not(:placeholder-shown) ~ label {
+        color: #0d6efd; /* Color activo del label */
+        font-weight: 600;
+    }
