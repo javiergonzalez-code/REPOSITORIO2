@@ -29,31 +29,25 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        // 1. Validación: Verifica que el email sea válido y la contraseña tenga al menos 8 caracteres
         $credentials = $request->validate([
             'email' => 'required|email',
             'password' => 'required|min:8',
         ]);
 
-        // 2. Intento de autenticación: Auth::attempt busca al usuario por email 
-        // y compara la contraseña (hashing automático)
         if (Auth::attempt($credentials)) {
-
-            // 3. Seguridad: Si el login es correcto, regenera el ID de la sesión
-            // para evitar ataques de "Session Fixation".
             $request->session()->regenerate();
 
-            // 4. Redirección: Envía al usuario a la ruta protegida 'home'
-            return redirect()->route('home');
-            Log::create([
+
+            \App\Models\Log::create([
                 'user_id' => auth()->id(),
                 'accion'  => 'Inicio de sesión exitoso',
                 'modulo'  => 'AUTH'
             ]);
+            // ---------------------------------------------------
+
+            return redirect()->route('home');
         }
 
-        // 5. Error: Si las credenciales no coinciden, regresa a la página anterior
-        // con un mensaje de error para el campo email.
         return back()->withErrors(['email' => 'Credenciales incorrectas']);
     }
 
