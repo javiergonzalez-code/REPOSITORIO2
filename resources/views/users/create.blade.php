@@ -1,126 +1,195 @@
 @extends('layouts.app')
 
 @section('content')
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-10 col-lg-8">
+                <div class="card login-card shadow-lg border-0 overflow-hidden">
 
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-7">
-            <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
-                
-                <div class="card-header bg-gradient bg-primary text-white p-4 text-center">
-                    <h3 class="fw-bold mb-1">Crear Cuenta</h3>
-                    <p class="mb-0 opacity-75 small">Complete la información para registrar un nuevo usuario</p>
-                </div>
+                    <div class="d-flex justify-content-center align-items-center py-4 mt-2 border-top">
 
-                <div class="card-body p-4 p-md-5 bg-light bg-opacity-10">
-                    <form method="POST" action="{{ route('users.store') }}">
-                        @csrf
-
-                        <div class="row g-3 mb-4">
-                            <div class="col-12">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control rounded-3 @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}" placeholder="Nombre Completo" required autofocus>
-                                    <label for="name"><i class="bi bi-person me-2"></i>Nombre Completo</label>
-                                    @error('name')
-                                        <div class="invalid-feedback ps-2">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control rounded-3 @error('id') is-invalid @enderror" id="id" name="id" value="{{ old('id') }}" placeholder="Código" required>
-                                    <label for="id"><i class="bi bi-upc-scan me-2"></i>ID</label>
-                                    @error('id')
-                                        <div class="invalid-feedback ps-2">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control rounded-3 @error('rfc') is-invalid @enderror" id="rfc" name="rfc" value="{{ old('rfc') }}" placeholder="RFC">
-                                    <label for="rfc"><i class="bi bi-card-heading me-2"></i>RFC (Opcional)</label>
-                                    @error('rfc')
-                                        <div class="invalid-feedback ps-2">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-7">
-                                <div class="form-floating">
-                                    <input type="email" class="form-control rounded-3 @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email') }}" placeholder="nombre@ejemplo.com" required>
-                                    <label for="email"><i class="bi bi-envelope me-2"></i>Correo Electrónico</label>
-                                    @error('email')
-                                        <div class="invalid-feedback ps-2">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-5">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control rounded-3 @error('telefono') is-invalid @enderror" id="telefono" name="telefono" value="{{ old('telefono') }}" placeholder="Teléfono">
-                                    <label for="telefono"><i class="bi bi-telephone me-2"></i>Teléfono</label>
-                                    @error('telefono')
-                                        <div class="invalid-feedback ps-2">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-floating mb-4">
-                            <select class="form-select rounded-3 @error('role') is-invalid @enderror" id="role" name="role" required>
-                                <option value="" selected disabled>Seleccione una opción</option>
-                                @foreach($roles as $roleOption)
-                                    <option value="{{ $roleOption }}" {{ old('role') == $roleOption ? 'selected' : '' }}>{{ $roleOption }}</option>
-                                @endforeach
-                            </select>
-                            <label for="role"><i class="bi bi-shield-lock me-2"></i>Rol de Usuario</label>
-                            @error('role')
-                                <div class="invalid-feedback ps-2">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <hr class="my-4 text-muted opacity-25">
-
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="password" class="form-control rounded-3 @error('password') is-invalid @enderror" id="password" name="password" placeholder="Contraseña" required>
-                                    <label for="password"><i class="bi bi-lock me-2"></i>Contraseña</label>
-                                    @error('password')
-                                        <div class="invalid-feedback ps-2">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="password" class="form-control rounded-3" id="password-confirm" name="password_confirmation" placeholder="Confirmar" required>
-                                    <label for="password-confirm"><i class="bi bi-check-circle me-2"></i>Confirmar</label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-5">
-                            <a href="{{ route('users.index') }}" class="btn btn-light btn-lg text-secondary border fw-medium px-4">
-                                Cancelar
+                        <div class="header-actions mt-3">
+                            <a href="{{ route('home') }}" class="btn-ragon-outline">
+                                <i class="fas fa-th-large me-2"></i> PANEL DE CONTROL
                             </a>
-                            <button type="submit" class="btn btn-primary btn-lg fw-bold px-5 shadow-sm">
-                                <i class="bi bi-save2 me-2"></i>Guardar Usuario
-                            </button>
                         </div>
 
-                    </form>
+                        <div class="header-actions mt-3">
+                            <a href="{{ route('users.index') }}" class="btn-ragon-outline px-5 py-3 shadow-lg mt-2">
+                                <i class="fas fa-th-large me-2 fas fa-arrow-right ms-3"></i> ATRÁS
+                            </a>
+                        </div>
+                    </div>
+                    <div class="login-header-modern py-4">
+                        <div class="d-flex justify-content-center mb-3">
+                            <div class="brand-icon-wrapper" style="width: 50px; height: 50px; font-size: 1.5rem;">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                        </div>
+                        <h3 class="fw-bold mb-1 text-white text-uppercase" style="letter-spacing: 1px;">Nuevo Usuario
+                        </h3>
+                        <p class="text-white-50 mb-0" style="font-size: 0.9rem;">Complete el formulario para registrar
+                            un
+                            miembro</p>
+                    </div>
+
+                    <div class="card-body p-4 p-md-5">
+                        <form method="POST" action="{{ route('users.store') }}">
+                            @csrf
+
+                            {{-- Sección: Información Personal --}}
+                            <h6 class="text-uppercase text-muted fw-bold mb-4"
+                                style="font-size: 0.75rem; letter-spacing: 1px;">
+                                <i class="fas fa-id-card me-2"></i>Información General
+                            </h6>
+
+                            <div class="row g-4 mb-4">
+                                {{-- Nombre Completo --}}
+                                <div class="col-12">
+                                    <label for="name" class="form-label-custom">Nombre Completo</label>
+                                    <div class="input-group-modern">
+                                        <i class="fas fa-user icon"></i>
+                                        <input type="text" class="form-input @error('name') is-invalid @enderror"
+                                            id="name" name="name" value="{{ old('name') }}"
+                                            placeholder="Ej. Juan Pérez" required autofocus>
+                                    </div>
+                                    @error('name')
+                                        <div class="error-msg">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                {{-- ID y RFC --}}
+                                <div class="col-md-6">
+                                    <label for="id" class="form-label-custom">ID / Código de Empleado</label>
+                                    <div class="input-group-modern">
+                                        <i class="fas fa-hashtag icon"></i>
+                                        <input type="text" class="form-input @error('id') is-invalid @enderror"
+                                            id="id" name="id" value="{{ old('id') }}"
+                                            placeholder="Ej. EMP-001" required>
+                                    </div>
+                                    @error('id')
+                                        <div class="error-msg">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="rfc" class="form-label-custom">RFC</label>
+                                    <div class="input-group-modern">
+                                        <i class="fas fa-passport icon"></i>
+                                        <input type="text" class="form-input @error('rfc') is-invalid @enderror"
+                                            id="rfc" name="rfc" value="{{ old('rfc') }}"
+                                            placeholder="Clave RFC">
+                                    </div>
+                                    @error('rfc')
+                                        <div class="error-msg">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            {{-- Sección: Contacto y Rol --}}
+                            <h6 class="text-uppercase text-muted fw-bold mb-4 mt-5"
+                                style="font-size: 0.75rem; letter-spacing: 1px;">
+                                <i class="fas fa-shield-alt me-2"></i>Cuenta y Acceso
+                            </h6>
+
+                            <div class="row g-4 mb-4">
+                                {{-- Email --}}
+                                <div class="col-md-7">
+                                    <label for="email" class="form-label-custom">Correo Electrónico</label>
+                                    <div class="input-group-modern">
+                                        <i class="fas fa-envelope icon"></i>
+                                        <input type="email" class="form-input @error('email') is-invalid @enderror"
+                                            id="email" name="email" value="{{ old('email') }}"
+                                            placeholder="usuario@empresa.com" required>
+                                    </div>
+                                    @error('email')
+                                        <div class="error-msg">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                {{-- Teléfono --}}
+                                <div class="col-md-5">
+                                    <label for="telefono" class="form-label-custom">Teléfono</label>
+                                    <div class="input-group-modern">
+                                        <i class="fas fa-phone icon"></i>
+                                        <input type="text" class="form-input @error('telefono') is-invalid @enderror"
+                                            id="telefono" name="telefono" value="{{ old('telefono') }}"
+                                            placeholder="55 1234 5678">
+                                    </div>
+                                    @error('telefono')
+                                        <div class="error-msg">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                {{-- Rol --}}
+                                <div class="col-12">
+                                    <label for="role" class="form-label-custom">Rol de Usuario</label>
+                                    <div class="input-group-modern">
+                                        <i class="fas fa-user-tag icon"></i>
+                                        <select class="form-input @error('role') is-invalid @enderror" id="role"
+                                            name="role" required style="background-color: #f8fafc;">
+                                            <option value="" selected disabled>Seleccione un nivel de acceso...
+                                            </option>
+                                            @foreach ($roles as $roleOption)
+                                                <option value="{{ $roleOption }}"
+                                                    {{ old('role') == $roleOption ? 'selected' : '' }}>
+                                                    {{ $roleOption }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    @error('role')
+                                        <div class="error-msg">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="row g-4 mb-5">
+                                {{-- Contraseñas --}}
+                                <div class="col-md-6">
+                                    <label for="password" class="form-label-custom">Contraseña</label>
+                                    <div class="input-group-modern">
+                                        <i class="fas fa-lock icon"></i>
+                                        <input type="password" class="form-input @error('password') is-invalid @enderror"
+                                            id="password" name="password" placeholder="********" required>
+                                    </div>
+                                    @error('password')
+                                        <div class="error-msg">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="password-confirm" class="form-label-custom">Confirmar
+                                        Contraseña</label>
+                                    <div class="input-group-modern">
+                                        <i class="fas fa-check-circle icon"></i>
+                                        <input type="password" class="form-input" id="password-confirm"
+                                            name="password_confirmation" placeholder="********" required>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="d-flex justify-content-end align-items-center pt-4 mt-4 border-top">
+
+                                <div class="header-actions mt-3">
+                                    <a href="{{ route('users.index') }}"
+                                        class="btn-ragon-outline px-5 py-3 shadow-lg mt-2">
+                                        <i class="fas fa-th-large me-2 fas fa-arrow-right ms-3"></i> CANCELAR
+                                    </a>
+                                </div>
+
+                                <button type="submit" class="btn btn-ragon-modern px-5 py-3 shadow-lg mt-5"
+                                    style="width: auto;">
+                                    <span>Guardar Usuario</span>
+                                    <i class="fas fa-arrow-right ms-3"></i>
+                                </button>
+
+                            </div>
+
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-
-<style>
-
-</style>
 @endsection
