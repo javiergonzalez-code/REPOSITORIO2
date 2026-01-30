@@ -69,7 +69,6 @@ class UserController extends Controller
     {
         $validatedData = $request->validate([
             'name'     => ['required', 'string', 'max:255'],
-            'id'   => ['required', Rule::unique('users')->ignore($user->id)],
             'rfc'      => ['nullable', Rule::unique('users')->ignore($user->id)],
             'email'    => ['required', 'email', Rule::unique('users')->ignore($user->id)],
             'role'     => ['required', Rule::in($this->roles)],
