@@ -13,7 +13,7 @@
                         </div>
                         <div class="col-md-5 text-md-end mt-5">
                             <span class="badge bg-blue-ragon-gradient px-4 py-2 rounded-pill shadow-sm">
-                                {{ $ordenes->count() }} Registros
+                                {{ $ordenes->total() }} Registros
                             </span>
                         </div>
 

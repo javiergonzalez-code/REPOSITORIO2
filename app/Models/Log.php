@@ -4,9 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Log extends Model
 {
+    use HasFactory;
     /**
      * Define la "lista blanca" de campos que pueden ser llenados masivamente.
      * Esto permite usar Log::create([...]) de forma segura.

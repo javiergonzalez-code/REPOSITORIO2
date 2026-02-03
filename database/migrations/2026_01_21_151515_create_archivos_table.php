@@ -16,6 +16,7 @@ public function up(): void
         $table->foreignId('user_id')->constrained()->onDelete('cascade');
         $table->string('nombre_original');
         $table->string('nombre_sistema');
+        $table->string('tipo_archivo');
         $table->string('ruta');
         $table->timestamps();
     });
