@@ -22,7 +22,7 @@ class UserController extends Controller
                 ->orWhere('rfc', 'like', "%{$search}%");
         })
         ->orderBy('name', 'asc') 
-        ->paginate(15)
+        ->paginate(5)
         ->withQueryString(); // Mantiene la búsqueda al cambiar de página
 
         return view('users.index', compact('users', 'search'));
