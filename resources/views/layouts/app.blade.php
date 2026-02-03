@@ -23,15 +23,19 @@
                     REPOSITORIO
                 </a>
 
-
-
-                <div class="ms-auto d-flex align-items-center gap-3"> {{-- gap-3 asegura el espacio a un lado --}}
-                    @auth
-                        {{-- Botón de Modo Oscuro --}}
-                        <a id="dark-mode-toggle" href="javascript:void(0)" class="text-white d-flex align-items-center"
+                                        {{-- Botón de Modo Oscuro --}}
+                        <a id="dark-mode-toggle" href="javascript:void(0)" class="text-white d-flex align-items-center ml-5"
                             style="text-decoration: none;">
                             <i class="fas fa-moon" id="dark-mode-icon" style="font-size: 1.1rem;"></i>
                         </a>
+
+                <div class="ms-auto d-flex align-items-center gap-3"> {{-- gap-3 asegura el espacio a un lado --}}
+                    @auth
+                        {{-- Botón de Modo Oscuro
+                        <a id="dark-mode-toggle" href="javascript:void(0)" class="text-white d-flex align-items-center"
+                            style="text-decoration: none;">
+                            <i class="fas fa-moon" id="dark-mode-icon" style="font-size: 1.1rem;"></i>
+                        </a> --}}
 
                         {{-- Dropdown de Usuario --}}
                         <div class="dropdown">
@@ -59,21 +63,21 @@
                 </div>
             </div>
         </nav>
-<div class="container mt-3">
-    @if (session('success'))
+        <div class="container mt-3">
+            {{-- @if (session('success'))
         <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
             <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-    @endif
+    @endif --}}
 
-    @if (session('error'))
+            {{-- @if (session('error'))
         <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
             <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ session('error') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-    @endif
-
+    @endif --}}
+            {{-- 
     @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
             <strong><i class="bi bi-exclamation-octagon-fill me-2"></i> Por favor revisa los siguientes errores:</strong>
@@ -84,8 +88,8 @@
             </ul>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-    @endif
-</div>
+    @endif --}}
+        </div>
         {{-- Espaciado para el contenido --}}
         <main class="py-4">
             @yield('content')

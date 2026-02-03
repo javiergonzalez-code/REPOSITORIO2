@@ -29,7 +29,7 @@ class OcController extends Controller
                     });
             })
             ->latest() // Ordenar por creación (descendente)
-            ->paginate(10); // Paginación de 10 en 10
+            ->paginate(20); // Paginación de 20 en 20
 
         return view('oc.index', compact('ordenes', 'search'));
     }
@@ -65,11 +65,11 @@ class OcController extends Controller
      */
     public function preview($id)
     {
-        // 1. Obtener datos del archivo y su ruta
+        //Obtiene datos del archivo y su ruta
         $oc = Archivo::findOrFail($id);
         $path = storage_path('app/public/uploads/' . $oc->nombre_sistema);
 
-        // 2. Extraer la extensión del nombre original para saber cómo procesarlo
+        //Extrae la extensión del nombre original para saber cómo procesarlo
         $extension = pathinfo($oc->nombre_original, PATHINFO_EXTENSION);
 
         if ($extension == 'csv') {
@@ -88,8 +88,7 @@ class OcController extends Controller
             // Carga el archivo como un objeto de SimpleXML
             $xmlContent = simplexml_load_file($path);
 
-            // Truco: Convierte el objeto XML a JSON y luego a un Array asociativo de PHP
-            // Esto facilita mucho el recorrido de los datos en Blade
+            //Convierte el objeto XML a JSON y luego a un Array asociativo de PHP
             $data = json_decode(json_encode($xmlContent), true);
         }
 

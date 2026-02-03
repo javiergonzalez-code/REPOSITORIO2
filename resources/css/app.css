@@ -1216,3 +1216,21 @@ select.form-input {
     .alert-general-ragon {
         color: #1e40af;
     }
+
+        .main-centering-wrapper {
+            display: flex !important;
+            justify-content: center !important;
+            width: 100% !important;
+            margin: 0 auto !important;
+            padding: 0 !important;
+        }
+
+        .custom-max-width {
+            width: 100% !important;
+            max-width: 1300px !important;
+        }
+
+        .container-fluid {
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }

@@ -37,7 +37,7 @@
                 <div class="brand-icon-wrapper mb-3">
                     <i class="fas fa-file-import"></i>
                 </div>
-                <h2 class="h3 fw-bold mb-0">CARGA DE DATOS</h2>
+                <h2 class="h3 fw-bold mb-0 mt-5">CARGA DE DATOS</h2>
                 <span class="badge bg-blue-ragon mt-2 px-3">SISTEMA DE GESTIÓN RAGON</span>
 
                 <div class="header-actions mt-5">
@@ -135,7 +135,7 @@
         dropZone.addEventListener('drop', (e) => {
             const dt = e.dataTransfer;
             const files = dt.files;
-            fileInput.files = files; // Asignar archivos al input oculto
+            fileInput.files = files; 
             updateDisplay(files[0]);
         }, false);
 

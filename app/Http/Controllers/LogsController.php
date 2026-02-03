@@ -8,12 +8,16 @@ use Illuminate\Http\Request;
 
 class LogsController extends Controller
 {
+    /**
+     * Muestra la lista de logs con filtros aplicados.
+     */
     public function index(Request $request)
     {
-        // 1. Iniciamos la consulta cargando la relación con el usuario
+        // Inicia la consulta cargando la relación 'user'.
         $query = Log::with('user');
 
-        // 2. Filtro: Búsqueda General (Acción o Módulo)
+        // Si el usuario escribió algo en el campo 'search', buscamos coincidencias
+        // tanto en la descripción de la acción como en el nombre del módulo.
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
                 $q->where('accion', 'like', '%' . $request->search . '%')
@@ -21,35 +25,41 @@ class LogsController extends Controller
             });
         }
 
-        // 3. Filtro: Usuario (desde el datalist/input de texto)
+        // 'whereHas' permite filtrar los logs basandose en una columna de otra tabla (la de users).
         if ($request->filled('user')) {
             $query->whereHas('user', function ($q) use ($request) {
                 $q->where('name', 'like', '%' . $request->user . '%');
             });
         }
 
-        // 4. Filtro: Actividad (Select de acción)
+        // Para buscar solo "Inicios de sesión" o "Subida de archivos".
         if ($request->filled('accion')) {
             $query->where('accion', 'like', '%' . $request->accion . '%');
         }
 
-        // 5. Filtro: Fecha
+        // 'whereDate' extrae solo la parte de la fecha (año-mes-día) ignorando la hora
+        // para que la comparación con el input de tipo date sea exacta.
         if ($request->filled('fecha')) {
             $query->whereDate('created_at', $request->fecha);
         }
 
+        // Filtra los logs para ver solo las acciones de, por ejemplo "Admin"
         if ($request->filled('role')) {
             $query->whereHas('user', function ($q) use ($request) {
                 $q->where('role', $request->role);
             });
         }
-        // 6. Obtenemos resultados ordenados por el más reciente
+
+        // - latest(): Ordena por 'created_at' del más nuevo al más viejo.
+        // - paginate(20): Muestra solo 20 resultados por página
+        // - withQueryString(): . Mantiene los filtros activos al cambiar de página
+        //   (evita que al ir a la página 2 se pierda la búsqueda que se hizo)
         $logs = $query->latest()->paginate(20)->withQueryString();
 
-        // 7. Obtenemos los usuarios para que el buscador pueda sugerir nombres
+        // Traemos solo los nombres de los usuarios para llenar el buscador o sugerencias en la vista.
         $usuarios_filtro = User::select('name')->get();
 
-        // 8. Enviamos todo a la vista
+        // Envia los datos a la vista usando compact() para pasar las variables.
         return view('logs.index', compact('logs', 'usuarios_filtro'));
     }
 }

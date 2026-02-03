@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+// Importación de herramientas de Laravel
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage; // Facade para manejar el sistema de archivos
-use App\Models\Log; // Modelo para registrar actividades
-use App\Models\Archivo; // Modelo para la tabla de archivos
-use Illuminate\Support\Facades\Validator; // Para validaciones personalizadas
+use Illuminate\Support\Facades\Storage;     // Para interactuar con el disco duro/nube
+use App\Models\Log;                         // Para registrar auditoría de lo que pasa
+use App\Models\Archivo;                     // El modelo para la tabla donde guardamos los nombres de archivos
+use Illuminate\Support\Facades\Validator;   // Para validar que los datos sean correctos
 
 class InputController extends Controller
 {
@@ -14,6 +15,7 @@ class InputController extends Controller
      * Muestra la vista principal del formulario de subida.
      */
     public function index() {
+        // Retorna la vista ubicada en resources/views/inputs/index.blade.php
         return view('inputs.index');
     }
 
@@ -22,41 +24,51 @@ class InputController extends Controller
      */
     public function store(Request $request)
     {
-        // 1. VALIDACIÓN INICIAL: Verifica que sea un archivo y no supere los 10MB
+        // 1. VALIDACIÓN INICIAL: 
+        // Verifica que el campo 'archivo' esté presente, sea un archivo real y no pese más de 10MB (10240 KB)
         $validator = Validator::make($request->all(), [
-            'archivo' => 'required|file|max:10240', 
+            'archivo' => 'required|file|max:5120', 
         ]);
 
-        // 2. VALIDACIÓN DE EXTENSIÓN: Obtenemos la extensión y comparamos con las permitidas
+        // 2. VALIDACIÓN DE EXTENSIÓN: 
+        // ?-> es un operador seguro: si no hay archivo, no intenta sacar la extensión (evita errores)
         $extension = $request->file('archivo')?->getClientOriginalExtension();
         $allowedExtensions = ['csv', 'xlsx', 'xls', 'xml'];
 
-        // Si la validación básica falla o la extensión no es permitida
+        // Si la validación de Laravel falla O la extensión no está en nuestra lista blanca
         if ($validator->fails() || !in_array(strtolower($extension), $allowedExtensions)) {
-            // Registra el error en la tabla de Logs para auditoría
+            
+            // Auditoría: Registramos que alguien intentó subir algo no permitido
             Log::create([
-                'user_id' => auth()->id(), // ID del usuario logueado
+                'user_id' => auth()->id(), // Quién fue (null si no está logueado)
                 'accion' => 'Intento fallido: Formato .' . $extension . ' no permitido',
                 'modulo' => 'INPUTS',
-                'ip' => $request->ip() // Captura la IP de quien intentó subirlo
+                'ip' => $request->ip() // Guardamos su dirección IP por seguridad
             ]);
 
+            // Regresa a la página anterior con un mensaje de error para el usuario
             return back()->with('error', 'El archivo .' . $extension . ' no es válido. Solo CSV o Excel.');
         }
 
         try {
-            // 3. PROCESAMIENTO DEL ARCHIVO: Si el archivo existe y es válido
+            // 3. PROCESAMIENTO DEL ARCHIVO:
             if ($request->hasFile('archivo')) {
                 $file = $request->file('archivo');
+                
+                // Nombre original que traía el archivo desde la PC del usuario
                 $originalName = $file->getClientOriginalName();
                 
-                // Genera un nombre único usando el tiempo actual para evitar colisiones
+                // 4. GENERAR NOMBRE ÚNICO:
+                // Usamos time() para que si dos personas suben "datos.csv" al mismo tiempo,
+                // no se borre uno al otro (ej: 1700000000_datos.csv)
                 $systemName = time() . '_' . $originalName;
                 
-                // 4. ALMACENAMIENTO FÍSICO: Guarda en storage/app/public/uploads
+                // 5. ALMACENAMIENTO FÍSICO: 
+                // Guarda el archivo en storage/app/public/uploads usando el disco 'public'
                 $file->storeAs('uploads', $systemName, 'public');
 
-                // 5. REGISTRO EN BD: Guarda la información para poder recuperar el archivo después
+                // 6. REGISTRO EN BASE DE DATOS: 
+                // Guardamos los nombres para saber cómo se llamaba y dónde quedó
                 Archivo::create([
                     'user_id' => auth()->id(),
                     'nombre_original' => $originalName,
@@ -64,7 +76,8 @@ class InputController extends Controller
                     'ruta' => 'uploads/' . $systemName,
                 ]);
 
-                // 6. LOG DE ÉXITO: Registra la actividad positiva
+                // 7. LOG DE ÉXITO: 
+                // Guardamos en el historial que todo salió bien
                 Log::create([
                     'user_id' => auth()->id(),
                     'accion' => 'Subió con éxito: ' . $originalName,
@@ -75,7 +88,8 @@ class InputController extends Controller
                 return back()->with('success', 'Archivo subido correctamente.');
             }
         } catch (\Exception $e) {
-            // 7. MANEJO DE ERRORES: Captura cualquier fallo de base de datos o permisos
+            // 8. CONTROL DE EMERGENCIAS:
+            // Si algo falla (ej: disco lleno, error de BD), atrapamos el error para que la web no "explote"
             return back()->with('error', 'Error interno: ' . $e->getMessage());
         }
     }

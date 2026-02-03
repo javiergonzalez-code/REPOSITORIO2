@@ -1,28 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-    <style>
-        /* Forzamos el centrado total del contenedor principal */
-        .main-centering-wrapper {
-            display: flex !important;
-            justify-content: center !important;
-            width: 100% !important;
-            margin: 0 auto !important;
-            padding: 0 !important;
-        }
-
-        .custom-max-width {
-            width: 100% !important;
-            max-width: 1300px !important;
-            /* El ancho ideal para que no se vea pegado a los bordes */
-        }
-
-        /* Esto quita cualquier margen izquierdo que Laravel/Bootstrap ponga por defecto */
-        .container-fluid {
-            margin-left: auto !important;
-            margin-right: auto !important;
-        }
-    </style>
 
     <div class="main-centering-wrapper">
         <div class="custom-max-width py-5 px-3">

@@ -7,7 +7,6 @@
             <div class="col-11 col-sm-8 col-md-6 col-lg-4">
                 
                 <div class="login-wrapper">
-    {{-- Ya no necesitas row ni col de Bootstrap si usas el flex del login-wrapper --}}
     <div class="card login-card">
         <div class="card-header login-header-modern">
             <div class="brand-icon-wrapper">
