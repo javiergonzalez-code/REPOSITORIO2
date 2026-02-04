@@ -1274,3 +1274,20 @@ select.form-input {
     width: 100% !important;
     margin: 0 auto !important;
 }
+
+    .bg-primary-light { background-color: #eff6ff; }
+    /* Estilo de scrollbar para navegadores modernos */
+    .table-responsive::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    .table-responsive::-webkit-scrollbar-track {
+        background: #f1f5f9;
+    }
+    .table-responsive::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
+    }
+    .table-responsive::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }

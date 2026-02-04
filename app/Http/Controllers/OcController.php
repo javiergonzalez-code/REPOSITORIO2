@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Archivo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
 class OcController extends Controller
 {
@@ -56,29 +57,40 @@ class OcController extends Controller
         return response()->download($path, $oc->nombre_original);
     }
 
-    // MÉTODO QUE FALTABA O DABA ERROR
+    /**
+     * Previsualiza contenido de Excel, CSV o XML
+     */
     public function preview($id)
     {
         $oc = Archivo::findOrFail($id);
-        $path = storage_path('app/public/uploads/' . $oc->nombre_sistema);
+        $path = storage_path('app/public/' . $oc->ruta); // Usamos la ruta guardada en BD
 
         if (!file_exists($path)) {
-            return back()->with('error', 'No se puede previsualizar: El archivo no existe.');
+            return back()->with('error', 'El archivo físico no existe en el servidor.');
         }
 
+        // Extraer extensión del nombre original
         $extension = strtolower(pathinfo($oc->nombre_original, PATHINFO_EXTENSION));
         $data = [];
 
-        if ($extension == 'csv') {
-            if (($handle = fopen($path, "r")) !== FALSE) {
-                while (($row = fgetcsv($handle, 1000, ",")) !== FALSE) {
-                    $data[] = $row;
-                }
-                fclose($handle);
+        try {
+            if (in_array($extension, ['xlsx', 'xls', 'csv'])) {
+                /** * LÓGICA PARA EXCEL Y CSV
+                 * Excel::toArray convierte las hojas en arrays. Tomamos la primera [0].
+                 */
+                $sheets = Excel::toArray(new \stdClass, $path);
+                $data = $sheets[0] ?? [];
+            } elseif ($extension === 'xml') {
+                /**
+                 * LÓGICA PARA XML
+                 */
+                $xmlContent = simplexml_load_file($path);
+                $data = json_decode(json_encode($xmlContent), true);
+            } else {
+                return back()->with('error', 'Formato de previsualización no soportado.');
             }
-        } elseif ($extension == 'xml') {
-            $xmlContent = simplexml_load_file($path);
-            $data = json_decode(json_encode($xmlContent), true);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error al leer el archivo: ' . $e->getMessage());
         }
 
         return view('oc.preview', compact('data', 'oc', 'extension'));

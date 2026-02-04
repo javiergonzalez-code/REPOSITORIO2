@@ -58,12 +58,12 @@
                             <input type="date" name="fecha" class="form-input" value="{{ request('fecha') }}">
                         </div>
 
-                        <div class="col-lg-3 col-md-12">
+                        <div class="col-lg-3 col-md-12 mt-5">
                             <div class="d-flex gap-2">
-                                <button type="submit" class="btn btn-primary w-100 fw-bold shadow-sm py-2 rounded-3 text-uppercase">
+                                <button type="submit" class="btn btn-gradient rounded-pill">
                                     <i class="fas fa-filter me-1"></i> Filtrar
                                 </button>
-                                <a href="{{ route('oc.index') }}" class="btn btn-light px-3 rounded-3 shadow-sm">
+                                <a href="{{ route('oc.index') }}" class="btn btn-gradient rounded-pill">
                                     <i class="fas fa-sync-alt text-muted"></i>
                                 </a>
                             </div>
@@ -75,7 +75,7 @@
             {{-- RECUADRO 3: TABLA --}}
             <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
+                    <table class="table table-hover align-middle mb-0 ml-5">
                         <thead style="background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
                             <tr class="text-uppercase" style="font-size: 0.7rem; font-weight: 800; color: #64748b;">
                                 <th class="ps-4 py-3">Estado</th>
@@ -111,14 +111,14 @@
                                             <span class="text-primary fw-semibold small">{{ $oc->nombre_original }}</span>
                                         </div>
                                     </td>
-                                    <td class="text-center">
-                                        <span class="fw-bold d-block text-dark mb-0 small">{{ $oc->created_at->format('d/m/Y') }}</span>
-                                        <span class="x-small text-muted font-monospace">{{ $oc->created_at->format('H:i') }} hrs</span>
+                                    <td class="text-center mr-5">
+                                        <span class="fw-bold d-block text-dark mb-0 small">{{ $oc->created_at->format('d/m/Y') }} , </span>
+                                        <span class="font-size: 1rem text-muted font-monospace">{{ $oc->created_at->format('H:i') }} hrs</span>
                                     </td>
                                     <td class="text-end pe-4">
-                                        <div class="btn-group shadow-sm rounded-3">
-                                            <a href="{{ route('oc.preview', $oc->id) }}" class="btn btn-white btn-sm px-3" title="Ver"><i class="fas fa-eye text-muted"></i></a>
-                                            <a href="{{ route('oc.download', $oc->id) }}" class="btn btn-white btn-sm px-3" title="Bajar"><i class="fas fa-download text-primary"></i></a>
+                                        <div class="btn-group rounded-3">
+                                            <a href="{{ route('oc.preview', $oc->id) }}" class="btn btn-gradient rounded-pill " title="Ver"><i class="fas fa-eye text-muted"></i></a>
+                                            <a href="{{ route('oc.download', $oc->id) }}" class="btn btn-gradient rounded-pill" title="Bajar"><i class="fas fa-download text-primary"></i></a>
                                         </div>
                                     </td>
                                 </tr>

@@ -1,222 +1,98 @@
 @extends('layouts.app')
 
 @section('content')
-    <style>
-        :root {
-            --primary-blue: #1a237e;
-            --accent-blue: #3949ab;
-            --soft-bg: #f0f2f9;
-            --xml-bg: #282c34;
-            /* Color estilo One Dark */
-        }
-
-        body {
-            background-color: var(--soft-bg);
-            font-family: 'Inter', sans-serif;
-        }
-
-        /* Card Principal con efecto de elevación */
-        .preview-card {
-            border: none;
-            border-radius: 24px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            overflow: hidden;
-        }
-
-        /* Panel de estadísticas rápidas */
-        .stat-pill {
-            background: white;
-            padding: 10px 20px;
-            border-radius: 15px;
-            border: 1px solid #e2e8f0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* Estilo de Tabla Pro */
-        .table-container {
-            max-height: 550px;
-            overflow-y: auto;
-            scrollbar-width: thin;
-        }
-
-        .table-container::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .table-container::-webkit-scrollbar-thumb {
-            background: #cbd5e0;
-            border-radius: 10px;
-        }
-
-        .table thead th {
-            position: sticky;
-            top: 0;
-            background: #f8fafc;
-            color: #64748b;
-            font-weight: 700;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 15px 24px;
-            border: none;
-            z-index: 20;
-        }
-
-        .table tbody tr {
-            transition: all 0.2s;
-        }
-
-        .table tbody tr:hover {
-            background-color: #f1f5f9;
-            transform: scale(1.002);
-        }
-
-        /* Visor XML Estilo VS Code */
-        .xml-window {
-            background: var(--xml-bg);
-            border-radius: 16px;
-            padding: 25px;
-            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .xml-line {
-            font-family: 'Fira Code', monospace;
-            font-size: 0.85rem;
-            line-height: 1.8;
-            border-left: 2px solid #3e4451;
-            padding-left: 15px;
-        }
-
-        .xml-tag {
-            color: #e06c75;
-        }
-
-        /* Rojo suave */
-        .xml-attr {
-            color: #d19a66;
-        }
-
-        /* Naranja */
-        .xml-value {
-            color: #98c379;
-        }
-
-        /* Verde */
-        .xml-text {
-            color: #abb2bf;
-        }
-
-        /* Gris claro */
-
-        .btn-action {
-            padding: 12px 24px;
-            border-radius: 50px;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-    </style>
-
     <div class="container py-5">
-        <div
-            class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
-            <div>
-                <a href="{{ route('oc.index') }}" class="text-decoration-none text-muted fw-medium small">
-                    <i class="fas fa-chevron-left me-1"></i> Volver al Repositorio
-                </a>
-                <h2 class="fw-bold text-dark mt-2 mb-0"></h2>
-            </div>
-            <div class="d-flex gap-2">
-                <div class="stat-pill shadow-sm">
-                    <i class="fas fa-file-alt text-primary"></i>
-                    <span class="small fw-bold">{{ strtoupper($extension) }}: {{ $oc->nombre_original }}</span>
-                </div>
-                <a href="{{ route('oc.download', $oc->id) }}" class="btn btn-primary btn-action shadow-sm mt-5">
-                    <i class="fas fa-cloud-download-alt me-2 mt-5"></i>Descargar 
-                </a>
-            </div>
-        </div>
+        <div class="row justify-content-center">
+            <div class="col-12 col-xl-11">
 
-        <div class="card preview-card">
-            <div class="card-body p-0">
-
-                <div class="p-4 bg-white border-bottom d-flex align-items-center justify-content-between">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="rounded-circle bg-soft-primary p-3" style="background: #eef2ff">
-                            <i class="fas fa-user-circle fs-4 text-primary"></i>
-                            <p class="mb-0 small text-muted">Subido por:</p>
-                            <p class="mb-0 fw-bold">{{ $oc->user->name }}</p>
-                        </div>
-                        <div>
-
-                        </div>
-                    </div>
-                    <div class="text-end d-none d-md-block">
-                        <p class="mb-0 small text-muted">Fecha de carga:</p>
-                        <p class="mb-0 fw-bold">{{ $oc->created_at->format('d M, Y - H:i') }}</p>
-                    </div>
-                </div>
-
-                @if ($extension == 'csv')
-                    <div class="table-container">
-                        <table class="table align-middle mb-0">
-                            <thead>
-                                <tr>
-                                    @foreach ($data[0] as $header)
-                                        <th>{{ $header }}</th>
-                                    @endforeach
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (array_slice($data, 1) as $row)
-                                    <tr>
-                                        @foreach ($row as $cell)
-                                            <td class="px-4 py-3 text-secondary">{{ $cell }}</td>
-                                        @endforeach
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @else
-                    <div class="p-4">
-                        <div class="xml-window">
-                            <div class="d-flex gap-2 mb-3">
-                                <div style="width:12px; height:12px; background:#ff5f56; border-radius:50%"></div>
-                                <div style="width:12px; height:12px; background:#ffbd2e; border-radius:50%"></div>
-                                <div style="width:12px; height:12px; background:#27c93f; border-radius:50%"></div>
+                {{-- RECUADRO 1: ENCABEZADO DE PREVISUALIZACIÓN --}}
+                <div class="card border-0 shadow-sm rounded-4 mb-4 bg-white">
+                    <div class="card-body p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+                        <div class="d-flex align-items-center">
+                            <div class="header-icon-box shadow-sm me-3"
+                                style="background: #0f172a; color: #3b82f6; width: 55px; height: 55px; display: flex; align-items: center; justify-content: center; border-radius: 12px;">
+                                <i
+                                    class="fas {{ in_array($extension, ['xlsx', 'xls', 'csv']) ? 'fa-file-excel' : 'fa-file-code' }} fa-lg"></i>
                             </div>
-                            <div class="table-responsive">
-                                @foreach ($data as $key => $value)
-                                    <div class="xml-line">
-                                        <span class="xml-tag">&lt;{{ $key }}&gt;</span>
-                                        @if (is_array($value))
-                                            <div class="ps-4">
-                                                @foreach ($value as $subKey => $subValue)
-                                                    <div>
-                                                        <span class="xml-tag">&lt;{{ $subKey }}&gt;</span>
-                                                        <span
-                                                            class="xml-text">{{ is_array($subValue) ? '{...}' : $subValue }}</span>
-                                                        <span class="xml-tag">&lt;/{{ $subKey }}&gt;</span>
-                                                    </div>
-                                                @endforeach
-                                            </div>
-                                        @else
-                                            <span class="xml-text">{{ $value }}</span>
-                                        @endif
-                                        <span class="xml-tag">&lt;/{{ $key }}&gt;</span>
-                                    </div>
-                                @endforeach
+                            <div>
+                                <h2 class="audit-title mb-0"
+                                    style="font-size: 1.4rem; font-weight: 800; color: #1e293b; letter-spacing: -0.5px;">
+                                    {{ $oc->nombre_original }}
+                                </h2>
+                                <div class="audit-subtitle d-flex align-items-center"
+                                    style="font-size: 1rem; color: #64748b; font-weight: 700;">
+                                    <span
+                                        class="badge bg-primary-light text-primary border-primary-subtle px-2 py-1 rounded-pill me-2 text-uppercase"
+                                        style="font-size: 1rem;">
+                                        Formato: {{ $extension }}
+                                    </span>
+                                    <span class="divider-v mx-2"
+                                        style="height: 12px; width: 1px; background: #cbd5e1;"></span>
+                                    <i class="fas fa-user-circle me-1 font-size: 1rem"></i> Subido por: {{ $oc->user->name }}
+                                </div>
                             </div>
                         </div>
+                        <div class="header-actions mt-5">
+                            <a href="{{ route('oc.index') }}" class="btn-ragon-outline shadow-sm">
+                                <i class="fas fa-arrow-left me-2"></i> VOLVER AL LISTADO
+                            </a>
+                            <a href="{{ route('oc.download', $oc->id) }}"
+                                class="btn btn-gradient rounded-pill">
+                                <i class="fas fa-download me-2"></i> DESCARGAR
+                            </a>
+                        </div>
                     </div>
-                @endif
+                </div>
+
+                {{-- RECUADRO 2: CONTENIDO DEL ARCHIVO --}}
+                <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
+                    <div class="card-header bg-light border-0 py-3 px-4 d-flex align-items-center">
+                        <h6 class="text-uppercase fw-black mb-0 text-muted" style="font-size: 1rem; letter-spacing: 1px;">
+                            <i class="fas fa-table me-2"></i> Lectura de datos del sistema
+                        </h6>
+                        <div class="ms-auto text-muted fw-bold font-size: 1rem">
+                            Mostrando contenido procesado
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        {{-- Contenedor con scroll personalizado --}}
+                        <div class="table-responsive" style="max-height: 650px; overflow-y: auto;">
+                            <table class="table table-hover table-striped-columns align-middle mb-0">
+                                <tbody class="font-monospace" style="font-size: 0.85rem;">
+                                    @forelse($data as $index => $row)
+                                        <tr class="log-row">
+                                            {{-- Indicador de número de fila --}}
+                                            <td class="bg-light text-center text-muted border-end p-2"
+                                                style="width: 50px; font-size: 0.7rem; font-weight: 800;">
+                                                {{ $index + 1 }}
+                                            </td>
+
+                                            @foreach ($row as $cell)
+                                                <td class="p-3 border-end" style="min-width: 150px; color: #334155;">
+                                                    {{ $cell }}
+                                                </td>
+                                            @endforeach
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td class="text-center py-5">
+                                                <div class="py-4">
+                                                    <i class="fas fa-database fa-3x text-light mb-3"></i>
+                                                    <p class="text-muted fw-bold">El archivo no contiene datos legibles.</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+
             </div>
         </div>
-
-
     </div>
+
+
 @endsection
