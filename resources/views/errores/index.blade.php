@@ -1,5 +1,3 @@
-@extends('app')
+@extends('layouts.app')
 
-<div>
-    <p>ya sirve</p>
-</div>
+@section('content')

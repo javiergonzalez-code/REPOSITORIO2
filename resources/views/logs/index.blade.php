@@ -30,82 +30,84 @@
                                 </div>
                             </div>
                         </div>
+{{-- Barra de Filtros Avanzados - Diseño Mejorado --}}
+<div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+    <div class="card-body p-4">
+        <form action="{{ route('logs.index') }}" method="GET" class="row g-3 align-items-end">
+            
+            {{-- Sección: Búsqueda General --}}
+            <div class="col-lg-3 col-md-6">
+                <label class="form-label small fw-bold text-dark text-uppercase mb-2" style="letter-spacing: 0.5px;">
+                    <i class="fas fa-search me-1 text-primary"></i> Búsqueda General
+                </label>
+                <div class="input-group shadow-none">
+                    <span class="input-group-text bg-white border-end-0" style="border-radius: 10px 0 0 10px;">
+                        <i class="fas fa-keyboard text-muted small"></i>
+                    </span>
+                    <input type="text" name="search" class="form-control border-start-0 ps-0 shadow-none" 
+                           placeholder="Palabra clave..." value="{{ request('search') }}"
+                           style="border-radius: 0 10px 10px 0; background-color: #fbfbfb;">
+                </div>
+            </div>
 
-                        {{-- Barra de Filtros Avanzados --}}
-                        <div class="card border-0 shadow-sm rounded-4 mb-4">
-                            <div class="card-body p-4">
-                                <form action="{{ route('logs.index') }}" method="GET" class="row g-3 align-items-end">
-                                    {{-- Búsqueda General --}}
-                                    <div class="col-lg-3 col-md-6">
-                                        <label class="form-label small fw-bold text-secondary text-uppercase"
-                                            style="letter-spacing: 1px;">Búsqueda General</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text bg-light border-0"><i
-                                                    class="fas fa-search text-muted"></i></span>
-                                            <input type="text" name="search"
-                                                class="form-control bg-light border-0 shadow-none"
-                                                placeholder="Palabra clave..." value="{{ request('search') }}">
-                                        </div>
-                                    </div>
+            {{-- Sección: Filtro por Usuario --}}
+            <div class="col-lg-2 col-md-6">
+                <label class="form-label small fw-bold text-dark text-uppercase mb-2" style="letter-spacing: 0.5px;">
+                    <i class="fas fa-user-shield me-1 text-primary"></i> Operador
+                </label>
+                <div class="input-group">
+                    <input class="form-control shadow-none" list="usuariosList" name="user" 
+                           placeholder="Nombre..." value="{{ request('user') }}"
+                           style="border-radius: 10px; background-color: #fbfbfb;">
+                </div>
+                <datalist id="usuariosList">
+                    @foreach ($usuarios_filtro as $u)
+                        <option value="{{ $u->name }}">
+                    @endforeach
+                </datalist>
+            </div>
 
-                                    {{-- Filtro por Usuario --}}
-                                    <div class="col-lg-2 col-md-6">
-                                        <label class="form-label small fw-bold text-secondary text-uppercase"
-                                            style="letter-spacing: 1px;">Usuario</label>
-                                        <input class="form-control bg-light border-0 shadow-none" list="usuariosList"
-                                            name="user" placeholder="Escribir nombre..." value="{{ request('user') }}">
-                                        <datalist id="usuariosList">
-                                            @foreach ($usuarios_filtro as $u)
-                                                <option value="{{ $u->name }}">
-                                            @endforeach
-                                        </datalist>
-                                    </div>
+            {{-- Sección: Filtro por Acción --}}
+            <div class="col-lg-2 col-md-6">
+                <label class="form-label small fw-bold text-dark text-uppercase mb-2" style="letter-spacing: 0.5px;">
+                    <i class="fas fa-bolt me-1 text-primary"></i> Actividad
+                </label>
+                <select name="accion" class="form-select shadow-none" style="border-radius: 10px; background-color: #fbfbfb; cursor: pointer;">
+                    <option value="">Todas las acciones</option>
+                    <option value="LOGIN" {{ request('accion') == 'LOGIN' ? 'selected' : '' }}>LOGIN</option>
+                    <option value="LOGOUT" {{ request('accion') == 'LOGOUT' ? 'selected' : '' }}>LOGOUT</option>
+                    <option value="SUBIDA" {{ request('accion') == 'SUBIDA' ? 'selected' : '' }}>SUBIDA DE ARCHIVO</option>
+                    <option value="DESCARGA" {{ request('accion') == 'DESCARGA' ? 'selected' : '' }}>DESCARGA</option>
+                    <option value="BORRADO" {{ request('accion') == 'BORRADO' ? 'selected' : '' }}>BORRADO</option>
+                </select>
+            </div>
 
-                                    {{-- Filtro por Acción --}}
-                                    <div class="col-lg-2 col-md-6">
-                                        <label class="form-label small fw-bold text-secondary text-uppercase"
-                                            style="letter-spacing: 1px;">Actividad</label>
-                                        <select name="accion" class="form-select bg-light border-0 shadow-none">
-                                            <option value="">Todas las acciones</option>
-                                            <option value="LOGIN" {{ request('accion') == 'LOGIN' ? 'selected' : '' }}>
-                                                LOGIN</option>
-                                            <option value="LOGOUT" {{ request('accion') == 'LOGOUT' ? 'selected' : '' }}>
-                                                LOGOUT</option>
-                                            <option value="SUBIDA" {{ request('accion') == 'SUBIDA' ? 'selected' : '' }}>
-                                                SUBIDA DE ARCHIVO</option>
-                                            <option value="DESCARGA"
-                                                {{ request('accion') == 'DESCARGA' ? 'selected' : '' }}>DESCARGA</option>
-                                            <option value="BORRADO" {{ request('accion') == 'BORRADO' ? 'selected' : '' }}>
-                                                BORRADO</option>
-                                        </select>
-                                    </div>
+            {{-- Sección: Filtro por Fecha --}}
+            <div class="col-lg-2 col-md-6">
+                <label class="form-label small fw-bold text-dark text-uppercase mb-2" style="letter-spacing: 0.5px;">
+                    <i class="fas fa-calendar-day me-1 text-primary"></i> Fecha
+                </label>
+                <input type="date" name="fecha" class="form-control shadow-none" 
+                       value="{{ request('fecha') }}" style="border-radius: 10px; background-color: #fbfbfb;">
+            </div>
 
-                                    {{-- Filtro por Fecha --}}
-                                    <div class="col-lg-2 col-md-6">
-                                        <label class="form-label small fw-bold text-secondary text-uppercase"
-                                            style="letter-spacing: 1px;">Fecha</label>
-                                        <input type="date" name="fecha"
-                                            class="form-control bg-light border-0 shadow-none"
-                                            value="{{ request('fecha') }}">
-                                    </div>
+            {{-- Sección: Botones de Acción --}}
+            <div class="col-lg-3 col-md-12">
+                <div class="d-flex gap-2 justify-content-lg-end">
+                    <button type="submit" class="btn btn-primary px-4 py-2 fw-bold shadow-sm flex-grow-1 flex-lg-grow-0" 
+                            style="border-radius: 10px; transition: all 0.3s ease;">
+                        <i class="fas fa-filter me-2"></i> FILTRAR
+                    </button>
+                    <a href="{{ route('logs.index') }}" class="btn btn-outline-secondary px-3 py-2 shadow-sm hover-rotate" 
+                       title="Limpiar Filtros" style="border-radius: 10px; transition: all 0.3s ease;">
+                        <i class="fas fa-sync-alt"></i>
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 
-                                    {{-- Botones de Acción --}}
-                                    <div class="col-lg-3 col-md-12">
-                                        <div class="d-flex gap-2">
-                                            <button type="submit"
-                                                class="btn btn-primary w-100 rounded-3 fw-bold py-2 shadow-sm">
-                                                <i class="fas fa-filter me-2"></i>FILTRAR
-                                            </button>
-                                            <a href="{{ route('logs.index') }}"
-                                                class="btn btn-outline-secondary rounded-3 py-2 px-3"
-                                                title="Limpiar Filtros">
-                                                <i class="fas fa-sync-alt"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
 
                         {{-- Tabla de Logs --}}
                         <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
