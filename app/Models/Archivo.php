@@ -14,18 +14,19 @@ class Archivo extends Model
      * se inserten campos no deseados en la base de datos.
      */
     protected $fillable = [
-        'user_id',         // ID del usuario que subió el archivo
-        'nombre_original', // Nombre real del archivo (ej: reporte.csv)
-        'nombre_sistema',  // Nombre único generado para evitar colisiones (ej: 1705923_reporte.csv)
-        'ruta' ,
-        'tipo_archivo',            // Dirección de almacenamiento en el disco
+        'user_id',
+        'nombre_original',
+        'nombre_sistema',
+        'tipo_archivo', 
+        'ruta',
+        'modulo'
     ];
 
     /**
      * Define la relación "pertenece a" (Muchos a Uno).
      * Indica que cada registro en la tabla 'archivos' pertenece a un 'User'.
      */
-    public function user() 
+    public function user()
     {
         // Esto permite acceder al nombre del autor así: $archivo->user->name
         return $this->belongsTo(User::class);

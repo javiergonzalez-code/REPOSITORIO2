@@ -1002,7 +1002,7 @@ body {
     );
     border: none;
     color: white;
-    padding: 12px 35px;
+    padding: 20px 20px;
     border-radius: 50px;
     font-weight: 600;
     transition: transform 0.2s;
@@ -1266,3 +1266,11 @@ select.form-input {
         transform: translateY(-1px);
         filter: brightness(1.1);
     }
+
+    .main-centering-wrapper {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-start; /* Centrado horizontal, inicia arriba */
+    width: 100% !important;
+    margin: 0 auto !important;
+}

@@ -1,0 +1,23 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+{
+    Schema::table('archivos', function (Blueprint $table) {
+        // Añadimos la columna modulo después del tipo de archivo
+        $table->string('modulo')->default('OC')->after('tipo_archivo');
+    });
+}
+
+public function down(): void
+{
+    Schema::table('archivos', function (Blueprint $table) {
+        $table->dropColumn('modulo');
+    });
+}
+};

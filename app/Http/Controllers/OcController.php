@@ -3,143 +3,84 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Archivo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use App\Models\Archivo;
 
 class OcController extends Controller
 {
-    /**
-     * Lista los archivos (Órdenes de Compra) con buscador dinámico.
-     */
     public function index(Request $request)
     {
-        // Obtiene el término de búsqueda del input 'search'
         $search = $request->input('search');
+        $userFilter = $request->input('user');
+        $extension = $request->input('extension');
+        $fecha = $request->input('fecha');
 
-        // Consulta el modelo Archivo cargando la relación con el usuario
-        $ordenes = \App\Models\Archivo::with('user')
-            // 'when' ejecuta este filtro solo si hay algo escrito en el buscador
-            ->when($search, function ($query, $search) {
-                // Busca por nombre del archivo
-                return $query->where('nombre_original', 'like', "%{$search}%")
-                    // O busca por el nombre del usuario que subió el archivo
-                    ->orWhereHas('user', function ($q) use ($search) {
-                        $q->where('name', 'like', "%{$search}%");
-                    });
-            })
-            ->latest() // Ordenar por creación (descendente)
-            ->paginate(20); // Paginación de 20 en 20
+        // Variable para el datalist de la vista
+        $usuarios_filtro = User::orderBy('name')->get();
 
-        return view('oc.index', compact('ordenes', 'search'));
-    }
+        $query = Archivo::with('user')->where('modulo', 'OC');
 
-    /**
-     * Gestiona la descarga segura de archivos.
-     */
-    public function download($id)
-    {
-        // Busca el registro o devuelve un error 404 si no existe
-        $oc = Archivo::findOrFail($id);
-
-        // Define la ruta física donde está guardado el archivo
-        $path = storage_path('app/public/uploads/' . $oc->nombre_sistema);
-
-        // Verifica que el archivo realmente exista en el disco
-        if (!file_exists($path)) {
-            return back()->with('error', 'El archivo no existe en la ruta especificada.');
+        if ($search) {
+            $query->where('nombre_original', 'like', "%{$search}%");
         }
 
-        // Descarga el archivo usando el nombre original que tenía cuando se subió
-        return response()->download($path, $oc->nombre_original);
+        if ($userFilter) {
+            $query->whereHas('user', function($q) use ($userFilter) {
+                $q->where('name', $userFilter);
+            });
+        }
 
-        Log::create([
-        'user_id' => auth()->id(),
-        'accion'  => 'Descargó archivo ID: #'.$id,
-        'modulo'  => 'ORDENES DE COMPRA'
-    ]);
+        if ($extension) {
+            $query->where('tipo_archivo', $extension);
+        }
+
+        if ($fecha) {
+            $query->whereDate('created_at', $fecha);
+        }
+
+        $ordenes = $query->latest()->paginate(10);
+
+        return view('oc.index', compact('ordenes', 'search', 'usuarios_filtro'));
     }
 
-    /**
-     * Previsualiza el contenido de un CSV o XML en una vista.
-     */
-    public function preview($id)
+    public function download($id)
     {
-        //Obtiene datos del archivo y su ruta
         $oc = Archivo::findOrFail($id);
         $path = storage_path('app/public/uploads/' . $oc->nombre_sistema);
 
-        //Extrae la extensión del nombre original para saber cómo procesarlo
-        $extension = pathinfo($oc->nombre_original, PATHINFO_EXTENSION);
+        if (!file_exists($path)) {
+            return back()->with('error', 'El archivo físico no existe.');
+        }
+
+        return response()->download($path, $oc->nombre_original);
+    }
+
+    // MÉTODO QUE FALTABA O DABA ERROR
+    public function preview($id)
+    {
+        $oc = Archivo::findOrFail($id);
+        $path = storage_path('app/public/uploads/' . $oc->nombre_sistema);
+
+        if (!file_exists($path)) {
+            return back()->with('error', 'No se puede previsualizar: El archivo no existe.');
+        }
+
+        $extension = strtolower(pathinfo($oc->nombre_original, PATHINFO_EXTENSION));
+        $data = [];
 
         if ($extension == 'csv') {
-            // LÓGICA PARA CSV
-            $data = [];
-            // Abre el archivo en modo lectura ("r")
             if (($handle = fopen($path, "r")) !== FALSE) {
-                // Lee fila por fila (fgetcsv) usando la coma como separador
                 while (($row = fgetcsv($handle, 1000, ",")) !== FALSE) {
-                    $data[] = $row; // Agrega la fila al array de datos
+                    $data[] = $row;
                 }
-                fclose($handle); // Cierra el archivo
+                fclose($handle);
             }
-        } else {
-            // LÓGICA PARA XML
-            // Carga el archivo como un objeto de SimpleXML
+        } elseif ($extension == 'xml') {
             $xmlContent = simplexml_load_file($path);
-
-            //Convierte el objeto XML a JSON y luego a un Array asociativo de PHP
             $data = json_decode(json_encode($xmlContent), true);
         }
 
-        // Envía los datos procesados, el objeto original y la extensión a la vista
         return view('oc.preview', compact('data', 'oc', 'extension'));
     }
-
-    // public function previewCsv($id)
-
-    // {
-
-    //     $oc = Archivo::findOrFail($id);
-
-    //     $path = storage_path('app/public/uploads' . $oc->nombre_sistema);
-
-
-    //     $data = [];
-
-    //     if (($handle = fopen($path, "r")) !== FALSE) {
-
-    //         while (($row = fgetcsv($handle, 1000, ",")) !== FALSE) {
-
-    //             $data[] = $row; //Guarda cada fila
-
-    //         }
-
-    //         fclose($handle);
-
-    //     }
-
-
-    //     return view('oc.preview_csv', compact('data', 'oc'));
-
-    // }
-
-
-    // public function previewXml($id){
-
-    //     $oc=Archivo::findOrFail($id);
-
-    //     $path =storage_path('app/public/uploads' . $oc->nombre_sistema);
-
-
-    //     $xmlContent = simplexml_load_file($path);
-
-    //     //Convertir  JSON y luego en Array para manejo facil en blade
-
-    //     $data=json_decode(json_decode($xmlContent), true);
-
-
-    //     return view('oc.preview_csv', compact('data', 'oc'));
-
-    // }
 }

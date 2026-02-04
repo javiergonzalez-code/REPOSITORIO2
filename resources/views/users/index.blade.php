@@ -13,8 +13,8 @@
                         <i class="fas fa-th-large me-2"></i> PANEL DE CONTROL
                     </a>
                 </div>
-                <a href="{{ route('users.create') }}" class="btn btn-gradient px-5 py-3 rounded-pill fw-bold">
-                    <i class="fas fa-user-plus me-2"></i> NUEVO USUARIO
+                <a href="{{ route('users.create') }}" class="btn btn-gradient rounded-pill">
+                    <i class="fas fa-user-plus"></i> NUEVO USUARIO
                 </a>
             </div>
         </div>
@@ -22,7 +22,7 @@
         {{-- Sustituye tu bloque de búsqueda actual por este --}}
         <form action="{{ route('users.index') }}" method="GET">
             <div class="d-flex align-items-center gap-3 mb-5 mt-5">
-                <div class="search-container flex-grow-1">
+                <div class="search-container flex-grow-1 mb-5">
                     <i class="fas fa-search text-muted"></i>
                     <input type="text" name="search" class="search-input" placeholder="Buscar por nombre o email..."
                         value="{{ $search }}">
@@ -48,7 +48,7 @@
                     @foreach ($users as $user)
                         <tr class="hover:bg-slate-50 transition">
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-slate-600">
-                                #{{ $user->matricula }}
+                                #{{ $user->id }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm font-semibold text-slate-900">{{ $user->name }}</div>

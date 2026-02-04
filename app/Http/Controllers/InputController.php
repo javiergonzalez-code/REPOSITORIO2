@@ -14,7 +14,8 @@ class InputController extends Controller
     /**
      * Muestra la vista principal del formulario de subida.
      */
-    public function index() {
+    public function index()
+    {
         // Retorna la vista ubicada en resources/views/inputs/index.blade.php
         return view('inputs.index');
     }
@@ -27,7 +28,7 @@ class InputController extends Controller
         // 1. VALIDACIÓN INICIAL: 
         // Verifica que el campo 'archivo' esté presente, sea un archivo real y no pese más de 10MB (10240 KB)
         $validator = Validator::make($request->all(), [
-            'archivo' => 'required|file|max:5120', 
+            'archivo' => 'required|file|max:5120',
         ]);
 
         // 2. VALIDACIÓN DE EXTENSIÓN: 
@@ -37,7 +38,7 @@ class InputController extends Controller
 
         // Si la validación de Laravel falla O la extensión no está en nuestra lista blanca
         if ($validator->fails() || !in_array(strtolower($extension), $allowedExtensions)) {
-            
+
             // Auditoría: Registramos que alguien intentó subir algo no permitido
             Log::create([
                 'user_id' => auth()->id(), // Quién fue (null si no está logueado)
@@ -54,26 +55,20 @@ class InputController extends Controller
             // 3. PROCESAMIENTO DEL ARCHIVO:
             if ($request->hasFile('archivo')) {
                 $file = $request->file('archivo');
-                
-                // Nombre original que traía el archivo desde la PC del usuario
                 $originalName = $file->getClientOriginalName();
-                
-                // 4. GENERAR NOMBRE ÚNICO:
-                // Usamos time() para que si dos personas suben "datos.csv" al mismo tiempo,
-                // no se borre uno al otro (ej: 1700000000_datos.csv)
+                $extension = $file->getClientOriginalExtension(); // Extraer extensión
+
                 $systemName = time() . '_' . $originalName;
-                
-                // 5. ALMACENAMIENTO FÍSICO: 
-                // Guarda el archivo en storage/app/public/uploads usando el disco 'public'
                 $file->storeAs('uploads', $systemName, 'public');
 
-                // 6. REGISTRO EN BASE DE DATOS: 
-                // Guardamos los nombres para saber cómo se llamaba y dónde quedó
+                // REGISTRO EN BASE DE DATOS CORREGIDO
                 Archivo::create([
-                    'user_id' => auth()->id(),
+                    'user_id'         => auth()->id(),
                     'nombre_original' => $originalName,
-                    'nombre_sistema' => $systemName,
-                    'ruta' => 'uploads/' . $systemName,
+                    'nombre_sistema'  => $systemName,
+                    'tipo_archivo'    => $extension, // <--- CAMBIO: Guardar la extensión
+                    'ruta'            => 'uploads/' . $systemName,
+                    'modulo'          => 'OC',        // <--- CAMBIO: Asignar el módulo
                 ]);
 
                 // 7. LOG DE ÉXITO: 
