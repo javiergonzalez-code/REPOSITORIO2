@@ -64,7 +64,7 @@
                                     <i class="fas fa-filter me-1"></i> Filtrar
                                 </button>
                                 <a href="{{ route('oc.index') }}" class="btn btn-gradient rounded-pill">
-                                    <i class="fas fa-sync-alt text-muted"></i>
+                                    <i class="fas fa-sync-alt text-muted"> Reestablecer filtros</i>
                                 </a>
                             </div>
                         </div>

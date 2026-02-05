@@ -57,13 +57,13 @@
                             </select>
                         </div>
 
-                        <div class="col-lg-3 col-md-6">
+                        <div class="col-lg-3 col-md-12 mt-5">
                             <div class="d-flex gap-2">
-                                <button type="submit" class="btn btn-primary w-100 fw-bold shadow-sm py-2 rounded-3">
-                                    <i class="fas fa-search me-1"></i> FILTRAR
+                                <button type="submit" class="btn btn-gradient rounded-pill">
+                                    <i class="fas fa-filter me-1"></i> Filtrar
                                 </button>
-                                <a href="{{ route('logs.index') }}" class="btn btn-light border px-3 rounded-3 shadow-sm">
-                                    <i class="fas fa-sync-alt text-muted"></i>
+                                <a href="{{ route('oc.index') }}" class="btn btn-gradient rounded-pill">
+                                    <i class="fas fa-sync-alt text-muted"> Reestablecer filtros</i>
                                 </a>
                             </div>
                         </div>
