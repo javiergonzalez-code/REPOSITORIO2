@@ -8,7 +8,7 @@
                 <p class="text-slate-500">Gestión de colaboradores y perfiles del sistema</p>
             </div>
             <div class="flex gap-3">
-                <div class="header-actions mt-5">
+                <div class="header-actions mt-2">
                     <a href="{{ route('home') }}" class="btn-ragon-outline">
                         <i class="fas fa-th-large me-2"></i> PANEL DE CONTROL
                     </a>
@@ -21,13 +21,13 @@
 
         {{-- Sustituye tu bloque de búsqueda actual por este --}}
         <form action="{{ route('users.index') }}" method="GET">
-            <div class="d-flex align-items-center gap-3 mb-5 mt-5">
-                <div class="search-container flex-grow-1 mb-5">
+            <div class="d-flex align-items-center gap-3 mb-5 mt-2">
+                <div class="search-container flex-grow-1">
                     <i class="fas fa-search text-muted"></i>
                     <input type="text" name="search" class="search-input" placeholder="Buscar por nombre o email..."
                         value="{{ $search }}">
                 </div>
-                <button type="submit" class="btn btn-gradient px-5 py-3 rounded-pill fw-bold mt-5">
+                <button type="submit" class="btn btn-gradient px-5 py-3 rounded-pill fw-bold">
                     Buscar
                 </button>
             </div>
@@ -37,8 +37,8 @@
             <table class="min-w-full divide-y divide-slate-200">
                 <thead class="bg-slate-50">
                     <tr>
-                        <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">ID Empleado</th>
-                        <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Colaborador</th>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">ID Proveedor</th>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Nombre y correo</th>
                         <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Perfil / Rol</th>
                         <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">Alta en Sistema</th>
                         <th class="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase">Acciones</th>

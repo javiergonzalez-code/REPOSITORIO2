@@ -5,7 +5,7 @@
     <div class="container">
         <div class="row justify-content-center">
             {{-- Encabezado de Bienvenida --}}
-            <div class="text-center my-5">
+            <div class="text-center ">
                 <h1 class="display-5 fw-bold">Panel de Control</h1>
                 <p class="text-muted lead">
                     Bienvenido de nuevo, <span class="fw-bold text-primary">{{ Auth::user()->name }}</span>. 

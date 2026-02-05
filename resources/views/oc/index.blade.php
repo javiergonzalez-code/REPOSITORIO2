@@ -75,7 +75,7 @@
             {{-- RECUADRO 3: TABLA --}}
             <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0 ml-5">
+                    <table class="table table-hover align-middle mb-0">
                         <thead style="background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
                             <tr class="text-uppercase" style="font-size: 0.7rem; font-weight: 800; color: #64748b;">
                                 <th class="ps-4 py-3">Estado</th>

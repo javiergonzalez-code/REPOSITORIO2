@@ -5,7 +5,6 @@
     <div class="row justify-content-center">
         <div class="col-12 col-xl-11">
             
-            {{-- RECUADRO 1: ENCABEZADO INDEPENDIENTE --}}
             <div class="card border-0 shadow-sm rounded-4 mb-4 bg-white">
                 <div class="card-body p-4 d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center">
@@ -25,15 +24,14 @@
                 </div>
             </div>
 
-            {{-- RECUADRO 2: PANEL DE FILTROS (ESTILO BOTONERA) --}}
-            <div class="card border-0 shadow-sm rounded-4 mb-4 bg-white">
+            <div class="card border-0 shadow-sm rounded-4 mb-2 bg-white" >
                 <div class="card-header bg-transparent border-0 pt-4 px-4">
-                    <h6 class="text-uppercase fw-black mb-0 text-muted" style="font-size: 0.7rem; letter-spacing: 1px;">
+                    <h6 class="text-uppercase fw-black mb-0 text-muted" style="font-size: 1rem; letter-spacing: 1px;">
                         <i class="fas fa-filter me-2"></i> Filtros de búsqueda
                     </h6>
                 </div>
-                <div class="card-body p-4">
-                    <form action="{{ route('logs.index') }}" method="GET" class="row g-3 align-items-end">
+                <div class="card-body p-4 ">
+                    <form action="{{ route('logs.index') }}" method="GET" class="row g-3 align-items-end" >
                         <div class="col-lg-3 col-md-6">
                             <label class="form-label-custom">Búsqueda</label>
                             <input type="text" name="search" class="form-input" placeholder="Palabra clave..." value="{{ request('search') }}">
@@ -57,13 +55,13 @@
                             </select>
                         </div>
 
-                        <div class="col-lg-3 col-md-12 mt-5">
+                        <div class="col-lg-3 col-md-12">
                             <div class="d-flex gap-2">
                                 <button type="submit" class="btn btn-gradient rounded-pill">
                                     <i class="fas fa-filter me-1"></i> Filtrar
                                 </button>
                                 <a href="{{ route('oc.index') }}" class="btn btn-gradient rounded-pill">
-                                    <i class="fas fa-sync-alt text-muted"> Reestablecer filtros</i>
+                                    <i class="fas fa-sync-alt text-muted"></i>
                                 </a>
                             </div>
                         </div>
@@ -133,7 +131,6 @@
                 </div>
             </div>
 
-            {{-- PAGINACIÓN --}}
             <div class="mt-4 d-flex justify-content-center">
                 {{ $logs->appends(request()->query())->links('pagination::bootstrap-5') }}
             </div>

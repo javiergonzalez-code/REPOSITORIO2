@@ -33,14 +33,14 @@
             @endif
 
 
-            <div class="card-header login-header-modern py-5">
-                <div class="brand-icon-wrapper mb-3">
+            <div class="card-header login-header-modern ">
+                <div class="brand-icon-wrapper ">
                     <i class="fas fa-file-import"></i>
                 </div>
-                <h2 class="h3 fw-bold mb-0 mt-5">CARGA DE DATOS</h2>
+                <h2 class="h3 fw-bold mb-0 mt-2">CARGA DE DATOS</h2>
                 <span class="badge bg-blue-ragon mt-2 px-3">SISTEMA DE GESTIÓN RAGON</span>
 
-                <div class="header-actions mt-5">
+                <div class="header-actions mt-4">
                     <a href="{{ route('home') }}" class="btn-ragon-outline">
                         <i class="fas fa-th-large me-2"></i> PANEL DE CONTROL
                     </a>
@@ -49,7 +49,7 @@
 
 
 
-            <div class="w-162 mt-7 text-center mb-4">
+            <div class="w-162 mt-7 text-center ">
                 <div class="format-notice-pill">
                     <div class="d-flex align-items-center justify-content-center">
                         <span class="pulse-icon">
@@ -65,7 +65,7 @@
                     </div>
                 </div>
             </div>
-            <div class="card-body p-5">
+            <div class="card-body">
                 <form action="{{ route('input.store') }}" method="POST" enctype="multipart/form-data" id="upload-form">
                     @csrf
 
