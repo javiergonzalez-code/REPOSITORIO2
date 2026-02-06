@@ -270,7 +270,7 @@ body {
 }
 
 .login-wrapper {
-    background: radial-gradient(circle at top left, #f8fafc, #cbd5e1);
+    background: radial-gradient(circle at top left, #f8fafc, #f8fafc);
     min-height: 200vh;
     display: flex;
     align-items: center;

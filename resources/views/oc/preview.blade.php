@@ -32,7 +32,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="header-actions mt-5">
+                        <div class="header-actions">
                             <a href="{{ route('oc.index') }}" class="btn-ragon-outline shadow-sm">
                                 <i class="fas fa-arrow-left me-2"></i> VOLVER AL LISTADO
                             </a>

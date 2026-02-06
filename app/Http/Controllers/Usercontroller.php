@@ -15,17 +15,40 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search');
-        $users = User::when($search, function ($query, $search) {
-            return $query->where('name', 'like', "%{$search}%")
-                ->orWhere('email', 'like', "%{$search}%")
-                ->orWhere('id', 'like', "%{$search}%")
-                ->orWhere('rfc', 'like', "%{$search}%");
-        })
-        ->orderBy('name', 'asc') 
-        ->paginate(5)
-        ->withQueryString(); // Mantiene la búsqueda al cambiar de página
+        $roleFilter = $request->input('role'); // Capturamos el rol
 
-        return view('users.index', compact('users', 'search'));
+        $query = User::query();
+
+        // 1. Buscador general
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('id', 'like', "%{$search}%")
+                    ->orWhere('rfc', 'like', "%{$search}%");
+            });
+        }
+
+        // 2. Filtro por nombre (Datalist)
+        if ($request->filled('user')) {
+            $query->where('name', 'like', '%' . $request->user . '%');
+        }
+
+        // 3. Filtro por Rol (CORREGIDO)
+        if ($request->filled('role')) {
+            $query->where('role', $roleFilter);
+        }
+
+        $users = $query->orderBy('name', 'asc')
+            ->paginate(5)
+            ->withQueryString();
+
+        $usuarios_filtro = User::select('name')->orderBy('name', 'asc')->get();
+
+        // Enviamos también la lista de roles definida arriba
+        $roles = $this->roles;
+
+        return view('users.index', compact('users', 'search', 'usuarios_filtro', 'roles'));
     }
 
     public function create()
