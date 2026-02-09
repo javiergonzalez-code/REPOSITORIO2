@@ -15,6 +15,7 @@
 </head>
 
 <body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <div id="app">
         {{-- Navbar con clases de Bootstrap y tu clase personalizada --}}
         <nav class="navbar navbar-expand-md navbar-dark navbar-custom shadow-lg">
@@ -38,24 +39,19 @@
                         </a> --}}
 
                         {{-- Dropdown de Usuario --}}
-                        <div class="dropdown">
-                            <a class="nav-link dropdown-toggle d-flex align-items-center text-white p-0" href="#"
+                            <a class="nav-link d-flex align-items-center text-white p-0" href="#"
                                 role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="fas fa-user-circle fa-lg me-2"></i>
                                 <span class="d-none d-sm-inline">{{ Auth::user()->name }}</span>
                             </a>
 
-                            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0">
-                                <li>
+
+
                                     <a class="dropdown-item dropdown-item-danger d-flex align-items-center"
                                         href="{{ route('logout') }}"
                                         onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                         <i class="fas fa-sign-out-alt me-2"></i> Cerrar Sesión
                                     </a>
-                                </li>
-                            </ul>
-                        </div>
-
                         <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                             @csrf
                         </form>

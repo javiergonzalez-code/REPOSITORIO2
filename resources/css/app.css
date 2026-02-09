@@ -13,17 +13,17 @@
         "Noto Color Emoji";
 }
 
-/* --- Variables Globales --- */
+/* Variables en estado claro */
 :root {
-    --primary-color: #3182ce;
     --bg-light: #f7fafc;
     --text-main: #2d3748;
+    --card-bg: #ffffff;
 }
 
 body {
-    background-color: var(--bg-light);
-    color: var(--text-main);
-    font-family: "Nunito", sans-serif;
+    background-color: var(--bg-light) !important;
+    color: var(--text-main) !important;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* --- Navbar Personalizada --- */
@@ -405,8 +405,8 @@ body {
 
 /* Ajustar la tarjeta para que no se estire demasiado */
 .login-card {
-    width: 100%;
-    max-width: 400px; /* Ancho ideal para login */
+    width: 600px;
+    max-width: 1000px; /* Ancho ideal para login */
     border: none !important;
     border-radius: 24px !important;
     background: #ffffff;
@@ -972,7 +972,7 @@ body {
 
 /* Buscador Estilo Flotante */
 .search-container {
-    background: #ffffff;
+
     padding: 10px;
     border-radius: 50px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -1016,7 +1016,7 @@ body {
 
 /* Tabla Estilo Minimalista */
 .table thead th {
-    background-color: #f8f9fa;
+    
     text-transform: uppercase;
     font-size: 0.75rem;
     letter-spacing: 1px;
@@ -1040,7 +1040,7 @@ body {
 }
 
 .search-container {
-    background: #ffffff;
+
     padding: 12px 20px; /* Aumentamos el padding para dar más aire */
     border-radius: 50px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -1076,13 +1076,11 @@ body {
     --dashboard-card-h3-color: #1e293b; /* Color para modo claro */
 }
 
-/* Variables para Modo Oscuro */
+/* Variables en modo oscuro - Usamos !important para asegurar el cambio */
 body.dark-mode {
-    --bg-light: #1a202c;
-    --text-main: #f7fafc;
-    --navbar-bg: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-    --card-bg: #2d3748;
-    --dashboard-card-h3-color: #f7fafc;
+    --bg-light: #1a202c !important;
+    --text-main: #f7fafc !important;
+    --card-bg: #2d3748 !important;
 }
 
 body {
@@ -1291,3 +1289,236 @@ select.form-input {
     .table-responsive::-webkit-scrollbar-thumb:hover {
         background: #94a3b8;
     }
+
+    /* Variables para Modo Oscuro */
+body.dark-mode {
+    --bg-light: #1a202c !important;
+    --text-main: #f7fafc !important;
+    --card-bg: #2d3748 !important;
+    --dashboard-card-h3-color: #ffffff !important;
+}
+
+/* Forzar cambios en elementos específicos en modo oscuro */
+body.dark-mode .card, 
+body.dark-mode .dashboard-card, 
+body.dark-mode .login-card, 
+body.dark-mode .custom-card {
+    background-color: var(--card-bg) !important;
+    color: var(--text-main) !important;
+}
+
+body.dark-mode .table {
+    color: #f7fafc !important;
+}
+
+body.dark-mode .table tbody tr:hover {
+    background-color: #3d4a5d !important;
+}
+
+body.dark-mode .dropdown-menu {
+    background-color: #2d3748;
+    border: 1px solid #4a5568;
+}
+
+body.dark-mode .dropdown-item {
+    color: #f7fafc;
+}
+
+body.dark-mode .dropdown-item:hover {
+    background-color: #4a5568;
+}
+
+/* Estado para Modo Oscuro en la vista de carga */
+body.dark-mode .login-wrapper {
+    background: radial-gradient(circle at top left, #1a202c, #0f172a) !important;
+}
+
+body.dark-mode .login-card {
+    background-color: #2d3748 !important;
+    color: #f7fafc !important;
+}
+
+/* Ajuste para la zona de arrastre de archivos */
+body.dark-mode .upload-zone {
+    background-color: #1a202c !important;
+    border-color: #4a5568 !important;
+}
+
+body.dark-mode .upload-label span.text-dark {
+    color: #e2e8f0 !important;
+}
+
+/* Ajuste para la pastilla de formatos permitidos */
+body.dark-mode .format-notice-pill {
+    background: #2d3748 !important;
+    border-color: #4a5568 !important;
+    color: #f7fafc !important;
+}
+
+/* Ajustes para la vista de Logs en Modo Oscuro */
+body.dark-mode .custom-card,
+body.dark-mode .card {
+    background-color: var(--card-bg) !important;
+    border-color: #4a5568 !important;
+}
+
+body.dark-mode .audit-title,
+body.dark-mode .fw-bold,
+body.dark-mode .text-dark {
+    color: #f7fafc !important;
+}
+
+/* Encabezado de la tabla */
+body.dark-mode .table thead {
+    background-color: #1a202c !important;
+}
+
+body.dark-mode .table thead th {
+    color: #a0aec0 !important;
+    border-bottom-color: #4a5568 !important;
+}
+
+/* Filas y celdas */
+body.dark-mode .table tbody tr {
+    border-bottom-color: #2d3748 !important;
+    color: #e2e8f0 !important;
+}
+
+body.dark-mode .log-row:hover {
+    background-color: #3d4a5d !important;
+}
+
+/* Badges de módulo y botones */
+body.dark-mode .badge-outline {
+    background: #1a202c !important;
+    border-color: #4a5568 !important;
+    color: #cbd5e1 !important;
+}
+
+body.dark-mode .btn-light {
+    background-color: #4a5568 !important;
+    border-color: #4a5568 !important;
+    color: #ffffff !important;
+}
+
+/* Específico para Logs en Modo Oscuro */
+body.dark-mode .custom-card {
+    background-color: var(--card-bg) !important;
+}
+
+body.dark-mode .audit-title, 
+body.dark-mode .fw-bold, 
+body.dark-mode .text-dark {
+    color: #f7fafc !important; /* Texto claro en modo oscuro */
+}
+
+body.dark-mode .table {
+    color: #e2e8f0 !important;
+}
+
+body.dark-mode .table thead {
+    background-color: #1a202c !important; /* Fondo oscuro para el header de tabla */
+}
+
+body.dark-mode .log-row:hover {
+    background-color: #2d3748 !important; /* Efecto hover en las filas */
+}
+
+body.dark-mode .badge-outline {
+    background: #1a202c;
+    color: #cbd5e1;
+    border-color: #4a5568;
+}
+
+/* Asegura legibilidad en la vista de Logs */
+body.dark-mode .text-main,
+body.dark-mode .fw-bold,
+body.dark-mode .audit-title,
+body.dark-mode .form-label-custom {
+    color: #f7fafc !important;
+}
+
+body.dark-mode .text-muted {
+    color: #a0aec0 !important;
+}
+
+/* Fondo de los inputs en modo oscuro */
+body.dark-mode .form-input {
+    background-color: #1a202c !important;
+    color: #ffffff !important;
+    border-color: #4a5568 !important;
+}
+
+body.dark-mode .header-icon-box {
+    background: #3182ce !important; /* Azul Ragon brillante */
+    color: #ffffff !important;
+}
+
+/* --- Fix para Tabla en Modo Oscuro --- */
+body.dark-mode .table {
+    color: #e2e8f0 !important;
+    border-color: #4a5568 !important;
+}
+
+/* Esto arregla específicamente el fondo de la cabecera */
+body.dark-mode .table thead,
+body.dark-mode .table thead tr,
+body.dark-mode .table thead th {
+    background-color: #1a202c !important; /* Gris muy oscuro */
+    color: #cbd5e1 !important; /* Texto gris claro */
+    border-bottom-color: #4a5568 !important;
+}
+
+/* Arreglo para las filas del cuerpo */
+body.dark-mode .table tbody tr {
+    background-color: transparent !important;
+    color: #e2e8f0 !important;
+}
+
+/* Efecto hover para que se note la fila seleccionada */
+body.dark-mode .table-hover tbody tr:hover {
+    background-color: #2d3748 !important; 
+    color: #ffffff !important;
+}
+
+/* --- ARREGLO DEFINITIVO PARA EL HEAD DE LA TABLA --- */
+body.dark-mode .table thead th {
+    background-color: #1a202c !important; /* Fondo oscuro */
+    color: #cbd5e1 !important;           /* Texto claro */
+    border-bottom: 2px solid #4a5568 !important;
+}
+
+/* También para las celdas del cuerpo si quedan blancas */
+body.dark-mode .table tbody td {
+    background-color: transparent !important; 
+    color: #f7fafc !important;
+}
+
+/* Quitar cualquier fondo que Bootstrap ponga por defecto a la tabla */
+body.dark-mode .table {
+    --bs-table-bg: transparent !important;
+    --bs-table-color: #f7fafc !important;   
+}
+
+/* --- Ajustes para el Search Container en Modo Oscuro --- */
+body.dark-mode .search-container {
+    background-color: #1a202c !important; /* Fondo oscuro igual al body */
+    border-color: #4a5568 !important;     /* Borde gris oscuro */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .search-input {
+    color: #f7fafc !important;           /* Texto claro */
+    background: transparent !important;
+}
+
+body.dark-mode .search-input::placeholder {
+    color: #718096 !important;           /* Placeholder más legible */
+}
+
+/* Ajuste para los iconos dentro del buscador o grupos de entrada */
+body.dark-mode .input-group-text {
+    background-color: #2d3748 !important;
+    border-color: #4a5568 !important;
+    color: #cbd5e1 !important;
+}

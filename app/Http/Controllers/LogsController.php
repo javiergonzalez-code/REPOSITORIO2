@@ -42,7 +42,7 @@ class LogsController extends Controller
         if ($request->filled('fecha')) {
             $query->whereDate('created_at', $request->fecha);
         }
-
+    
         // Filtra los logs para ver solo las acciones de, por ejemplo "Admin"
         if ($request->filled('role')) {
             $query->whereHas('user', function ($q) use ($request) {

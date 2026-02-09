@@ -4,9 +4,9 @@
     <div class="container py-5">
         <div class="row justify-content-center">
             <div class="col-md-10 col-lg-8">
-                <div class="card login-card shadow-lg border-0 overflow-hidden">
+                <div class="card login-card shadow-lg overflow-hidden">
 
-                    <div class="d-flex justify-content-center align-items-center py-4 mt-2 border-top gap-3">
+                    <div class="d-flex justify-content-center align-items-center py-4 gap-3">
                         <div class="header-actions">
                             <a href="{{ route('home') }}" class="btn-ragon-outline">
                                 <i class="fas fa-th-large me-2"></i> PANEL DE CONTROL

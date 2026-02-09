@@ -38,13 +38,13 @@
                                         </div>
                                     </div>
 
-                                    <div class="d-flex justify-content-center mb-4">
+                                    {{-- <div class="d-flex justify-content-center mb-4">
                                         <div class="form-check">
                                             <input type="checkbox" class="form-check-input" id="remember">
                                             <label class="form-check-label text-muted small" for="remember">Mantener
                                                 sesión</label>
                                         </div>
-                                    </div>
+                                    </div> --}}
 
                                     <button type="submit" class="btn-ragon-modern w-100">
                                         INICIAR SESIÓN
