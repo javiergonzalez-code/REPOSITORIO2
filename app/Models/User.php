@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Backpack\CRUD\app\Models\Traits\CrudTrait;
 // Importaciones necesarias para la autenticación, notificaciones y fábricas de datos
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -9,6 +10,7 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
+    use CrudTrait;
     // HasFactory: Permite crear usuarios de prueba fácilmente
     // Notifiable: Permite enviar correos o alertas al usuario (ej: restablecer contraseña)
     use HasFactory, Notifiable;

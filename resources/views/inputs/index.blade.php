@@ -135,7 +135,7 @@
         dropZone.addEventListener('drop', (e) => {
             const dt = e.dataTransfer;
             const files = dt.files;
-            fileInput.files = files; 
+            fileInput.files = files;
             updateDisplay(files[0]);
         }, false);
 

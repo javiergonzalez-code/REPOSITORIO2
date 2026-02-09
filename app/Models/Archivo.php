@@ -2,12 +2,17 @@
 
 namespace App\Models;
 
+use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Permission\Traits\HasRoles;
+
 
 class Archivo extends Model
 {
+    use CrudTrait;
     use HasFactory;
+
     /**
      * Atributos que se pueden asignar de manera masiva.
      * Esto es una medida de seguridad (Mass Assignment) para evitar que 
@@ -17,7 +22,7 @@ class Archivo extends Model
         'user_id',
         'nombre_original',
         'nombre_sistema',
-        'tipo_archivo', 
+        'tipo_archivo',
         'ruta',
         'modulo'
     ];
@@ -28,7 +33,6 @@ class Archivo extends Model
      */
     public function user()
     {
-        // Esto permite acceder al nombre del autor así: $archivo->user->name
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(\App\Models\User::class);
     }
 }
