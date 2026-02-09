@@ -1507,6 +1507,7 @@ body.dark-mode .search-container {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
+
 body.dark-mode .search-input {
     color: #f7fafc !important;           /* Texto claro */
     background: transparent !important;
