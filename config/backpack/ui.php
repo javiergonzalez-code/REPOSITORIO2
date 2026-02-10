@@ -46,7 +46,7 @@ return [
     // ----
 
     // Project name - shown in the window title
-    'project_name' => 'Super Administrador',
+    'project_name' => 'Ragon<b>Admin</b>',
 
     // Content of the HTML meta robots tag to prevent indexing and link following
     'meta_robots_content' => 'noindex, nofollow',
@@ -72,7 +72,7 @@ return [
     // FOOTER
     // ------
 
-    'developer_name' => 'Comercializador Ragón S.A. de C.V.',
+    'developer_name' => 'Tu Nombre o Empresa',
     'developer_link' => 'https://tusitio.com',
     'show_powered_by' => false,
 
