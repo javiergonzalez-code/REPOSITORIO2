@@ -4,10 +4,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-// 1. Importar el Trait de Backpack
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
-// Si vas a usar roles de Spatie (vi el paquete en tu composer.json), descomenta la siguiente línea:
-// use Spatie\Permission\Traits\HasRoles; 
+//use Spatie\Permission\Traits\HasRoles; 
 
 class User extends Authenticatable
 {
@@ -22,7 +20,7 @@ class User extends Authenticatable
         'codigo',
         'rfc',
         'telefono',
-        'role', // Veo que tienes un campo 'role' directo en la tabla
+        'role',
     ];
 
     protected $hidden = [
