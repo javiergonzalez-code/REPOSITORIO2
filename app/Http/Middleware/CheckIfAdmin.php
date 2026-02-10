@@ -27,8 +27,8 @@ class CheckIfAdmin
      */
     private function checkIfUserIsAdmin($user)
     {
-        // return ($user->is_admin == 1);
-        return true;
+        // Solo permite el acceso si la columna 'role' en la base de datos es 'admin'
+        return $user->role === 'admin';
     }
 
     /**

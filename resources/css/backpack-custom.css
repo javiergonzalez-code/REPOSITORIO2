@@ -1,0 +1,154 @@
+/* resources/css/backpack-custom.css */
+
+/* 1. Fondo General */
+body.app, .page {
+    background-color: #f7fafc !important; /* Tu --bg-light */
+    font-family: "Instrument Sans", ui-sans-serif, system-ui, sans-serif !important;
+}
+
+/* 2. Barra Lateral (Sidebar) y Navbar Superior */
+aside.navbar {
+    background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%) !important; /* Tu gradiente navbar-custom */
+    border-right: none !important;
+}
+
+aside.navbar .navbar-brand {
+    color: #ffffff !important;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+/* Enlaces del menú lateral */
+aside.navbar .nav-link {
+    color: #e2e8f0 !important;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    margin: 2px 10px;
+}
+
+aside.navbar .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: #63b3ed !important;
+    transform: translateX(5px);
+}
+
+aside.navbar .nav-link.active {
+    background-color: #3182ce !important; /* Tu --ragon-accent */
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(49, 130, 206, 0.3);
+}
+
+aside.navbar .nav-link-icon {
+    color: #a0aec0 !important; /* Iconos más tenues */
+}
+aside.navbar .nav-link:hover .nav-link-icon,
+aside.navbar .nav-link.active .nav-link-icon {
+    color: #ffffff !important;
+}
+
+/* 3. Tarjetas (Cards) - Estilo "Ragon" */
+.card {
+    border: none !important;
+    border-radius: 20px !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05) !important;
+    background: #ffffff !important;
+    margin-bottom: 20px;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08) !important;
+}
+
+.card-header {
+    background: #ffffff !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    padding: 20px 25px !important;
+}
+
+.card-title {
+    font-weight: 800 !important;
+    color: #2d3748 !important; /* Tu --text-main */
+    letter-spacing: -0.5px;
+}
+
+/* 4. Botones Principales */
+.btn-primary {
+    background: linear-gradient(135deg, #1a202c 0%, #3182ce 100%) !important; /* Gradiente Ragon */
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 10px 20px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 6px rgba(49, 130, 206, 0.2);
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(49, 130, 206, 0.3) !important;
+}
+
+/* Botones Secundarios (Filtros, acciones menores) */
+.btn-secondary, .btn-ghost-secondary {
+    background: #ffffff !important;
+    border: 2px solid #e2e8f0 !important;
+    color: #475569 !important;
+    border-radius: 12px !important;
+    font-weight: 600 !important;
+}
+
+.btn-secondary:hover {
+    border-color: #3182ce !important;
+    color: #3182ce !important;
+    background: #f8fafc !important;
+}
+
+/* 5. Tablas */
+.table thead th {
+    background-color: #ffffff !important;
+    color: #64748b !important;
+    font-weight: 800 !important;
+    text-transform: uppercase;
+    font-size: 0.75rem !important;
+    letter-spacing: 1px !important;
+    border-bottom: 2px solid #f1f5f9 !important;
+    padding: 15px !important;
+}
+
+.table tbody td {
+    padding: 15px !important;
+    vertical-align: middle !important;
+    color: #2d3748 !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f8fafc !important; /* Hover suave */
+}
+
+/* 6. Inputs y Formularios (Create/Edit) */
+.form-control, .form-select {
+    border: 2px solid #f1f5f9 !important;
+    border-radius: 12px !important;
+    padding: 10px 15px !important;
+    background-color: #f8fafc !important;
+    color: #2d3748 !important;
+    font-size: 0.95rem !important;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #3182ce !important; /* Azul Ragon */
+    background-color: #ffffff !important;
+    box-shadow: 0 0 0 4px rgba(49, 130, 206, 0.1) !important;
+}
+
+label {
+    font-weight: 700 !important;
+    color: #64748b !important;
+    font-size: 0.85rem !important;
+    margin-bottom: 8px !important;
+}

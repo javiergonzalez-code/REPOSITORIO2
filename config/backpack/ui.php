@@ -46,7 +46,7 @@ return [
     // ----
 
     // Project name - shown in the window title
-    'project_name' => 'Backpack Admin Panel',
+    'project_name' => 'Ragon<b>Admin</b>',
 
     // Content of the HTML meta robots tag to prevent indexing and link following
     'meta_robots_content' => 'noindex, nofollow',
@@ -72,14 +72,9 @@ return [
     // FOOTER
     // ------
 
-    // Developer or company name. Shown in footer.
-    'developer_name' => 'Cristian Tabacitu',
-
-    // Developer website. Link in footer. Type false if you want to hide it.
-    'developer_link' => 'http://tabacitu.ro',
-
-    // Show powered by Laravel Backpack in the footer? true/false
-    'show_powered_by' => true,
+    'developer_name' => 'Tu Nombre o Empresa',
+    'developer_link' => 'https://tusitio.com',
+    'show_powered_by' => false,
 
     // ---------
     // DASHBOARD
@@ -106,7 +101,8 @@ return [
     // CSS files that are loaded in all pages, using Laravel's @vite() helper
     // Please note that support for Vite was added in Laravel 9.19. Earlier versions are not able to use this feature.
     'vite_styles' => [ // resource file_path
-        // 'resources/css/app.css',
+        'resources/css/app.css',
+        'resources/css/backpack-custom.css',
     ],
 
     // --------------
