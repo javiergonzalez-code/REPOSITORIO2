@@ -20,7 +20,6 @@ class User extends Authenticatable
         'codigo',
         'rfc',
         'telefono',
-        'role', // Veo que tienes un campo 'role' directo en la tabla
     ];
 
     protected $hidden = [

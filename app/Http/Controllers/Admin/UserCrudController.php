@@ -54,21 +54,45 @@ class UserCrudController extends CrudController
         // Esto define los inputs del formulario de crear/editar
         CRUD::field('name')->label('Nombre Completo');
         CRUD::field('email')->type('email')->label('Correo');
-        
+
         // Campo para la contraseña (solo si se está creando o si se quiere cambiar)
         CRUD::field('password')->type('password')->label('Contraseña');
-        
+
         // Tus campos personalizados basados en tu modelo User.php
         CRUD::field('id')->label('Código de Estudiante/Empleado');
         CRUD::field('rfc')->label('RFC');
         CRUD::field('telefono')->label('Teléfono');
-        
+
         // Si 'role' es un texto simple en base de datos:
-        CRUD::field('role')->type('select_from_array')->options([
-            'admin' => 'Administrador',
-            'user' => 'Usuario',
-            'student' => 'Estudiante'
-        ])->label('Rol Asignado');
+        // CRUD::field('role')->type('select_from_array')->options([
+        //     'admin' => 'Administrador',
+        //     'user' => 'Usuario',
+        //     'student' => 'Estudiante'
+        // ])->label('Rol Asignado');
+
+        CRUD::field('roles,permissions')
+            ->type('checklist_dependency') // O 'select_multiple'
+            ->label('Roles y Permisos')
+            ->subfields([
+                'primary' => [
+                    'label'            => 'Roles',
+                    'name'             => 'roles', // La relación en el modelo User (Spatie la provee)
+                    'entity'           => 'roles', // El modelo de rol
+                    'entity_secondary' => 'permissions', // La relación secundaria
+                    'attribute'        => 'name', // El atributo a mostrar
+                    'model'            => config('permission.models.role'), // Modelo Role de Spatie
+                    'pivot'            => true, // IMPORTANTE: es una relación n-n
+                ],
+                'secondary' => [
+                    'label'          => 'Permisos',
+                    'name'           => 'permissions', // La relación en el modelo User
+                    'entity'         => 'permissions', // El modelo de permiso
+                    'entity_primary' => 'roles', // La relación primaria
+                    'attribute'      => 'name', // El atributo a mostrar
+                    'model'          => config('permission.models.permission'), // Modelo Permission de Spatie
+                    'pivot'          => true,
+                ],
+            ]);
     }
 
     protected function setupUpdateOperation()
