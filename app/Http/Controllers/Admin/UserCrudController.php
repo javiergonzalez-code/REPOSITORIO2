@@ -43,8 +43,7 @@ class UserCrudController extends CrudController
         CRUD::column('name')->label('Nombre');
         CRUD::column('email')->label('Correo Electrónico');
         CRUD::column('role')->label('Rol');
-        CRUD::column('id')->label('id');
-        // No mostramos password por seguridad
+        CRUD::column('roles')->type('relationship')->label('Roles')->attribute('name');        // No mostramos password por seguridad
     }
 
     protected function setupCreateOperation()
@@ -59,7 +58,7 @@ class UserCrudController extends CrudController
         CRUD::field('password')->type('password')->label('Contraseña');
 
         // Tus campos personalizados basados en tu modelo User.php
-        CRUD::field('id')->label('Código de Estudiante/Empleado');
+        CRUD::field('codigo')->label('Códigoo');
         CRUD::field('rfc')->label('RFC');
         CRUD::field('telefono')->label('Teléfono');
 

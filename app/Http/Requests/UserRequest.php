@@ -24,8 +24,16 @@ class UserRequest extends FormRequest
      */
     public function rules()
     {
+        // Obtener el ID del usuario si se está editando (para ignorar su propio email en la validación unique)
+        $userId = backpack_user()->id ?? null;
+        // O mejor: $userId = $this->route('id');
+
         return [
-            // 'name' => 'required|min:5|max:255'
+            'name'     => 'required|min:2|max:255',
+            'email'    => 'required|email|unique:users,email,' . $this->route('id'), // Ignorar el actual al editar
+            'password' => 'sometimes|nullable|min:6', // 'required' solo en create, lógica compleja
+            'codigo'   => 'nullable|string|max:20',
+            'rfc'      => 'nullable|string|max:13',
         ];
     }
 
