@@ -46,7 +46,7 @@ return [
     // ----
 
     // Project name - shown in the window title
-    'project_name' => 'Ragon<b>Admin</b>',
+    'project_name' => 'SuperAdmin',
 
     // Content of the HTML meta robots tag to prevent indexing and link following
     'meta_robots_content' => 'noindex, nofollow',
@@ -66,13 +66,13 @@ return [
     'project_logo' => '<b>Back</b>pack',
 
     // Show / hide breadcrumbs on admin panel pages.
-    'breadcrumbs' => true,
+    'breadcrumbs' => false,
 
     // ------
     // FOOTER
     // ------
 
-    'developer_name' => 'Tu Nombre o Empresa',
+    'developer_name' => 'Comercializador Ragón S.A. de C.V.',
     'developer_link' => 'https://tusitio.com',
     'show_powered_by' => false,
 
@@ -101,7 +101,7 @@ return [
     // CSS files that are loaded in all pages, using Laravel's @vite() helper
     // Please note that support for Vite was added in Laravel 9.19. Earlier versions are not able to use this feature.
     'vite_styles' => [ // resource file_path
-        'resources/css/app.css',
+        //'resources/css/app.css',
         'resources/css/backpack-custom.css',
     ],
 

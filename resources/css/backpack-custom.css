@@ -1,154 +1,299 @@
 /* resources/css/backpack-custom.css */
 
-/* 1. Fondo General */
-body.app, .page {
-    background-color: #f7fafc !important; /* Tu --bg-light */
-    font-family: "Instrument Sans", ui-sans-serif, system-ui, sans-serif !important;
+/* --- 1. VARIABLES Y FUENTES (Estilo Ragon) --- */
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+    --ragon-primary: #1a202c;
+    --ragon-accent: #3182ce;
+    --bg-light: #f4f7fe;
+    --card-radius: 20px;
 }
 
-/* 2. Barra Lateral (Sidebar) y Navbar Superior */
-aside.navbar {
-    background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%) !important; /* Tu gradiente navbar-custom */
+body, .page {
+    background-color: var(--bg-light) !important;
+    font-family: "Instrument Sans", ui-sans-serif, system-ui, sans-serif !important;
+    color: #2d3748 !important;
+}
+
+/* --- 2. SIDEBAR (La barra lateral oscura) --- */
+/* Forzamos el gradiente Ragon en el sidebar de Tabler */
+aside.navbar-vertical {
+    background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%) !important;
     border-right: none !important;
 }
 
-aside.navbar .navbar-brand {
+/* Logo "Backpack" o Nombre del Proyecto */
+aside.navbar-vertical .navbar-brand, 
+aside.navbar-vertical .navbar-brand-autodark {
     color: #ffffff !important;
     font-weight: 800;
     letter-spacing: 1.5px;
     text-transform: uppercase;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
-/* Enlaces del menú lateral */
-aside.navbar .nav-link {
+/* Enlaces del menú */
+aside.navbar-vertical .nav-link {
     color: #e2e8f0 !important;
     font-weight: 500;
+    border-radius: 12px;
+    margin: 4px 12px;
+    padding: 10px 15px !important;
     transition: all 0.3s ease;
-    border-radius: 8px;
-    margin: 2px 10px;
 }
 
-aside.navbar .nav-link:hover {
+/* Iconos del menú */
+aside.navbar-vertical .nav-link .nav-link-icon {
+    color: #a0aec0 !important;
+}
+
+/* Hover en items del menú */
+aside.navbar-vertical .nav-link:hover {
     background-color: rgba(255, 255, 255, 0.1) !important;
     color: #63b3ed !important;
     transform: translateX(5px);
 }
 
-aside.navbar .nav-link.active {
-    background-color: #3182ce !important; /* Tu --ragon-accent */
-    color: #ffffff !important;
-    box-shadow: 0 4px 12px rgba(49, 130, 206, 0.3);
+aside.navbar-vertical .nav-link:hover .nav-link-icon {
+    color: #63b3ed !important;
 }
 
-aside.navbar .nav-link-icon {
-    color: #a0aec0 !important; /* Iconos más tenues */
+/* Item Activo */
+aside.navbar-vertical .nav-link.active {
+    background: var(--ragon-accent) !important; /* Azul brillante */
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(49, 130, 206, 0.4);
 }
-aside.navbar .nav-link:hover .nav-link-icon,
-aside.navbar .nav-link.active .nav-link-icon {
+
+aside.navbar-vertical .nav-link.active .nav-link-icon {
     color: #ffffff !important;
 }
 
-/* 3. Tarjetas (Cards) - Estilo "Ragon" */
+/* --- 3. TOP NAVBAR (La barra superior blanca/transparente) --- */
+header.navbar-expand-md {
+    background: transparent !important;
+    border-bottom: none !important;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+/* --- 4. TARJETAS Y CONTENEDORES --- */
 .card {
     border: none !important;
-    border-radius: 20px !important;
+    border-radius: var(--card-radius) !important;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05) !important;
     background: #ffffff !important;
-    margin-bottom: 20px;
-    overflow: hidden;
-    transition: transform 0.3s ease;
-}
-
-.card:hover {
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08) !important;
+    margin-bottom: 1.5rem;
+    overflow: hidden; /* Para que el header respete el radio */
 }
 
 .card-header {
     background: #ffffff !important;
     border-bottom: 1px solid #f1f5f9 !important;
-    padding: 20px 25px !important;
+    padding: 1.5rem !important;
 }
 
 .card-title {
     font-weight: 800 !important;
-    color: #2d3748 !important; /* Tu --text-main */
+    color: #1a202c !important;
+    font-size: 1.25rem !important;
     letter-spacing: -0.5px;
 }
 
-/* 4. Botones Principales */
+/* --- 5. BOTONES (Estilo Gradiente) --- */
 .btn-primary {
-    background: linear-gradient(135deg, #1a202c 0%, #3182ce 100%) !important; /* Gradiente Ragon */
+    background: linear-gradient(135deg, #1a237e 0%, #3949ab 100%) !important;
     border: none !important;
-    border-radius: 12px !important;
-    padding: 10px 20px !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.5px;
-    box-shadow: 0 4px 6px rgba(49, 130, 206, 0.2);
-    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(57, 73, 171, 0.3) !important;
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+    padding: 8px 20px !important;
+    transition: transform 0.2s ease !important;
 }
 
 .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 15px rgba(49, 130, 206, 0.3) !important;
+    box-shadow: 0 6px 15px rgba(57, 73, 171, 0.4) !important;
 }
 
-/* Botones Secundarios (Filtros, acciones menores) */
-.btn-secondary, .btn-ghost-secondary {
-    background: #ffffff !important;
-    border: 2px solid #e2e8f0 !important;
-    color: #475569 !important;
-    border-radius: 12px !important;
-    font-weight: 600 !important;
+/* Botones fantasmas o secundarios */
+.btn-ghost-secondary, .btn-link {
+    color: #64748b !important;
+    font-weight: 600;
+}
+.btn-ghost-secondary:hover {
+    background-color: #f1f5f9 !important;
+    color: var(--ragon-accent) !important;
 }
 
-.btn-secondary:hover {
-    border-color: #3182ce !important;
-    color: #3182ce !important;
-    background: #f8fafc !important;
-}
-
-/* 5. Tablas */
+/* --- 6. TABLAS (DataTables) --- */
 .table thead th {
     background-color: #ffffff !important;
     color: #64748b !important;
-    font-weight: 800 !important;
     text-transform: uppercase;
     font-size: 0.75rem !important;
-    letter-spacing: 1px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.05em;
     border-bottom: 2px solid #f1f5f9 !important;
-    padding: 15px !important;
+    padding: 15px 20px !important;
 }
 
 .table tbody td {
-    padding: 15px !important;
+    padding: 15px 20px !important;
     vertical-align: middle !important;
-    color: #2d3748 !important;
-    border-bottom: 1px solid #f1f5f9 !important;
+    color: #4a5568 !important;
+    border-bottom: 1px solid #f8fafc !important;
+    font-size: 0.9rem !important;
 }
 
 .table-hover tbody tr:hover {
-    background-color: #f8fafc !important; /* Hover suave */
+    background-color: #f8fafc !important;
 }
 
-/* 6. Inputs y Formularios (Create/Edit) */
+/* --- 7. FORMULARIOS E INPUTS --- */
 .form-control, .form-select {
-    border: 2px solid #f1f5f9 !important;
-    border-radius: 12px !important;
-    padding: 10px 15px !important;
     background-color: #f8fafc !important;
+    border: 2px solid #edf2f7 !important;
+    border-radius: 12px !important;
+    padding: 0.625rem 1rem !important;
     color: #2d3748 !important;
     font-size: 0.95rem !important;
+    transition: all 0.2s;
 }
 
 .form-control:focus, .form-select:focus {
-    border-color: #3182ce !important; /* Azul Ragon */
     background-color: #ffffff !important;
+    border-color: var(--ragon-accent) !important;
     box-shadow: 0 0 0 4px rgba(49, 130, 206, 0.1) !important;
 }
 
-label {
-    font-weight: 700 !important;
-    color: #64748b !important;
-    font-size: 0.85rem !important;
-    margin-bottom: 8px !important;
+/* Ajuste específico para Select2 (los dropdowns de Backpack) */
+.select2-container--bootstrap-5 .select2-selection {
+    border: 2px solid #edf2f7 !important;
+    border-radius: 12px !important;
+    background-color: #f8fafc !important;
+    min-height: 45px;
+    padding-top: 5px;
+}
+
+/* --- 8. MODO OSCURO (Compatibilidad Ragon) --- */
+/* Tabler usa data-bs-theme="dark" en el body */
+[data-bs-theme="dark"] body, 
+[data-bs-theme="dark"] .page {
+    background-color: #1a202c !important;
+    color: #f7fafc !important;
+}
+
+[data-bs-theme="dark"] .card, 
+[data-bs-theme="dark"] .card-header,
+[data-bs-theme="dark"] .modal-content {
+    background-color: #2d3748 !important;
+    color: #ffffff !important;
+    border-color: #4a5568 !important;
+}
+
+[data-bs-theme="dark"] .card-title,
+[data-bs-theme="dark"] h1, [data-bs-theme="dark"] h2, [data-bs-theme="dark"] h3 {
+    color: #ffffff !important;
+}
+
+[data-bs-theme="dark"] .table thead th {
+    background-color: #2d3748 !important;
+    color: #a0aec0 !important;
+    border-bottom-color: #4a5568 !important;
+}
+
+[data-bs-theme="dark"] .table tbody td {
+    color: #e2e8f0 !important;
+    border-bottom-color: #4a5568 !important;
+}
+
+[data-bs-theme="dark"] .table-hover tbody tr:hover {
+    background-color: #384559 !important;
+}
+
+[data-bs-theme="dark"] .form-control, 
+[data-bs-theme="dark"] .form-select {
+    background-color: #1a202c !important;
+    border-color: #4a5568 !important;
+    color: #ffffff !important;
+}
+
+/* --- 9. AJUSTES DE ESPACIADO "NUCLEAR" (Eliminar huecos grandes) --- */
+
+/* 1. Aplastar el encabezado de la página (Título y Breadcrumbs) */
+.page-header {
+    margin-bottom: 0px !important;
+    padding-bottom: 10px !important; /* Solo un respiro mínimo */
+    border-bottom: none !important;
+}
+
+/* 2. Subir el cuerpo de la página (La tabla/tarjeta) */
+.page-body {
+    padding-top: 0px !important;
+    margin-top: 0px !important;
+}
+
+/* 3. Eliminar margen superior del contenedor interno */
+.page-body .container-xl {
+    padding-top: 0px !important;
+}
+
+/* 4. Si hay una fila (row) envolviendo la tarjeta, quitarle el margen */
+.page-body .row:first-child {
+    margin-top: 0 !important;
+}
+
+/* 5. Pegar la tarjeta al techo del contenedor */
+.page-body .card {
+    margin-top: 0 !important;
+}
+
+/* 6. (Opcional) Si el espacio viene de los "breadcrumbs" (la ruta de navegación) y no los quieres */
+.breadcrumb {
+    margin-bottom: 5px !important;
+}
+
+/* MODO DEBUG: Pinta las cajas de colores para ver quién es el culpable */
+.page-header { background: rgba(255, 0, 0, 0.2) !important; }
+.page-body { background: rgba(0, 255, 0, 0.2) !important; }
+.page-wrapper { background: rgba(0, 0, 255, 0.2) !important; }
+
+/* --- 10. CORRECCIÓN MAESTRA DE ESPACIADO (WRAPPER) --- */
+
+/* 1. Eliminar el relleno superior del contenedor principal */
+.page-wrapper {
+    padding-top: 0px !important;
+    margin-top: 0px !important;
+}
+
+/* 2. IMPORTANTE: El contenedor interno también trae relleno por defecto. 
+   Esto suele ser lo que causa el "doble espacio" enorme. */
+.page-wrapper > .container-xl,
+.page-wrapper > .container-fluid {
+    padding-top: 10px !important; /* Solo dejamos 10px para que no toque el borde de la ventana */
+    padding-bottom: 0 !important;
+}
+
+/* 3. Comprimir el Encabezado de la Página (Título "Usuarios", Breadcrumbs) */
+.page-header {
+    margin-top: 10px !important;
+    margin-bottom: 10px !important; /* Reduce el espacio entre el título y la tabla */
+    padding-bottom: 0 !important;
+    border-bottom: none !important;
+    min-height: auto !important;
+}
+
+/* 4. Subir el cuerpo de la página (La tabla/tarjeta) */
+.page-body {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+/* 5. (Opcional) Si usas el layout "Vertical Transparent", la navbar superior vacía puede estar ocupando espacio */
+header.navbar-expand-md {
+    display: none !important; /* Oculta la barra superior si no la usas */
+    height: 0 !important;
+    padding: 0 !important;
 }

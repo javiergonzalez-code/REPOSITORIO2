@@ -1,9 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container mx-auto mt-8 px-4">
+    <div class="container mx-auto px-4">
         {{-- Header: Control de Accesos --}}
-        <div class="card border-0 shadow-sm rounded-4 mb-4 custom-card">
+        <div class="card border-0 shadow-sm rounded-4 custom-card">
             <div class="card-body p-4">
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-4">
                     <div>
@@ -26,7 +26,7 @@
         </div>
 
         {{-- Barra de Búsqueda y Filtros --}}
-        <div class="card border-0 shadow-sm rounded-4 mb-4 custom-card">
+        <div class="card border-0 shadow-sm rounded-4 mb-2 custom-card">
             <div class="card-body p-4">
                 <form action="{{ route('users.index') }}" method="GET">
                     <div class="row g-3">
