@@ -11,7 +11,6 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // AGREGA ESTA LÍNEA PARA ELIMINAR EL MIDDLEWARE QUE FALLA:
         $middleware->remove(\RealRashid\SweetAlert\ToSweetAlert::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
