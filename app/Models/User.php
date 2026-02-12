@@ -36,7 +36,6 @@ class User extends Authenticatable
         ];
     }
 
-    // app/Models/User.php
     public function setPasswordAttribute($value)
     {
         if ($value) {

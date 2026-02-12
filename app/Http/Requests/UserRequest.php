@@ -13,7 +13,7 @@ class UserRequest extends FormRequest
      */
     public function authorize()
     {
-        // only allow updates if the user is logged in
+        // Solo permitir si el usuario está autenticado en el panel administrativo
         return backpack_auth()->check();
     }
 
@@ -24,16 +24,16 @@ class UserRequest extends FormRequest
      */
     public function rules()
     {
-        // Obtener el ID del usuario si se está editando (para ignorar su propio email en la validación unique)
-        $userId = backpack_user()->id ?? null;
-        // O mejor: $userId = $this->route('id');
+        $userId = $this->route('id'); // Obtiene el ID del usuario en edición
 
         return [
             'name'     => 'required|min:2|max:255',
-            'email'    => 'required|email|unique:users,email,' . $this->route('id'), // Ignorar el actual al editar
-            'password' => 'sometimes|nullable|min:6', // 'required' solo en create, lógica compleja
+            'email'    => 'required|email|unique:users,email,' . $userId,
+            // La contraseña es obligatoria solo si no hay un ID de usuario (es una creación)
+            'password' => $userId ? 'nullable|min:6' : 'required|min:6',
             'codigo'   => 'nullable|string|max:20',
             'rfc'      => 'nullable|string|max:13',
+            'telefono' => 'nullable|string|max:20', // Añadido para coincidir con tu modelo y controlador
         ];
     }
 
@@ -45,7 +45,12 @@ class UserRequest extends FormRequest
     public function attributes()
     {
         return [
-            //
+            'name'     => 'Nombre',
+            'email'    => 'Correo Electrónico',
+            'password' => 'Contraseña',
+            'codigo'   => 'Código',
+            'rfc'      => 'RFC',
+            'telefono' => 'Teléfono',
         ];
     }
 
@@ -57,7 +62,8 @@ class UserRequest extends FormRequest
     public function messages()
     {
         return [
-            //
+            'email.unique' => 'Este correo electrónico ya está en uso.',
+            'password.required' => 'La contraseña es obligatoria para nuevos usuarios.',
         ];
     }
 }
