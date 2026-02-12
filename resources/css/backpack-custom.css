@@ -260,40 +260,56 @@ header.navbar-expand-md {
 .page-body { background: rgba(0, 255, 0, 0.2) !important; }
 .page-wrapper { background: rgba(0, 0, 255, 0.2) !important; }
 
-/* --- 10. CORRECCIÓN MAESTRA DE ESPACIADO (WRAPPER) --- */
+/* resources/css/backpack-custom.css */
 
-/* 1. Eliminar el relleno superior del contenedor principal */
+/* --- SOLUCIÓN FINAL: MATAR EL ESPACIO --- */
+
+/* 1. DESAPARECER el encabezado de página (Donde dice "Users" o "Dashboard") */
+/* Si este bloque existe, aunque tenga margen 0, ocupa altura. Lo ocultamos. */
+.page-header {
+    display: none !important; 
+}
+
+/* 2. ELIMINAR el padding del contenedor principal (El culpable habitual) */
 .page-wrapper {
     padding-top: 0px !important;
     margin-top: 0px !important;
 }
 
-/* 2. IMPORTANTE: El contenedor interno también trae relleno por defecto. 
-   Esto suele ser lo que causa el "doble espacio" enorme. */
-.page-wrapper > .container-xl,
-.page-wrapper > .container-fluid {
-    padding-top: 10px !important; /* Solo dejamos 10px para que no toque el borde de la ventana */
+/* 3. AJUSTAR el contenedor interno para que la tarjeta no toque el techo del navegador */
+/* Le damos solo 20px para que respire un poco, o ponle 0px si lo quieres pegado */
+.page-body .container-xl, 
+.page-body .container-fluid {
+    padding-top: 20px !important; 
     padding-bottom: 0 !important;
 }
 
-/* 3. Comprimir el Encabezado de la Página (Título "Usuarios", Breadcrumbs) */
-.page-header {
-    margin-top: 10px !important;
-    margin-bottom: 10px !important; /* Reduce el espacio entre el título y la tabla */
-    padding-bottom: 0 !important;
-    border-bottom: none !important;
-    min-height: auto !important;
+/* 4. Si por casualidad sigue activo el modo Horizontal, ocultamos la barra de navegación superior vacía */
+header.navbar-expand-md {
+    display: none !important;
+    height: 0 !important;
+    border: none !important;
 }
 
-/* 4. Subir el cuerpo de la página (La tabla/tarjeta) */
+/* 5. Asegurar que el body de la página no tenga relleno superior */
+.page-page {
+    padding-top: 0 !important;
+}
+
+/* Eliminamos paddings que quedan huérfanos */
+.page-wrapper {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+
 .page-body {
     margin-top: 0 !important;
     padding-top: 0 !important;
 }
 
-/* 5. (Opcional) Si usas el layout "Vertical Transparent", la navbar superior vacía puede estar ocupando espacio */
-header.navbar-expand-md {
-    display: none !important; /* Oculta la barra superior si no la usas */
+/* Si usas layout Vertical, a veces queda una barra superior vacía para móviles */
+.sticky-top {
+    position: static !important; /* Evita que flote ocupando espacio */
     height: 0 !important;
-    padding: 0 !important;
+    overflow: hidden !important;
 }
