@@ -275,11 +275,6 @@ header.navbar-expand-md {
 
 /* --- SOLUCIÓN FINAL: MATAR EL ESPACIO --- */
 
-/* 1. DESAPARECER el encabezado de página (Donde dice "Users" o "Dashboard") */
-/* Si este bloque existe, aunque tenga margen 0, ocupa altura. Lo ocultamos. */
-.page-header {
-    display: none !important; 
-}
 
 /* 2. ELIMINAR el padding del contenedor principal (El culpable habitual) */
 .page-wrapper {
@@ -297,7 +292,7 @@ header.navbar-expand-md {
 
 /* 4. Si por casualidad sigue activo el modo Horizontal, ocultamos la barra de navegación superior vacía */
 header.navbar-expand-md {
-    display: none !important;
+
     height: 0 !important;
     border: none !important;
 }
