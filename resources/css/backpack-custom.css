@@ -292,6 +292,8 @@ header.navbar-expand-md {
 
 /* 4. Si por casualidad sigue activo el modo Horizontal, ocultamos la barra de navegación superior vacía */
 header.navbar-expand-md {
+
+    height: 0 !important;
     border: none !important;
 }
 
