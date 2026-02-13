@@ -2,7 +2,18 @@
 
 /* --- 1. VARIABLES Y FUENTES (Estilo Ragon) --- */
 @import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap');
+/* Reduce el espacio vertical entre ítems del menú */
+.nav-sidebar .nav-item .nav-link {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+    min-height: auto !important; /* Esto elimina el height forzado si existe */
+}
 
+/* Ajusta el espacio de los encabezados (Gestión de Datos, etc) */
+.nav-sidebar .nav-heading {
+    margin-top: 1rem !important;
+    padding-bottom: 0.25rem !important;
+}
 :root {
     --ragon-primary: #1a202c;
     --ragon-accent: #3182ce;
@@ -312,4 +323,26 @@ header.navbar-expand-md {
     position: static !important; /* Evita que flote ocupando espacio */
     height: 0 !important;
     overflow: hidden !important;
+}
+
+/* Elimina el estiramiento de los elementos en la barra lateral */
+.nav-sidebar {
+    justify-content: flex-start !important;
+    height: auto !important;
+}
+
+/* Compacta los enlaces del menú */
+.nav-sidebar .nav-item .nav-link {
+    min-height: auto !important;
+    padding-top: 0.4rem !important;
+    padding-bottom: 0.4rem !important;
+    height: auto !important;
+}
+
+/* Ajusta el espacio de los encabezados de sección */
+.nav-sidebar .nav-heading {
+    margin-top: 0.5rem !important;
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.2rem !important;
+    background: transparent !important;
 }
