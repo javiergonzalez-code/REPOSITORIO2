@@ -1,4 +1,5 @@
-<header class="navbar navbar-expand-md navbar-light d-print-none" style="min-height: 0px !important; height: auto !important; padding-top: 0 !important; padding-bottom: 0 !important; margin-bottom: 0 !important;">    <div class="collapse navbar-collapse" id="navbar-menu">
+<header data-bs-theme={{ $theme ?? 'system' }} class="{{ backpack_theme_config('classes.menuHorizontalContainer') ?? 'navbar-expand-lg top' }}">
+    <div class="collapse navbar-collapse" id="navbar-menu">
         <div class="d-print-none {{ backpack_theme_config('classes.menuHorizontalContent') ?? 'navbar navbar-expand-lg navbar-'.($theme ?? 'light').' navbar-'.(($overlap ?? false) ? 'overlap' : '') }}">
             <div class="{{ backpack_theme_config('options.useFluidContainers') ? 'container-fluid' : 'container-xxl' }}">
                 <ul class="navbar-nav">
