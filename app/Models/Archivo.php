@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Archivo extends Model
 {
     use HasFactory;
+    use \Backpack\CRUD\app\Models\Traits\CrudTrait;
     /**
      * Atributos que se pueden asignar de manera masiva.
      * Esto es una medida de seguridad (Mass Assignment) para evitar que 

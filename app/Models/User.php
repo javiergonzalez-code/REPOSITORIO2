@@ -32,7 +32,8 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            //'password' => 'hashed',
+            //se corre el riesgo de hashear el hash (doble encriptación), lo que hará que el usuario nunca pueda iniciar sesión
         ];
     }
 
@@ -41,6 +42,6 @@ class User extends Authenticatable
         if ($value) {
             $this->attributes['password'] = bcrypt($value); // O Hash::make($value)
         }
-        // Si $value es null o vacío, no hace nada, manteniendo la contraseña vieja.
+        // Si $value es null o vacío, no hace nada, manteniendo la contraseña vieja
     }
 }

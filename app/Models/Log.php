@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Log extends Model
 {
     use HasFactory;
+    use \Backpack\CRUD\app\Models\Traits\CrudTrait;
     /**
      * Define la "lista blanca" de campos que pueden ser llenados masivamente.
      * Esto permite usar Log::create([...]) de forma segura.

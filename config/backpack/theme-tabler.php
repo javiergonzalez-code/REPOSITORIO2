@@ -58,7 +58,6 @@ return [
          * The available color modes.
          */
         'colorModes' => [
-            'system' => 'la-desktop',
             'light' => 'la-sun',
             'dark' => 'la-moon',
         ],
@@ -174,5 +173,12 @@ return [
      * 1. Create a new blade file in resources/views/layouts/your-custom-layout.blade.php
      * 2. Replace the value of layout on this file with "your-custom-layout"
      * 3. Customize the blade and place components such as sidebar, header, top-bar, where you need them!
+     * 
+     * 
      */
+
+    'styles' => [
+        base_path('resources/css/custom.css'),
+    ],
+
 ];

@@ -19,87 +19,71 @@ class UserCrudController extends CrudController
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
 
-    /**
-     * Configure the CrudPanel object. Apply settings to all operations.
-     * 
-     * @return void
-     */
     public function setup()
     {
         CRUD::setModel(\App\Models\User::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/user');
-        CRUD::setEntityNameStrings('user', 'users');
+        CRUD::setEntityNameStrings('usuario', 'usuarios');
 
+        // Solo permitir editar si tiene permiso
         if (!backpack_user()->can('edit users')) {
             $this->crud->denyAccess('update');
         }
     }
 
-    /**
-     * Define what happens when the List operation is loaded.
-     * 
-     * @see  https://backpackforlaravel.com/docs/crud-operation-list-entries
-     * @return void
-     */
     protected function setupListOperation()
     {
-        // Esto define qué columnas se ven en la tabla principal
         CRUD::column('name')->label('Nombre');
         CRUD::column('email')->label('Correo Electrónico');
-        CRUD::column('role')->label('Rol');
-        CRUD::column('roles')->type('relationship')->label('Roles')->attribute('name');        // No mostramos password por seguridad
+        // Mostrar roles en la lista (opcional, solo visual)
+        CRUD::column('roles')->type('relationship')->label('Roles')->attribute('name'); 
     }
 
     protected function setupCreateOperation()
     {
         CRUD::setValidation(\App\Http\Requests\UserRequest::class);
 
-        // Esto define los inputs del formulario de crear/editar
+        // --- CAMPOS GENERALES (Para todos) ---
         CRUD::field('name')->label('Nombre Completo');
         CRUD::field('email')->type('email')->label('Correo');
-
-        // Campo para la contraseña (solo si se está creando o si se quiere cambiar)
-        CRUD::field('password')->type('password')->label('Contraseña');
-
-        // Tus campos personalizados basados en tu modelo User.php
-        CRUD::field('codigo')->label('Códigoo');
+        CRUD::field('password')->type('password')->label('Contraseña')->hint('Dejar vacío para mantener la actual.');
+        
+        CRUD::field('codigo')->label('Código');
         CRUD::field('rfc')->label('RFC');
         CRUD::field('telefono')->label('Teléfono');
 
-        // Si 'role' es un texto simple en base de datos:
-        // CRUD::field('role')->type('select_from_array')->options([
-        //     'admin' => 'Administrador',
-        //     'user' => 'Usuario',
-        //     'student' => 'Estudiante'
-        // ])->label('Rol Asignado');
-
-        CRUD::field('roles,permissions')
-            ->type('checklist_dependency') // O 'select_multiple'
-            ->label('Roles y Permisos')
-            ->subfields([
-                'primary' => [
-                    'label'            => 'Roles',
-                    'name'             => 'roles', // La relación en el modelo User (Spatie la provee)
-                    'entity'           => 'roles', // El modelo de rol
-                    'entity_secondary' => 'permissions', // La relación secundaria
-                    'attribute'        => 'name', // El atributo a mostrar
-                    'model'            => config('permission.models.role'), // Modelo Role de Spatie
-                    'pivot'            => true, // IMPORTANTE: es una relación n-n
-                ],
-                'secondary' => [
-                    'label'          => 'Permisos',
-                    'name'           => 'permissions', // La relación en el modelo User
-                    'entity'         => 'permissions', // El modelo de permiso
-                    'entity_primary' => 'roles', // La relación primaria
-                    'attribute'      => 'name', // El atributo a mostrar
-                    'model'          => config('permission.models.permission'), // Modelo Permission de Spatie
-                    'pivot'          => true,
-                ],
-            ]);
+        // --- CAMPO PROTEGIDO (Solo para Super Admin) ---
+        // Verificamos el rol AQUÍ para que sirva tanto al crear como al editar
+        if (backpack_user()->hasRole('Super Admin')) { 
+            CRUD::field('roles,permissions')
+                ->type('checklist_dependency')
+                ->label('Roles y Permisos')
+                ->subfields([
+                    'primary' => [
+                        'label'            => 'Roles',
+                        'name'             => 'roles', 
+                        'entity'           => 'roles', 
+                        'entity_secondary' => 'permissions', 
+                        'attribute'        => 'name', 
+                        'model'            => config('permission.models.role'), 
+                        'pivot'            => true, 
+                    ],
+                    'secondary' => [
+                        'label'          => 'Permisos',
+                        'name'           => 'permissions', 
+                        'entity'         => 'permissions', 
+                        'entity_primary' => 'roles', 
+                        'attribute'      => 'name', 
+                        'model'          => config('permission.models.permission'), 
+                        'pivot'          => true,
+                    ],
+                ]);
+        }
     }
 
     protected function setupUpdateOperation()
     {
+        // Al llamar a esto, se ejecuta la lógica de arriba, incluyendo la validación del rol 'Super Admin'
         $this->setupCreateOperation();
     }
 }
