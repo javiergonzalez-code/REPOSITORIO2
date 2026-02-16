@@ -35,11 +35,18 @@ class Archivo extends Model
 
     public function setRutaAttribute($value)
     {
-        $attribute_name = "ruta"; // El nombre de la columna en la BD
-        $disk = "public"; // Guardar en storage/app/public
-        $destination_path = "uploads/archivos"; // Carpeta destino
+        $attribute_name = "ruta";
+        $disk = "public";
+        $destination_path = "uploads/archivos";
 
-        // Lógica estándar de Backpack para subida de archivos
+        // CORRECCIÓN PARA QUE EL SEEDER FUNCIONE:
+        // Si el valor es un string (viene del Seeder o Factory), lo guardamos directo.
+        if (is_string($value) && $value != null) {
+            $this->attributes[$attribute_name] = $value;
+            return;
+        }
+
+        // Si no es string (es un archivo subido desde el formulario), dejamos que Backpack lo procese
         $this->uploadFileToDisk($value, $attribute_name, $disk, $destination_path);
     }
 
