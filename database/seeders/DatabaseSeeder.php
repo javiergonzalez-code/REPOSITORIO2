@@ -21,7 +21,23 @@ class DatabaseSeeder extends Seeder
     {
         // 0. Limpiar caché de permisos para evitar errores
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        // 1. Crear Permisos (ESTO FALTABA)
+        Permission::firstOrCreate(['name' => 'edit users']);
+        Permission::firstOrCreate(['name' => 'list users']);
+        Permission::firstOrCreate(['name' => 'delete users']);
+        // Permisos para archivos
+        Permission::firstOrCreate(['name' => 'list archivos']);
+        Permission::firstOrCreate(['name' => 'upload archivos']);
 
+        // 2. Crear Roles y asignar permisos
+        $roleAdmin = Role::firstOrCreate(['name' => 'admin']);
+        $roleProveedor = Role::firstOrCreate(['name' => 'proveedor']);
+
+        // Asignar permisos al rol Admin
+        $roleAdmin->givePermissionTo(['edit users', 'list users', 'delete users', 'list archivos', 'upload archivos']);
+
+        // Asignar permisos al rol Proveedor (ejemplo)
+        $roleProveedor->givePermissionTo(['upload archivos']);
         // 1. Crear los Roles en la tabla de Spatie
         // Usamos 'firstOrCreate' para que no falle si ejecutas el seeder dos veces
         $roleAdmin = Role::firstOrCreate(['name' => 'admin']);
@@ -57,7 +73,7 @@ class DatabaseSeeder extends Seeder
         // Para este ejemplo, dejaremos que factory cree usuarios nuevos para los archivos 
         // o puedes vincularlos a los 95 proveedores si prefieres.
         Archivo::factory(100)->create()->each(function ($archivo) {
-            
+
             Log::create([
                 'user_id'    => $archivo->user_id,
                 'accion'     => 'SUBIDA DE ARCHIVO',

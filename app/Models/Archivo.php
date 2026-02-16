@@ -32,4 +32,20 @@ class Archivo extends Model
         // Esto permite acceder al nombre del autor así: $archivo->user->name
         return $this->belongsTo(User::class);
     }
+
+    public function setRutaAttribute($value)
+    {
+        $attribute_name = "ruta"; // El nombre de la columna en la BD
+        $disk = "public"; // Guardar en storage/app/public
+        $destination_path = "uploads/archivos"; // Carpeta destino
+
+        // Lógica estándar de Backpack para subida de archivos
+        $this->uploadFileToDisk($value, $attribute_name, $disk, $destination_path);
+    }
+
+    // Opcional: Accessor para obtener la URL completa
+    public function getRutaUrlAttribute()
+    {
+        return asset('storage/' . $this->ruta);
+    }
 }

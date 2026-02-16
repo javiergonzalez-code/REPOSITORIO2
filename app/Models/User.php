@@ -44,4 +44,10 @@ class User extends Authenticatable
         }
         // Si $value es null o vacío, no hace nada, manteniendo la contraseña vieja
     }
+
+    public function archivos()
+    {
+        return $this->hasMany(Archivo::class);
+    }
 }
+
