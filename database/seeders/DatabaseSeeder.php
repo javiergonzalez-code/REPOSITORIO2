@@ -7,77 +7,71 @@ use App\Models\Archivo;
 use App\Models\Log;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;       // [IMPORTANTE] Necesario para crear roles
-use Spatie\Permission\Models\Permission; // [IMPORTANTE] Necesario para permisos
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\PermissionRegistrar;
 
 class DatabaseSeeder extends Seeder
 {
     use WithoutModelEvents;
 
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
         // 0. Limpiar caché de permisos para evitar errores
-        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
-        // 1. Crear Permisos (ESTO FALTABA)
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
+
+        // 1. Crear Permisos (Tus permisos específicos)
+        // Usuarios
         Permission::firstOrCreate(['name' => 'edit users']);
         Permission::firstOrCreate(['name' => 'list users']);
         Permission::firstOrCreate(['name' => 'delete users']);
-        // Permisos para archivos
+        // Archivos
         Permission::firstOrCreate(['name' => 'list archivos']);
         Permission::firstOrCreate(['name' => 'upload archivos']);
+        Permission::firstOrCreate(['name' => 'delete archivos']); // Agregado por si acaso
 
-        // 2. Crear Roles y asignar permisos
+        // 2. Crear Roles
         $roleAdmin = Role::firstOrCreate(['name' => 'admin']);
         $roleProveedor = Role::firstOrCreate(['name' => 'proveedor']);
 
-        // Asignar permisos al rol Admin
-        $roleAdmin->givePermissionTo(['edit users', 'list users', 'delete users', 'list archivos', 'upload archivos']);
+        // 3. Asignar permisos a los Roles
+        // Admin tiene todo
+        $roleAdmin->givePermissionTo(Permission::all());
+        
+        // Proveedor solo puede subir y listar sus archivos
+        $roleProveedor->givePermissionTo(['list archivos', 'upload archivos']);
 
-        // Asignar permisos al rol Proveedor (ejemplo)
-        $roleProveedor->givePermissionTo(['upload archivos']);
-        // 1. Crear los Roles en la tabla de Spatie
-        // Usamos 'firstOrCreate' para que no falle si ejecutas el seeder dos veces
-        $roleAdmin = Role::firstOrCreate(['name' => 'admin']);
-        $roleProveedor = Role::firstOrCreate(['name' => 'proveedor']);
-
-        // 2. Crear 5 ADMINISTRADORES
-        User::factory(5)->create([
-            'role' => 'admin', // Actualizamos la columna de texto simple (para que lo veas en la DB)
-        ])->each(function ($user) use ($roleAdmin) {
-            $user->assignRole($roleAdmin); // Asignamos el rol real de Spatie
-        });
-
-        // 3. Crear 95 USUARIOS NORMALES (Proveedores)
-        User::factory(95)->create([
-            'role' => 'proveedor', // Columna de texto simple
-        ])->each(function ($user) use ($roleProveedor) {
-            $user->assignRole($roleProveedor); // Rol de Spatie
-        });
-
-        // 4. Tu usuario de prueba (Super Admin)
-        $myUser = User::factory()->create([
-            'name'     => 'Test User',
-            'email'    => 'test@example.com',
-            'password' => bcrypt('holamundo1234'),
-            'role'     => 'admin',
-        ]);
+        // 4. Tu usuario de prueba (Super Admin) - Para que puedas loguearte ya
+        $myUser = User::firstOrCreate(
+            ['email' => 'test@example.com'],
+            [
+                'name'     => 'Test User',
+                'password' => bcrypt('holamundo1234'),
+                // 'role'     => 'admin', // Descomentar solo si tienes la columna 'role' en tu tabla users
+            ]
+        );
         $myUser->assignRole($roleAdmin);
 
+        // 5. Crear 5 ADMINISTRADORES extra
+        User::factory(5)->create([
+            // 'role' => 'admin', 
+        ])->each(function ($user) use ($roleAdmin) {
+            $user->assignRole($roleAdmin);
+        });
 
-        // 5. Crear 100 archivos y sus logs
-        // Nota: Esto creará 100 usuarios extra (propios de cada archivo) si no vinculamos
-        // los archivos a los usuarios que acabamos de crear. 
-        // Para este ejemplo, dejaremos que factory cree usuarios nuevos para los archivos 
-        // o puedes vincularlos a los 95 proveedores si prefieres.
+        // 6. Crear 95 PROVEEDORES
+        User::factory(95)->create([
+            // 'role' => 'proveedor', 
+        ])->each(function ($user) use ($roleProveedor) {
+            $user->assignRole($roleProveedor);
+        });
+
+        // 7. Crear 100 archivos y sus logs correspondientes
         Archivo::factory(100)->create()->each(function ($archivo) {
-
             Log::create([
-                'user_id'    => $archivo->user_id,
+                'user_id'    => $archivo->user_id, // Usamos el ID del usuario que creó el archivo
                 'accion'     => 'SUBIDA DE ARCHIVO',
-                'modulo'     => 'ORDENES DE COMPRA',
+                'modulo'     => $archivo->modulo ?? 'ORDENES DE COMPRA', // Usar el módulo del archivo o default
                 'created_at' => $archivo->created_at,
             ]);
         });

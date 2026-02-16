@@ -18,9 +18,9 @@ class Archivo extends Model
         'user_id',
         'nombre_original',
         'nombre_sistema',
-        'tipo_archivo', 
-        'ruta',
-        'modulo'
+        'tipo_archivo',
+        'modulo',
+        'ruta'
     ];
 
     /**
