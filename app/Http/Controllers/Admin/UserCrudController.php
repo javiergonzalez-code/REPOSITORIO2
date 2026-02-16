@@ -43,27 +43,25 @@ class UserCrudController extends CrudController
     {
         CRUD::setValidation(\App\Http\Requests\UserRequest::class);
 
-        // --- CAMPOS GENERALES ---
+        // --- Datos Personales ---
         CRUD::field('name')->label('Nombre Completo');
-        CRUD::field('email')->type('email')->label('Correo');
-        CRUD::field('password')->type('password')->label('Contraseña')->hint('Dejar vacío para mantener la actual.');
+        CRUD::field('email')->type('email')->label('Correo Electrónico');
+        CRUD::field('password')->type('password')->label('Contraseña')->hint('Dejar vacío para mantener la actual');
         CRUD::field('codigo')->label('Código');
         CRUD::field('rfc')->label('RFC');
         CRUD::field('telefono')->label('Teléfono');
 
-        // --- GESTIÓN DE ROLES Y PERMISOS ---
-        // Solo el Super Admin (o quien tenga permiso de editar roles) debería ver esto.
-        // El 'checklist_dependency' maneja tanto Roles como Permisos visualmente.
-        
-        if (backpack_user()->hasRole('admin') || backpack_user()->can('edit users')) {
+        // --- Roles y Permisos (Integración Spatie) ---
+        // Se muestra solo si el usuario tiene permisos o es admin
+        if (backpack_user()->can('manage roles') || backpack_user()->hasRole('admin')) {
             CRUD::addField([
                 'label'             => 'Roles y Permisos',
                 'type'              => 'checklist_dependency',
-                'name'              => 'roles,permissions', // Nombre compuesto requerido por este campo
+                'name'              => 'roles,permissions', 
                 'subfields'         => [
                     'primary' => [
                         'label'            => 'Roles',
-                        'name'             => 'roles', // Relación en User model
+                        'name'             => 'roles', 
                         'entity'           => 'roles',
                         'entity_secondary' => 'permissions',
                         'attribute'        => 'name',
@@ -71,8 +69,8 @@ class UserCrudController extends CrudController
                         'pivot'            => true, 
                     ],
                     'secondary' => [
-                        'label'          => 'Permisos Extras (Directos)',
-                        'name'           => 'permissions', // Relación en User model
+                        'label'          => 'Permisos Extras',
+                        'name'           => 'permissions', 
                         'entity'         => 'permissions',
                         'entity_primary' => 'roles',
                         'attribute'      => 'name',

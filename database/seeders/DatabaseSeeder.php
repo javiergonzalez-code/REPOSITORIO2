@@ -17,61 +17,59 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
-        // 0. Limpiar caché de permisos para evitar errores
+        // 0. Limpiar caché de permisos
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // 1. Crear Permisos (Tus permisos específicos)
-        // Usuarios
-        Permission::firstOrCreate(['name' => 'edit users']);
-        Permission::firstOrCreate(['name' => 'list users']);
-        Permission::firstOrCreate(['name' => 'delete users']);
-        // Archivos
-        Permission::firstOrCreate(['name' => 'list archivos']);
-        Permission::firstOrCreate(['name' => 'upload archivos']);
-        Permission::firstOrCreate(['name' => 'delete archivos']); // Agregado por si acaso
+        // 1. Crear Permisos
+        $permissions = [
+            'edit users', 'list users', 'delete users',
+            'list archivos', 'upload archivos', 'delete archivos'
+        ];
+
+        foreach ($permissions as $permission) {
+            Permission::firstOrCreate(['name' => $permission]);
+        }
 
         // 2. Crear Roles
         $roleAdmin = Role::firstOrCreate(['name' => 'admin']);
         $roleProveedor = Role::firstOrCreate(['name' => 'proveedor']);
 
         // 3. Asignar permisos a los Roles
-        // Admin tiene todo
-        $roleAdmin->givePermissionTo(Permission::all());
-        
-        // Proveedor solo puede subir y listar sus archivos
-        $roleProveedor->givePermissionTo(['list archivos', 'upload archivos']);
+        $roleAdmin->syncPermissions(Permission::all());
+        $roleProveedor->syncPermissions(['list archivos', 'upload archivos']);
 
-        // 4. Tu usuario de prueba (Super Admin) - Para que puedas loguearte ya
-        $myUser = User::firstOrCreate(
-            ['email' => 'test@example.com'],
+        // 4. Tu usuario personal (Super Admin)
+        // Usamos updateOrCreate para que si ya existe, solo le asigne el rol correctamente
+        $myUser = User::updateOrCreate(
+            ['email' => 'admin@ragon.com'], // Usa el correo que usaste en Tinker
             [
-                'name'     => 'Test User',
+                'name'     => 'Administrador Principal',
                 'password' => bcrypt('holamundo1234'),
-                // 'role'     => 'admin', // Descomentar solo si tienes la columna 'role' en tu tabla users
+                'role'     => 'admin', // Actualizamos tu columna física
             ]
         );
         $myUser->assignRole($roleAdmin);
 
         // 5. Crear 5 ADMINISTRADORES extra
         User::factory(5)->create([
-            // 'role' => 'admin', 
+            'role' => 'admin',
         ])->each(function ($user) use ($roleAdmin) {
             $user->assignRole($roleAdmin);
         });
 
         // 6. Crear 95 PROVEEDORES
         User::factory(95)->create([
-            // 'role' => 'proveedor', 
+            'role' => 'proveedor', // Aseguramos que la columna física diga proveedor
         ])->each(function ($user) use ($roleProveedor) {
             $user->assignRole($roleProveedor);
         });
 
-        // 7. Crear 100 archivos y sus logs correspondientes
+        // 7. Crear 100 archivos y sus logs
         Archivo::factory(100)->create()->each(function ($archivo) {
             Log::create([
-                'user_id'    => $archivo->user_id, // Usamos el ID del usuario que creó el archivo
+                'user_id'    => $archivo->user_id,
                 'accion'     => 'SUBIDA DE ARCHIVO',
-                'modulo'     => $archivo->modulo ?? 'ORDENES DE COMPRA', // Usar el módulo del archivo o default
+                'modulo'     => $archivo->modulo ?? 'ORDENES DE COMPRA',
                 'created_at' => $archivo->created_at,
             ]);
         });
