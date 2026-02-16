@@ -43,7 +43,7 @@ class UserCrudController extends CrudController
     {
         CRUD::setValidation(\App\Http\Requests\UserRequest::class);
 
-        // --- CAMPOS GENERALES (Para todos) ---
+        // --- CAMPOS GENERALES ---
         CRUD::field('name')->label('Nombre Completo');
         CRUD::field('email')->type('email')->label('Correo');
         CRUD::field('password')->type('password')->label('Contraseña')->hint('Dejar vacío para mantener la actual.');
@@ -51,49 +51,41 @@ class UserCrudController extends CrudController
         CRUD::field('rfc')->label('RFC');
         CRUD::field('telefono')->label('Teléfono');
 
-        // Campo para asignar ROLES
-        CRUD::addField([
-            'label' => "Roles y Permisos",
-            'type' => 'select_multiple',
-            'name' => 'roles', // la relación en el modelo User (Spatie la inyecta automáticamente)
-            'entity' => 'roles',
-            'attribute' => 'name',
-            'model' => "Spatie\Permission\Models\Role",
-            'pivot' => true,
-        ]);
-
-        // --- CAMPO PROTEGIDO (Solo para Super Admin) ---
-        // Verificamos el rol AQUÍ para que sirva tanto al crear como al editar
-        if (backpack_user()->hasRole('Super Admin')) {
-            CRUD::field('roles,permissions')
-                ->type('checklist_dependency')
-                ->label('Roles y Permisos')
-                ->subfields([
+        // --- GESTIÓN DE ROLES Y PERMISOS ---
+        // Solo el Super Admin (o quien tenga permiso de editar roles) debería ver esto.
+        // El 'checklist_dependency' maneja tanto Roles como Permisos visualmente.
+        
+        if (backpack_user()->hasRole('admin') || backpack_user()->can('edit users')) {
+            CRUD::addField([
+                'label'             => 'Roles y Permisos',
+                'type'              => 'checklist_dependency',
+                'name'              => 'roles,permissions', // Nombre compuesto requerido por este campo
+                'subfields'         => [
                     'primary' => [
                         'label'            => 'Roles',
-                        'name'             => 'roles',
+                        'name'             => 'roles', // Relación en User model
                         'entity'           => 'roles',
                         'entity_secondary' => 'permissions',
                         'attribute'        => 'name',
                         'model'            => config('permission.models.role'),
-                        'pivot'            => true,
+                        'pivot'            => true, 
                     ],
                     'secondary' => [
-                        'label'          => 'Permisos',
-                        'name'           => 'permissions',
+                        'label'          => 'Permisos Extras (Directos)',
+                        'name'           => 'permissions', // Relación en User model
                         'entity'         => 'permissions',
                         'entity_primary' => 'roles',
                         'attribute'      => 'name',
                         'model'          => config('permission.models.permission'),
-                        'pivot'          => true,
+                        'pivot'          => true, 
                     ],
-                ]);
+                ],
+            ]);
         }
     }
 
     protected function setupUpdateOperation()
     {
-        // Al llamar a esto, se ejecuta la lógica de arriba, incluyendo la validación del rol 'Super Admin'
         $this->setupCreateOperation();
     }
 }
