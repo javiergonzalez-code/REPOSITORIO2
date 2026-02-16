@@ -25,10 +25,8 @@ class UserCrudController extends CrudController
         CRUD::setRoute(config('backpack.base.route_prefix') . '/user');
         CRUD::setEntityNameStrings('usuario', 'usuarios');
 
-        // Solo permitir editar si tiene permiso
-        if (!backpack_user()->can('edit users')) {
-            $this->crud->denyAccess('update');
-        }
+        // CAMBIO: Por ahora permite el acceso total mientras terminas de configurar
+        $this->crud->allowAccess(['list', 'create', 'update', 'delete']);
     }
 
     protected function setupListOperation()
@@ -57,25 +55,25 @@ class UserCrudController extends CrudController
             CRUD::addField([
                 'label'             => 'Roles y Permisos',
                 'type'              => 'checklist_dependency',
-                'name'              => 'roles,permissions', 
+                'name'              => 'roles,permissions',
                 'subfields'         => [
                     'primary' => [
                         'label'            => 'Roles',
-                        'name'             => 'roles', 
+                        'name'             => 'roles',
                         'entity'           => 'roles',
                         'entity_secondary' => 'permissions',
                         'attribute'        => 'name',
                         'model'            => config('permission.models.role'),
-                        'pivot'            => true, 
+                        'pivot'            => true,
                     ],
                     'secondary' => [
                         'label'          => 'Permisos Extras',
-                        'name'           => 'permissions', 
+                        'name'           => 'permissions',
                         'entity'         => 'permissions',
                         'entity_primary' => 'roles',
                         'attribute'      => 'name',
                         'model'          => config('permission.models.permission'),
-                        'pivot'          => true, 
+                        'pivot'          => true,
                     ],
                 ],
             ]);
