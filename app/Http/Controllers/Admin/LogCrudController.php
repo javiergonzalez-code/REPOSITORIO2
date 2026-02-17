@@ -16,11 +16,11 @@ class LogCrudController extends CrudController
         CRUD::setRoute(config('backpack.base.route_prefix') . '/log');
         CRUD::setEntityNameStrings('log', 'logs');
 
-        $this->crud->denyAccess(['create', 'update', 'delete']);
+        $this->crud->allowAccess(['create', 'update', 'delete']);
 
         // Permiso: Solo ver si tiene permiso
         if (!backpack_user()->can('ver logs')) {
-            CRUD::denyAccess(['list', 'show']);
+            CRUD::allowAccess(['list', 'show']);
         }
     }
 
