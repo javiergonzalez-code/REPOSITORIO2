@@ -266,14 +266,6 @@ header.navbar-expand-md {
     margin-bottom: 5px !important;
 }
 
-/* MODO DEBUG: Pinta las cajas de colores para ver quién es el culpable */
-.page-header { background: rgba(255, 0, 0, 0.2) !important; }
-.page-body { background: rgba(0, 255, 0, 0.2) !important; }
-.page-wrapper { background: rgba(0, 0, 255, 0.2) !important; }
-
-/* resources/css/backpack-custom.css */
-
-/* --- SOLUCIÓN FINAL: MATAR EL ESPACIO --- */
 
 
 /* 2. ELIMINAR el padding del contenedor principal (El culpable habitual) */
