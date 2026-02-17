@@ -6,11 +6,6 @@ use App\Http\Requests\UserRequest;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 
-/**
- * Class UserCrudController
- * @package App\Http\Controllers\Admin
- * @property-read \Backpack\CRUD\app\Library\CrudPanel\CrudPanel $crud
- */
 class UserCrudController extends CrudController
 {
     use \Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
@@ -24,59 +19,53 @@ class UserCrudController extends CrudController
         CRUD::setModel(\App\Models\User::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/user');
         CRUD::setEntityNameStrings('usuario', 'usuarios');
-
-        // CAMBIO: Por ahora permite el acceso total mientras terminas de configurar
-        $this->crud->allowAccess(['list', 'create', 'update', 'delete']);
+        
+        // Verificación de acceso básica (puedes refinar esto con permisos específicos luego)
+        // Ejemplo: if (!backpack_user()->can('list users')) { CRUD::denyAccess(['list']); }
     }
 
     protected function setupListOperation()
     {
         CRUD::column('name')->label('Nombre');
-        CRUD::column('email')->label('Correo Electrónico');
-        // Mostrar roles en la lista (opcional, solo visual)
-        CRUD::column('roles')->type('relationship')->label('Roles')->attribute('name');
+        CRUD::column('email')->label('Correo');
+        CRUD::column('roles')->label('Roles')->type('relationship')->attribute('name');
+        CRUD::column('created_at')->label('Creado')->type('date');
     }
 
     protected function setupCreateOperation()
     {
-        CRUD::setValidation(\App\Http\Requests\UserRequest::class);
+        CRUD::setValidation(UserRequest::class);
 
-        // --- Datos Personales ---
-        CRUD::field('name')->label('Nombre Completo');
-        CRUD::field('email')->type('email')->label('Correo Electrónico');
-        CRUD::field('password')->type('password')->label('Contraseña')->hint('Dejar vacío para mantener la actual');
-        CRUD::field('codigo')->label('Código');
-        CRUD::field('rfc')->label('RFC');
-        CRUD::field('telefono')->label('Teléfono');
+        // --- Datos Básicos ---
+        CRUD::field('name')->label('Nombre Completo')->size(6);
+        CRUD::field('email')->type('email')->label('Correo Electrónico')->size(6);
+        
+        // --- Contraseña ---
+        // Solo requerida en creación, opcional en edición
+        CRUD::field('password')
+            ->label('Contraseña')
+            ->type('password')
+            ->size(6)
+            ->hint('Dejar vacío para mantener la actual (solo edición)');
 
-        // --- Roles y Permisos (Integración Spatie) ---
-        // Se muestra solo si el usuario tiene permisos o es admin
+        // --- Datos Extra ---
+        CRUD::field('codigo')->label('Código')->size(6);
+        CRUD::field('rfc')->label('RFC')->size(6);
+        CRUD::field('telefono')->label('Teléfono')->size(6);
+
+        // --- Roles y Permisos ---
+        // Verifica el permiso que AHORA SÍ existe en el Seeder
         if (backpack_user()->can('manage roles') || backpack_user()->hasRole('admin')) {
-            CRUD::addField([
-                'label'             => 'Roles y Permisos',
-                'type'              => 'checklist_dependency',
-                'name'              => 'roles,permissions',
-                'subfields'         => [
-                    'primary' => [
-                        'label'            => 'Roles',
-                        'name'             => 'roles',
-                        'entity'           => 'roles',
-                        'entity_secondary' => 'permissions',
-                        'attribute'        => 'name',
-                        'model'            => config('permission.models.role'),
-                        'pivot'            => true,
-                    ],
-                    'secondary' => [
-                        'label'          => 'Permisos Extras',
-                        'name'           => 'permissions',
-                        'entity'         => 'permissions',
-                        'entity_primary' => 'roles',
-                        'attribute'      => 'name',
-                        'model'          => config('permission.models.permission'),
-                        'pivot'          => true,
-                    ],
-                ],
-            ]);
+            
+            // Campo para asignar ROL (Spatie)
+            CRUD::field('roles')
+                ->type('relationship')
+                ->label('Roles Asignados')
+                ->name('roles') // la relación en el modelo User
+                ->entity('roles') 
+                ->attribute('name')
+                ->pivot(true)
+                ->size(12); // Ocupa todo el ancho
         }
     }
 

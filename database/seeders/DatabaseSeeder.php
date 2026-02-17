@@ -17,13 +17,21 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
-        // 0. Limpiar caché de permisos
+        // 0. Limpiar caché
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // 1. Crear Permisos
+        // 1. Crear Permisos (CORREGIDO)
+        // Agregamos 'manage roles' y 'manage permissions' para que coincida con tu controlador
         $permissions = [
-            'edit users', 'list users', 'delete users',
-            'list archivos', 'upload archivos', 'delete archivos'
+            'manage roles',
+            'manage permissions',
+            'create users', // Faltaba este para la operación create
+            'edit users',
+            'list users',
+            'delete users',
+            'list archivos',
+            'upload archivos',
+            'delete archivos'
         ];
 
         foreach ($permissions as $permission) {
@@ -34,8 +42,11 @@ class DatabaseSeeder extends Seeder
         $roleAdmin = Role::firstOrCreate(['name' => 'admin']);
         $roleProveedor = Role::firstOrCreate(['name' => 'proveedor']);
 
-        // 3. Asignar permisos a los Roles
+        // 3. Asignar permisos (CORREGIDO)
+        // El Admin tiene todo
         $roleAdmin->syncPermissions(Permission::all());
+
+        // El proveedor solo lo suyo
         $roleProveedor->syncPermissions(['list archivos', 'upload archivos']);
 
         // 4. Tu usuario personal (Super Admin)
@@ -48,7 +59,7 @@ class DatabaseSeeder extends Seeder
                 'role'     => 'admin', // Actualizamos tu columna física
             ]
         );
-        $myUser->assignRole($roleAdmin);    
+        $myUser->assignRole($roleAdmin);
 
         // 5. Crear 5 ADMINISTRADORES extra
         User::factory(5)->create([
