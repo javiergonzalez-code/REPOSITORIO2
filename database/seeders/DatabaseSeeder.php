@@ -44,11 +44,11 @@ class DatabaseSeeder extends Seeder
             ['email' => 'admin@ragon.com'], // Usa el correo que usaste en Tinker
             [
                 'name'     => 'Administrador Principal',
-                'password' => bcrypt('holamundo1234'),
+                'password' => 'holamundo1234',
                 'role'     => 'admin', // Actualizamos tu columna física
             ]
         );
-        $myUser->assignRole($roleAdmin);
+        $myUser->assignRole($roleAdmin);    
 
         // 5. Crear 5 ADMINISTRADORES extra
         User::factory(5)->create([
