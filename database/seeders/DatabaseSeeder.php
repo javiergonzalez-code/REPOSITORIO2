@@ -25,13 +25,14 @@ class DatabaseSeeder extends Seeder
         $permissions = [
             'manage roles',
             'manage permissions',
-            'create users', // Faltaba este para la operación create
+            'create users',
             'edit users',
             'list users',
             'delete users',
             'list archivos',
             'upload archivos',
-            'delete archivos'
+            'delete archivos',
+            'list logs'
         ];
 
         foreach ($permissions as $permission) {

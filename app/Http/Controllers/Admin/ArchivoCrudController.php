@@ -22,6 +22,26 @@ class ArchivoCrudController extends CrudController
         CRUD::setModel(\App\Models\Archivo::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/archivo');
         CRUD::setEntityNameStrings('archivo', 'archivos');
+
+        // --- SEGURIDAD ---
+        // 1. Ver lista
+        if (!backpack_user()->can('list archivos')) {
+            CRUD::denyAccess(['list', 'show']);
+        }
+
+        // 2. Subir (Crear)
+        if (!backpack_user()->can('upload archivos')) {
+            CRUD::denyAccess(['create']);
+        }
+
+        // 3. Borrar
+        if (!backpack_user()->can('delete archivos')) {
+            CRUD::denyAccess(['delete']);
+        }
+
+        // Generalmente no editamos archivos, solo los subimos o borramos.
+        // Si no quieres permitir editar la metadata del archivo:
+        CRUD::denyAccess(['update']);
     }
 
     protected function setupListOperation()

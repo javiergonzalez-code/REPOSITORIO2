@@ -10,6 +10,10 @@ class RoleCrudController extends OriginalRoleCrudController
     public function setup()
     {
         parent::setup();
-        // Aquí podrías personalizar cosas en el futuro si quisieras
+
+        // Si NO es admin Y NO tiene permiso de gestionar roles, fuera.
+        if (!backpack_user()->hasRole('admin') && !backpack_user()->can('manage roles')) {
+            CRUD::denyAccess(['list', 'create', 'update', 'delete']);
+        }
     }
 }

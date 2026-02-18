@@ -19,9 +19,23 @@ class UserCrudController extends CrudController
         CRUD::setModel(\App\Models\User::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/user');
         CRUD::setEntityNameStrings('usuario', 'usuarios');
-        
-        // Verificación de acceso básica (puedes refinar esto con permisos específicos luego)
-        // Ejemplo: if (!backpack_user()->can('list users')) { CRUD::denyAccess(['list']); }
+
+        // --- SEGURIDAD: Verificar Permisos ---
+        if (!backpack_user()->can('list users')) {
+            CRUD::denyAccess(['list', 'show', 'create', 'update', 'delete']);
+        }
+
+        if (!backpack_user()->can('create users')) {
+            CRUD::denyAccess(['create']);
+        }
+
+        if (!backpack_user()->can('update users')) {
+            CRUD::denyAccess(['update']);
+        }
+
+        if (!backpack_user()->can('delete users')) {
+            CRUD::denyAccess(['delete']);
+        }
     }
 
     protected function setupListOperation()
@@ -39,7 +53,7 @@ class UserCrudController extends CrudController
         // --- Datos Básicos ---
         CRUD::field('name')->label('Nombre Completo')->size(6);
         CRUD::field('email')->type('email')->label('Correo Electrónico')->size(6);
-        
+
         // --- Contraseña ---
         // Solo requerida en creación, opcional en edición
         CRUD::field('password')
@@ -56,13 +70,13 @@ class UserCrudController extends CrudController
         // --- Roles y Permisos ---
         // Verifica el permiso que AHORA SÍ existe en el Seeder
         if (backpack_user()->can('manage roles') || backpack_user()->hasRole('admin')) {
-            
+
             // Campo para asignar ROL (Spatie)
             CRUD::field('roles')
                 ->type('relationship')
                 ->label('Roles Asignados')
                 ->name('roles') // la relación en el modelo User
-                ->entity('roles') 
+                ->entity('roles')
                 ->attribute('name')
                 ->pivot(true)
                 ->size(12); // Ocupa todo el ancho
