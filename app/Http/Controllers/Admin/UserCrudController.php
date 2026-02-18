@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Requests\UserRequest;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
+use Spatie\Permission\Traits\HasRoles;
+use Backpack\CRUD\app\Models\Traits\CrudTrait;
 
 class UserCrudController extends CrudController
 {
@@ -13,6 +15,7 @@ class UserCrudController extends CrudController
     use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
+    use CrudTrait, HasRoles;
 
     public function setup()
     {
@@ -22,33 +25,40 @@ class UserCrudController extends CrudController
 
         // --- 1. SEGURIDAD: Verificar Permisos Globales ---
         // Si no tienes permiso de ver lista, fuera.
-        if (!backpack_user()->can('list users')) {
-            CRUD::denyAccess(['list', 'show', 'create', 'update', 'delete']);
-        }
 
-        // Restricciones por operación específica
-        if (!backpack_user()->can('create users')) {
-            CRUD::denyAccess(['create']);
-        }
-        if (!backpack_user()->can('update users')) {
-            CRUD::denyAccess(['update']);
-        }
-        if (!backpack_user()->can('delete users')) {
-            CRUD::denyAccess(['delete']);
+        // Si es admin, permitimos TODO sin preguntar.
+        if (backpack_user()->hasRole('admin')) {
+            CRUD::allowAccess(['list', 'show', 'create', 'update', 'delete']);
+        } else {
+            // Si NO es admin, entonces sí verificamos permisos uno por uno
+            if (!backpack_user()->can('list users')) {
+                CRUD::denyAccess(['list', 'show']);
+            }
+
+
+            // Restricciones por operación específica
+            if (!backpack_user()->can('create users')) {
+                CRUD::denyAccess(['create']);
+            }
+            if (!backpack_user()->can('update users')) {
+                CRUD::denyAccess(['update']);
+            }
+            if (!backpack_user()->can('delete users')) {
+                CRUD::denyAccess(['delete']);
+            }
         }
     }
-
     protected function setupListOperation()
     {
         CRUD::column('name')->label('Nombre');
         CRUD::column('email')->label('Correo');
-        
+
         // Columna especial para ver cuántos roles tiene
         CRUD::column('roles')
             ->type('relationship_count')
             ->label('Roles')
             ->suffix(' rol(es)');
-            
+
         CRUD::column('created_at')->label('Creado')->type('date');
     }
 
@@ -74,7 +84,7 @@ class UserCrudController extends CrudController
         // --- Bloque 2: Seguridad (Roles y Permisos) ---
         // Solo mostramos esto si eres ADMIN o tienes permiso de gestionar roles
         if (backpack_user()->hasRole('admin') || backpack_user()->can('manage roles')) {
-            
+
             CRUD::field('separator_security')
                 ->type('custom_html')
                 ->value('<br><h4>🛡️ Asignación de Seguridad</h4><hr>');

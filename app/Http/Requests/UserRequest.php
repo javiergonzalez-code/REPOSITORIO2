@@ -13,17 +13,14 @@ class UserRequest extends FormRequest
 
     public function rules()
     {
-        // Obtenemos el ID del usuario que se está editando (si existe)
-        $userId = request()->route('id');
+        // Esto obtiene el ID del usuario que estás editando desde la URL
+        $userId = request()->route('id') ?? request()->route('user');
 
         return [
-            'name'     => 'required|min:2|max:255',
-            
-            // IMPORTANTE: unique:users,email,EXCEPT_ID
-            // Esto permite guardar tu propio perfil sin cambiar el correo
-            'email'    => 'required|email|unique:users,email,'.$userId,
-            
-            // Contraseña: Obligatoria solo al CREAR ($userId es null), opcional al editar
+            'name' => 'required|min:5|max:255',
+            // El email es único, EXCEPTO para el usuario que tiene este ID
+            'email' => 'required|email|unique:users,email,' . $userId,
+            // La contraseña es obligatoria al crear, pero opcional (nullable) al editar
             'password' => $userId ? 'nullable|min:6' : 'required|min:6',
         ];
     }
