@@ -5,8 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Requests\UserRequest;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
-use Spatie\Permission\Traits\HasRoles;
-use Backpack\CRUD\app\Models\Traits\CrudTrait;
 
 class UserCrudController extends CrudController
 {
@@ -15,7 +13,6 @@ class UserCrudController extends CrudController
     use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
-    use CrudTrait, HasRoles;
 
     public function setup()
     {
@@ -23,20 +20,11 @@ class UserCrudController extends CrudController
         CRUD::setRoute(config('backpack.base.route_prefix') . '/user');
         CRUD::setEntityNameStrings('usuario', 'usuarios');
 
-        // --- 1. SEGURIDAD: Verificar Permisos Globales ---
-        // Si no tienes permiso de ver lista, fuera.
-
-        // Si es admin, permitimos TODO sin preguntar.
-        if (backpack_user()->hasRole('admin')) {
-            CRUD::allowAccess(['list', 'show', 'create', 'update', 'delete']);
-        } else {
-            // Si NO es admin, entonces sí verificamos permisos uno por uno
+        // --- 1. SEGURIDAD: Verificar Permisos ---
+        if (!backpack_user()->hasRole('admin')) {
             if (!backpack_user()->can('list users')) {
                 CRUD::denyAccess(['list', 'show']);
             }
-
-
-            // Restricciones por operación específica
             if (!backpack_user()->can('create users')) {
                 CRUD::denyAccess(['create']);
             }
@@ -48,12 +36,14 @@ class UserCrudController extends CrudController
             }
         }
     }
+
     protected function setupListOperation()
     {
+        // En la lista siempre es útil ver el ID primero
+        CRUD::column('id')->label('ID');
         CRUD::column('name')->label('Nombre');
         CRUD::column('email')->label('Correo');
 
-        // Columna especial para ver cuántos roles tiene
         CRUD::column('roles')
             ->type('relationship_count')
             ->label('Roles')
@@ -67,6 +57,14 @@ class UserCrudController extends CrudController
         CRUD::setValidation(UserRequest::class);
 
         // --- Bloque 1: Datos Personales ---
+        
+        // CORRECCIÓN AQUI: Mostramos el ID pero deshabilitado
+        // Solo tiene valor real en la edición, en creación aparecerá vacío o "Auto"
+        CRUD::field('id')
+            ->label('ID')
+            ->size(6)
+            ->attributes(['disabled' => 'disabled']); 
+
         CRUD::field('name')->label('Nombre Completo')->size(6);
         CRUD::field('email')->type('email')->label('Correo Electrónico')->size(6);
 
@@ -74,22 +72,19 @@ class UserCrudController extends CrudController
             ->label('Contraseña')
             ->type('password')
             ->size(6)
-            // El hint solo tiene sentido al editar, pero no estorba al crear
             ->hint('Déjalo vacío para mantener la contraseña actual (solo al editar).');
 
-        CRUD::field('codigo')->label('Código')->size(6);
+        // Eliminamos 'codigo' y dejamos solo los que sí existen en tu BD
         CRUD::field('rfc')->label('RFC')->size(6);
         CRUD::field('telefono')->label('Teléfono')->size(6);
 
         // --- Bloque 2: Seguridad (Roles y Permisos) ---
-        // Solo mostramos esto si eres ADMIN o tienes permiso de gestionar roles
         if (backpack_user()->hasRole('admin') || backpack_user()->can('manage roles')) {
 
             CRUD::field('separator_security')
                 ->type('custom_html')
                 ->value('<br><h4>🛡️ Asignación de Seguridad</h4><hr>');
 
-            // A. Selector de ROLES (Checklist)
             CRUD::field('roles')
                 ->label('Roles / Perfiles')
                 ->type('checklist')
@@ -98,9 +93,8 @@ class UserCrudController extends CrudController
                 ->model('Spatie\Permission\Models\Role')
                 ->pivot(true);
 
-            // B. Selector de PERMISOS (Checklist - Excepciones)
             CRUD::field('permissions')
-                ->label('Permisos Específicos (Adicionales)')
+                ->label('Permisos Específicos')
                 ->type('checklist')
                 ->entity('permissions')
                 ->attribute('name')
@@ -111,8 +105,6 @@ class UserCrudController extends CrudController
 
     protected function setupUpdateOperation()
     {
-        // Reutilizamos EXACTAMENTE la misma configuración de crear
-        // Esto asegura que veas los checklists de roles/permisos al editar
         $this->setupCreateOperation();
     }
 }

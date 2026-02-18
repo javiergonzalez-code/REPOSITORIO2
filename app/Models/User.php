@@ -41,7 +41,7 @@ class User extends Authenticatable
 /**
      * 3. Configuración de las opciones del Log
      */
-    public function getActivitylogOptions(): LogOptions
+    public function getActivitylogOptions():\Spatie\Activitylog\LogOptions
     {
         return LogOptions::defaults()
             // Definimos qué campos queremos auditar
