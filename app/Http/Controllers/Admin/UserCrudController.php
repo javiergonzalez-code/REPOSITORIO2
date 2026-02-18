@@ -42,7 +42,13 @@ class UserCrudController extends CrudController
     {
         CRUD::column('name')->label('Nombre');
         CRUD::column('email')->label('Correo');
-        CRUD::column('roles')->label('Roles')->type('relationship')->attribute('name');
+        
+        // --- Mostrar Roles en la lista ---
+        CRUD::column('roles')
+            ->type('relationship_count')
+            ->label('Roles')
+            ->suffix(' rol(es)');
+            
         CRUD::column('created_at')->label('Creado')->type('date');
     }
 
@@ -50,36 +56,49 @@ class UserCrudController extends CrudController
     {
         CRUD::setValidation(UserRequest::class);
 
-        // --- Datos Básicos ---
+        // --- 1. Datos Básicos ---
         CRUD::field('name')->label('Nombre Completo')->size(6);
         CRUD::field('email')->type('email')->label('Correo Electrónico')->size(6);
 
-        // --- Contraseña ---
-        // Solo requerida en creación, opcional en edición
+        // --- 2. Contraseña ---
         CRUD::field('password')
             ->label('Contraseña')
             ->type('password')
             ->size(6)
             ->hint('Dejar vacío para mantener la actual (solo edición)');
 
-        // --- Datos Extra ---
+        // --- 3. Datos Extra ---
         CRUD::field('codigo')->label('Código')->size(6);
         CRUD::field('rfc')->label('RFC')->size(6);
         CRUD::field('telefono')->label('Teléfono')->size(6);
 
-        // --- Roles y Permisos ---
-        // Verifica el permiso que AHORA SÍ existe en el Seeder
-        if (backpack_user()->can('manage roles') || backpack_user()->hasRole('admin')) {
+        // --- 4. PODER DE SUPERUSUARIO: Asignar Roles y Permisos ---
+        // Solo mostramos esto si el usuario actual es ADMIN o tiene permiso de gestionar roles
+        if (backpack_user()->hasRole('admin') || backpack_user()->can('manage roles')) {
+            
+            // Separador visual
+            CRUD::field('roles_and_permissions_separator')
+                ->type('custom_html')
+                ->value('<br><h4>🛡️ Asignación de Seguridad</h4><hr>');
 
-            // Campo para asignar ROL (Spatie)
+            // A. Selector de ROLES (Checklist)
             CRUD::field('roles')
-                ->type('relationship')
-                ->label('Roles Asignados')
-                ->name('roles') // la relación en el modelo User
-                ->entity('roles')
+                ->label('Roles / Perfiles')
+                ->type('checklist')
+                ->entity('roles') // La relación en App\Models\User
+                ->attribute('name') // Mostrar 'admin', 'proveedor', etc.
+                ->model('Spatie\Permission\Models\Role')
+                ->pivot(true);
+
+            // B. Selector de PERMISOS EXTRAS (Checklist)
+            // Permite dar permisos específicos sin asignar un rol completo
+            CRUD::field('permissions')
+                ->label('Permisos Directos (Excepciones)')
+                ->type('checklist')
+                ->entity('permissions')
                 ->attribute('name')
-                ->pivot(true)
-                ->size(12); // Ocupa todo el ancho
+                ->model('Spatie\Permission\Models\Permission')
+                ->pivot(true);
         }
     }
 
