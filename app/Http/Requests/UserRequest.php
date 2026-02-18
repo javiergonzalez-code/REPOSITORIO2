@@ -3,25 +3,57 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+// 1. Importamos el Trait del paquete
+use Elegant\Sanitizer\Laravel\SanitizesInput;
 
 class UserRequest extends FormRequest
 {
+    // 2. Usamos el Trait para habilitar la sanitización automática antes de validar
+    use SanitizesInput;
+
     public function authorize()
     {
         return backpack_auth()->check();
     }
 
-    public function rules()
+public function rules()
     {
-        // Esto obtiene el ID del usuario que estás editando desde la URL
+        // Obtiene el ID del usuario desde la ruta para la excepción de email único
         $userId = request()->route('id') ?? request()->route('user');
 
         return [
-            'name' => 'required|min:5|max:255',
-            // El email es único, EXCEPTO para el usuario que tiene este ID
-            'email' => 'required|email|unique:users,email,' . $userId,
-            // La contraseña es obligatoria al crear, pero opcional (nullable) al editar
+            'name'     => 'required|min:5|max:255',
+            'email'    => 'required|email|unique:users,email,' . $userId,
             'password' => $userId ? 'nullable|min:6' : 'required|min:6',
+            
+            // Reglas para los nuevos campos detectados en UserCrudController:
+            'codigo'   => 'nullable|string|max:50', 
+            'rfc'      => 'nullable|string|min:12|max:13', 
+            'telefono' => 'nullable|string|max:20', 
+        ];
+    }
+    /**
+     * 3. Definimos los filtros de Sanitización.
+     * Estos se ejecutan ANTES de las reglas de validación (rules).
+     */
+    public function filters()
+    {
+        return [
+            // 'trim': Quita espacios al inicio y final.
+            // 'capitalize': Pone la primera letra de cada palabra en mayúscula (Juan Perez).
+            // 'empty_string_to_null': Si el campo viene vacío "", lo convierte en NULL.
+            'name' => 'trim|capitalize|empty_string_to_null',
+
+            // 'lowercase': Convierte todo a minúsculas (crucial para emails).
+            'email' => 'trim|lowercase|empty_string_to_null',
+
+            // Para RFC y Código, suele ser mejor todo en mayúsculas y sin espacios extra.
+            'rfc'    => 'trim|uppercase|empty_string_to_null',
+            'codigo' => 'trim|uppercase|empty_string_to_null',
+
+            // 'digit': Elimina todo lo que NO sea número (quita guiones, paréntesis, espacios).
+            // Ejemplo: "(555) 123-456" -> "555123456"
+            'telefono' => 'trim|digit|empty_string_to_null',
         ];
     }
 
@@ -31,6 +63,9 @@ class UserRequest extends FormRequest
             'name' => 'nombre',
             'email' => 'correo electrónico',
             'password' => 'contraseña',
+            'rfc' => 'RFC',
+            'telefono' => 'teléfono',
+            'codigo' => 'código',
         ];
     }
 

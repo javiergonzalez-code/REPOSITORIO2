@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
+use App\Models\Activity;
 
 class LogCrudController extends CrudController
 {
@@ -12,30 +13,48 @@ class LogCrudController extends CrudController
 
 public function setup()
     {
-        CRUD::setModel(\App\Models\Log::class);
+        // 2. CAMBIO AQUÍ: Cambiamos \App\Models\Log::class por Activity::class
+        CRUD::setModel(Activity::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/log');
-        CRUD::setEntityNameStrings('log', 'logs');
+        CRUD::setEntityNameStrings('auditoría', 'auditorías');
 
-        // 1. Denegar operaciones de escritura para mantener la integridad de los logs
         CRUD::denyAccess(['create', 'update', 'delete']);
 
-        // 2. Seguridad: Verificar permiso de lectura
-        // Si el usuario NO tiene permiso 'list logs', le quitamos el acceso.
         if (!backpack_user()->can('list logs')) {
             CRUD::denyAccess(['list', 'show']);
         }
     }
 
-    protected function setupListOperation()
+protected function setupListOperation()
     {
-        CRUD::column('created_at')->label('Fecha');
-        CRUD::column('user')->type('relationship')->attribute('name')->label('Usuario');
-        CRUD::column('accion')->label('Acción');
-        CRUD::column('modulo')->label('Módulo');
+        // Fecha del movimiento
+        CRUD::column('created_at')->type('datetime')->label('Fecha');
+
+        // Quién lo hizo (el CAUSER)
+        CRUD::column('causer_id')
+            ->label('Usuario')
+            ->type('select')
+            ->entity('causer')
+            ->attribute('name')
+            ->model('App\Models\User');
+
+        // Qué hizo (created, updated, deleted)
+        CRUD::column('description')->label('Evento');
+
+        // Sobre qué registro (User, etc.)
+        CRUD::column('subject_type')->label('Módulo');
+        
+        // ID del registro afectado
+        CRUD::column('subject_id')->label('ID Ref');
     }
 
     protected function setupShowOperation()
     {
         $this->setupListOperation();
+
+        // Añadimos una columna especial para ver qué datos cambiaron (en formato JSON)
+        CRUD::column('properties')
+            ->type('json')
+            ->label('Detalles del Cambio');
     }
 }

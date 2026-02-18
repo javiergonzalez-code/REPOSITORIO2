@@ -7,11 +7,13 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Spatie\Permission\Traits\HasRoles;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
+
 
 class User extends Authenticatable
 {
-    // 2. Añadir CrudTrait al uso de la clase
-    use HasFactory, Notifiable, CrudTrait, HasRoles;
+    use HasFactory, Notifiable, CrudTrait, HasRoles, LogsActivity;
 
     protected $fillable = [
         'name',
@@ -35,6 +37,21 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
         ];
+    }
+/**
+     * 3. Configuración de las opciones del Log
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            // Definimos qué campos queremos auditar
+            ->logOnly(['name', 'email', 'codigo', 'rfc', 'telefono'])
+            // Evitamos que se registre el log si no hubo cambios reales
+            ->logOnlyDirty()
+            // Guardamos el estado anterior para comparar (útil en ediciones)
+            ->dontSubmitEmptyLogs()
+            // Nombre de la bitácora (opcional)
+            ->useLogName('user');
     }
 
     public function setPasswordAttribute($value)
