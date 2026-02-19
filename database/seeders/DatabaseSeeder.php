@@ -85,5 +85,9 @@ class DatabaseSeeder extends Seeder
                 'created_at' => $archivo->created_at,
             ]);
         });
+
+        $this->call([
+            PermissionSeeder::class, // <--- Agrega esta línea
+        ]);
     }
 }
