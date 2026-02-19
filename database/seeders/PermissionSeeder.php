@@ -8,17 +8,19 @@ use Spatie\Permission\Models\Role;
 
 class PermissionSeeder extends Seeder
 {
-    public function run()
-    {
-        // Limpiar caché de permisos (importante para que se apliquen de inmediato)
-        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+// database/seeders/PermissionSeeder.php
+public function run()
+{
+    app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // Crear permisos
-        Permission::firstOrCreate(['name' => 'list users']);
-        Permission::firstOrCreate(['name' => 'create users']);
+    // Crear todos los permisos usados en web.php
+    Permission::firstOrCreate(['name' => 'list users']);
+    Permission::firstOrCreate(['name' => 'create users']);
+    Permission::firstOrCreate(['name' => 'edit users']);   // <--- Importante
+    Permission::firstOrCreate(['name' => 'delete users']); // <--- Importante
 
-        // Crear rol y asignar
-        $admin = Role::firstOrCreate(['name' => 'admin']);
-        $admin->givePermissionTo(['list users', 'create users']);
-    }
+    $admin = Role::firstOrCreate(['name' => 'admin']);
+    // Asignar todos los permisos al admin
+    $admin->syncPermissions(Permission::all());
+}
 }
