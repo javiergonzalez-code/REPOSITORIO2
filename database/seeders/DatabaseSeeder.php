@@ -71,7 +71,8 @@ class DatabaseSeeder extends Seeder
 
         // 6. Crear 95 PROVEEDORES
         User::factory(95)->create([
-            'role' => 'proveedor', // Aseguramos que la columna física diga proveedor
+            'role' => 'proveedor',
+            'password' => 'password', // Aseguramos que la columna física diga proveedor
         ])->each(function ($user) use ($roleProveedor) {
             $user->assignRole($roleProveedor);
         });
