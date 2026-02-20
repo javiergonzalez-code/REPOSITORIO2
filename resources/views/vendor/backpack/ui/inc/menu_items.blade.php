@@ -1,3 +1,9 @@
+{{-- Botón para regresar al Panel Principal del sistema --}}
+<li class="nav-item">
+    <a class="nav-link text-primary fw-bold" href="{{ url('/home') }}">
+        <i class="la la-arrow-left nav-icon"></i> Regresar al Panel de Control
+    </a>
+</li>
 {{-- Dashboard --}}
 <li class="nav-item">
     <a class="nav-link" href="{{ backpack_url('dashboard') }}">

@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
         // 0. Limpiar caché
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // 1. Crear Permisos (CORREGIDO)
+        // 1. Crear Permisos 
         // Agregamos 'manage roles' y 'manage permissions' para que coincida con tu controlador
         $permissions = [
             'manage roles',
@@ -43,7 +43,7 @@ class DatabaseSeeder extends Seeder
         $roleAdmin = Role::firstOrCreate(['name' => 'admin']);
         $roleProveedor = Role::firstOrCreate(['name' => 'proveedor']);
 
-        // 3. Asignar permisos (CORREGIDO)
+        // 3. Asignar permisos
         // El Admin tiene todo
         $roleAdmin->syncPermissions(Permission::all());
 
@@ -53,11 +53,11 @@ class DatabaseSeeder extends Seeder
         // 4. Tu usuario personal (Super Admin)
         // Usamos updateOrCreate para que si ya existe, solo le asigne el rol correctamente
         $myUser = User::updateOrCreate(
-            ['email' => 'admin@ragon.com'], // Usa el correo que usaste en Tinker
+            ['email' => 'admin@ragon.com'],
             [
                 'name'     => 'Administrador Principal',
                 'password' => 'holamundo1234',
-                'role'     => 'admin', // Actualizamos tu columna física
+                'role'     => 'admin', 
             ]
         );
         $myUser->assignRole($roleAdmin);
@@ -72,7 +72,7 @@ class DatabaseSeeder extends Seeder
         // 6. Crear 95 PROVEEDORES
         User::factory(95)->create([
             'role' => 'proveedor',
-            'password' => 'password', // Aseguramos que la columna física diga proveedor
+            'password' => 'password',
         ])->each(function ($user) use ($roleProveedor) {
             $user->assignRole($roleProveedor);
         });
@@ -88,7 +88,7 @@ class DatabaseSeeder extends Seeder
         });
 
         $this->call([
-            PermissionSeeder::class, // <--- Agrega esta línea
+            PermissionSeeder::class, 
         ]);
     }
 }
