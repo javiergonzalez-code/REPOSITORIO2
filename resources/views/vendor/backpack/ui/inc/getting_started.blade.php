@@ -6,7 +6,7 @@
                 <i class="la la-user-shield text-primary me-2"></i>
                 Bienvenido al Panel de Control, {{ backpack_user()->name ?? 'Superusuario' }}
             </h3>
-            <span class="badge bg-primary">Administrador Global</span>
+            <span class="badge bg-primary">Super Usuario</span>
         </div>
     </div>
 

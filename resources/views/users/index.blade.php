@@ -63,8 +63,8 @@
                                 <span class="input-group-text bg-light border-0"><i class="fas fa-user-shield text-muted"></i></span>
                                 <select name="role" class="form-input">
                                     <option value="">Todos los roles</option>
-                                    <option value="Administrador" {{ request('role') == 'Administrador' ? 'selected' : '' }}>Administrador</option>
-                                    <option value="Proveedor" {{ request('role') == 'Proveedor' ? 'selected' : '' }}>Proveedor</option>
+                                    <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Administrador</option>
+                                    <option value="proveedor" {{ request('role') == 'proveedor' ? 'selected' : '' }}>Proveedor</option>
                                 </select>
                             </div>
                         </div>
@@ -103,7 +103,7 @@
                                     <div class="x-small text-muted">{{ $user->email }}</div>
                                 </td>
                                 <td>
-                                    <span class="status-indicator {{ $user->role == 'Administrador' ? 'status-error' : 'status-upload' }} d-inline-flex">
+                                    <span class="status-indicator {{ $user->role == 'admin' ? 'status-error' : 'status-upload' }} d-inline-flex">
                                         <span class="dot"></span> {{ strtoupper($user->role) }}
                                     </span>
                                 </td>

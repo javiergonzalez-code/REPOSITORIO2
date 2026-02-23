@@ -10,7 +10,7 @@ use Illuminate\Validation\Rule;
 class UserController extends Controller
 {
     // DEFINIR LOS ROLES
-    private $roles = ['Administrador', 'Proveedor'];
+    private $roles = ['admin', 'proveedor'];
 
     public function index(Request $request)
     {
@@ -34,7 +34,7 @@ class UserController extends Controller
             $query->where('name', 'like', '%' . $request->user . '%');
         }
 
-        // 3. Filtro por Rol (CORREGIDO)
+        // 3. Filtro por Rol 
         if ($request->filled('role')) {
             $query->where('role', $roleFilter);
         }
