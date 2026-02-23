@@ -20,18 +20,20 @@ class UserCrudController extends CrudController
         CRUD::setRoute(config('backpack.base.route_prefix') . '/user');
         CRUD::setEntityNameStrings('usuario', 'usuarios');
 
-        // --- 1. SEGURIDAD: Verificar Permisos ---
-        if (!backpack_user()->hasRole('admin')) {
-            if (!backpack_user()->can('list users')) {
+        $user = backpack_user();
+
+        // Verificación robusta: Si no es admin por rol ni por correo de auxilio
+        if (!$user->hasRole('admin') && $user->email !== 'admin@ragon.com') {
+            if (!$user->can('list users')) {
                 CRUD::denyAccess(['list', 'show']);
             }
-            if (!backpack_user()->can('create users')) {
+            if (!$user->can('create users')) {
                 CRUD::denyAccess(['create']);
             }
-            if (!backpack_user()->can('update users')) {
+            if (!$user->can('update users')) {
                 CRUD::denyAccess(['update']);
             }
-            if (!backpack_user()->can('delete users')) {
+            if (!$user->can('delete users')) {
                 CRUD::denyAccess(['delete']);
             }
         }
@@ -56,12 +58,12 @@ class UserCrudController extends CrudController
         CRUD::setValidation(UserRequest::class);
 
         // --- Bloque 1: Datos Personales ---
-        
+
 
         CRUD::field('id')
             ->label('ID')
             ->size(6)
-            ->attributes(['disabled' => 'disabled']); 
+            ->attributes(['disabled' => 'disabled']);
 
         CRUD::field('name')->label('Nombre Completo')->size(6);
         CRUD::field('email')->type('email')->label('Correo Electrónico')->size(6);

@@ -14,6 +14,8 @@ use Spatie\Activitylog\LogOptions;
 class User extends Authenticatable
 {
     use HasFactory, Notifiable, CrudTrait, HasRoles, LogsActivity;
+    
+    protected $guard_name = 'web';
 
     protected $fillable = [
         'name',
@@ -38,10 +40,10 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
         ];
     }
-/**
+    /**
      * 3. Configuración de las opciones del Log
      */
-    public function getActivitylogOptions():\Spatie\Activitylog\LogOptions
+    public function getActivitylogOptions(): \Spatie\Activitylog\LogOptions
     {
         return LogOptions::defaults()
             // Definimos qué campos queremos auditar
@@ -67,4 +69,3 @@ class User extends Authenticatable
         return $this->hasMany(Archivo::class);
     }
 }
-

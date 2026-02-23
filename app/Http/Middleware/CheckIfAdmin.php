@@ -6,12 +6,6 @@ use Closure;
 
 class CheckIfAdmin
 {
-    /**
-     * Answer to unauthorized access request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
-     */
     private function respondToUnauthorizedRequest($request)
     {
         if ($request->ajax() || $request->wantsJson()) {
@@ -21,13 +15,6 @@ class CheckIfAdmin
         }
     }
 
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return mixed
-     */
     public function handle($request, Closure $next)
     {
         if (backpack_auth()->guest()) {
@@ -36,11 +23,9 @@ class CheckIfAdmin
 
         $user = backpack_user();
 
-        // 1. Verificamos por ROL de Spatie
-        // 2. O verificamos por columna física 'role' (por si Spatie falla)
-        // 3. O verificamos por EMAIL (tu salvavidas para no quedarte fuera)
+        // Verificamos por Spatie o por los correos de salvavidas
+        // NOTA: Asegúrate de que el rol en tu base de datos se llame exactamente 'admin' (en minúsculas)
         if ($user->hasRole('admin') || 
-            $user->role === 'admin' || 
             $user->email === 'admin@ragon.com' ||
             $user->email === 'test@example.com') {
             
