@@ -269,12 +269,7 @@ body {
     --white: #ffffff;
 }
 
-.login-wrapper {
-    background: radial-gradient(circle at top left, #f8fafc, #f8fafc);
-    min-height: 200vh;
-    display: flex;
-    align-items: center;
-}
+
 
 /* Tarjeta Estilo Elevado */
 .login-card {
@@ -395,8 +390,6 @@ body {
 
 /* Contenedor principal para centrado total */
 .login-wrapper {
-    background: radial-gradient(circle at top left, #f8fafc, #cbd5e1);
-    min-height: 100vh;
     display: flex;
     align-items: center; /* Centrado vertical */
     justify-content: center; /* Centrado horizontal */
@@ -1328,10 +1321,6 @@ body.dark-mode .dropdown-item:hover {
     background-color: #4a5568;
 }
 
-/* Estado para Modo Oscuro en la vista de carga */
-body.dark-mode .login-wrapper {
-    background: radial-gradient(circle at top left, #1a202c, #0f172a) !important;
-}
 
 body.dark-mode .login-card {
     background-color: #2d3748 !important;

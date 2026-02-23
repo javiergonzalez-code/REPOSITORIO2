@@ -69,7 +69,7 @@
                                 <li class="nav-item">
                                     <a class="nav-link {{ request()->is('users*') ? 'active' : '' }}"
                                         href="{{ route('users.index') }}">
-                                        <i class="fas fa-users me-1"></i> Usuarios
+                                        <i class="fas me-1"></i> Usuarios
                                     </a>
                                 </li>
                             @endcan
@@ -86,7 +86,7 @@
 
                             <li class="nav-item">
                                 <a class="nav-link {{ request()->is('logs*') ? 'active' : '' }}"
-                                    href="{{ route('logs.index') }}">Auditoría</a>
+                                    href="{{ route('logs.index') }}">Logs</a>
                             </li>
                         @endauth
                     </ul>

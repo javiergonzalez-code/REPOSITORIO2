@@ -39,7 +39,6 @@ class UserCrudController extends CrudController
 
     protected function setupListOperation()
     {
-        // En la lista siempre es útil ver el ID primero
         CRUD::column('id')->label('ID');
         CRUD::column('name')->label('Nombre');
         CRUD::column('email')->label('Correo');
@@ -58,8 +57,7 @@ class UserCrudController extends CrudController
 
         // --- Bloque 1: Datos Personales ---
         
-        // CORRECCIÓN AQUI: Mostramos el ID pero deshabilitado
-        // Solo tiene valor real en la edición, en creación aparecerá vacío o "Auto"
+
         CRUD::field('id')
             ->label('ID')
             ->size(6)
@@ -74,7 +72,6 @@ class UserCrudController extends CrudController
             ->size(6)
             ->hint('Déjalo vacío para mantener la contraseña actual (solo al editar).');
 
-        // Eliminamos 'codigo' y dejamos solo los que sí existen en tu BD
         CRUD::field('rfc')->label('RFC')->size(6);
         CRUD::field('telefono')->label('Teléfono')->size(6);
 
