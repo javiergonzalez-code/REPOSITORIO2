@@ -14,7 +14,7 @@ class UserCrudController extends CrudController
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
 
-    public function setup()
+public function setup()
     {
         CRUD::setModel(\App\Models\User::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/user');
@@ -22,20 +22,9 @@ class UserCrudController extends CrudController
 
         $user = backpack_user();
 
-        // Verificación robusta: Si no es admin por rol ni por correo de auxilio
-        if (!$user->hasRole('admin') && $user->email !== 'admin@ragon.com') {
-            if (!$user->can('list users')) {
-                CRUD::denyAccess(['list', 'show']);
-            }
-            if (!$user->can('create users')) {
-                CRUD::denyAccess(['create']);
-            }
-            if (!$user->can('update users')) {
-                CRUD::denyAccess(['update']);
-            }
-            if (!$user->can('delete users')) {
-                CRUD::denyAccess(['delete']);
-            }
+        // Si NO dice 'admin' en la columna 'role' y no es el correo de salvavidas:
+        if ($user->role !== 'admin' && $user->email !== 'admin@ragon.com') {
+            CRUD::denyAccess(['list', 'show', 'create', 'update', 'delete']);
         }
     }
 

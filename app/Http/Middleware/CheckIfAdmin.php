@@ -15,20 +15,16 @@ class CheckIfAdmin
         }
     }
 
-    public function handle($request, Closure $next)
+public function handle($request, Closure $next)
     {
         if (backpack_auth()->guest()) {
             return $this->respondToUnauthorizedRequest($request);
         }
 
-        $user = backpack_user();
+        $user = backpack_auth()->user();
 
-        // Verificamos por Spatie o por los correos de salvavidas
-        // NOTA: Asegúrate de que el rol en tu base de datos se llame exactamente 'admin' (en minúsculas)
-        if ($user->hasRole('admin') || 
-            $user->email === 'admin@ragon.com' ||
-            $user->email === 'test@example.com') {
-            
+        // Validamos usando TU columna 'role' en la base de datos
+        if ($user->role === 'admin' || $user->email === 'admin@ragon.com') {
             return $next($request);
         }
 

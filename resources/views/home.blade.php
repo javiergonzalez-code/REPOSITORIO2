@@ -41,10 +41,8 @@
                     <h3 class="fw-bold">OC</h3>
                 </a>
 
-                {{-- Validamos que el usuario tenga el rol de administrador --}}
-                @hasrole('admin')
-                    {{-- Asegúrate de usar el nombre exacto de tu rol, ej: 'admin' o 'administrador' --}}
-
+                {{-- Cambia @hasrole('admin') o @if (auth()->user()->hasRole(...)) por esto: --}}
+                @if (auth()->user()->role === 'admin')
                     {{-- Tarjeta para Manejo de usuarios y privilegios --}}
                     <a href="{{ route('users.index') }}" class="dashboard-card">
                         <i class="fas fa-user fa-2x"></i>
@@ -56,7 +54,7 @@
                         <i class="fas fa-user-shield fa-2x"></i>
                         <h3 class="fw-bold">Superusuario</h3>
                     </a>
-                @endhasrole
+                @endif
             </div>
         </div>
     </main>
