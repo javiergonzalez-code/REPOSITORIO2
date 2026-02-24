@@ -22,69 +22,91 @@ class UserCrudController extends CrudController
 
         $user = backpack_user();
 
-        // Seguridad basada en tu columna 'role'
-        if ($user->role !== 'admin' && $user->email !== 'admin@ragon.com') {
+        // SEGURIDAD: Solo admin o superadmin entran aquí
+        // Nota: Agregamos 'superadmin' a la validación
+        if ($user->role !== 'admin' && $user->role !== 'superadmin' && $user->email !== 'admin@ragon.com') {
             CRUD::denyAccess(['list', 'show', 'create', 'update', 'delete']);
         }
     }
 
     protected function setupListOperation()
     {
-        // En la lista sí puedes dejar el ID porque es solo una columna visual
+        $user = backpack_user();
+
+        // Filtro de visibilidad: El admin normal NO ve a los superadmins en la lista
+        if ($user->role !== 'superadmin' && $user->email !== 'admin@ragon.com') {
+            $this->crud->addClause('where', 'role', '!=', 'superadmin');
+        }
+
         CRUD::column('id')->label('ID');
         CRUD::column('name')->label('Nombre');
         CRUD::column('email')->label('Correo');
-        CRUD::column('role')->label('Rol Base'); // Agregamos visualización de tu columna
-
-
-
+        CRUD::column('role')->label('Rol Base'); 
         CRUD::column('created_at')->label('Creado')->type('date');
     }
 
     protected function setupCreateOperation()
     {
         CRUD::setValidation(UserRequest::class);
+        $user = backpack_user();
+        $isSuper = ($user->role === 'superadmin' || $user->email === 'admin@ragon.com');
 
         // --- Bloque 1: Datos Personales ---
-        
         CRUD::field('name')->label('Nombre Completo')->size(6);
         CRUD::field('email')->type('email')->label('Correo Electrónico')->size(6);
 
         CRUD::field('password')
             ->label('Contraseña')
             ->type('password')
-            ->size(6)
-            ->hint('Déjalo vacío para mantener la contraseña actual (solo al editar).');
+            ->size(6);
+
+        // --- Bloque de Roles (MySQL) ---
+        $opcionesRoles = ['admin' => 'Administrador', 'proveedor' => 'Proveedor'];
+        if ($isSuper) {
+            $opcionesRoles['superadmin'] = 'Super Administrador';
+        }
 
         CRUD::field('role')
-            ->label('Rol (Columna Base de Datos)')
+            ->label('Rol (Base de Datos)')
             ->type('select_from_array')
-            ->options(['admin' => 'Administrador', 'proveedor' => 'Proveedor'])
+            ->options($opcionesRoles)
             ->size(6);
 
         CRUD::field('rfc')->label('RFC')->size(6);
         CRUD::field('telefono')->label('Teléfono')->size(6);
 
-        // --- Bloque 2: Seguridad (Spatie) ---
-        // Usamos la lógica de tu columna física para dar permiso de asignar roles de Spatie
-        if (backpack_user()->role === 'admin' || backpack_user()->email === 'admin@ragon.com') {
+        // --- Bloque 2: Sincronización Spatie ---
+        CRUD::field('separator_security')
+            ->type('custom_html')
+            ->value('<br><h4>🛡️ Permisos y Seguridad</h4><hr>');
 
-            CRUD::field('separator_security')
-                ->type('custom_html')
-                ->value('<br><h4>🛡️ Sincronización con Spatie</h4><hr>');
-
-            CRUD::field('roles')
-                ->label('Roles Spatie (Tablas ocultas)')
-                ->type('checklist')
-                ->entity('roles')
-                ->attribute('name')
-                ->model('Spatie\Permission\Models\Role')
-                ->pivot(true);
-        }
+        CRUD::field('roles')
+            ->label('Asignar Rol de Acceso (Spatie)')
+            ->type('select_multiple') // Cambiado a select_multiple para mejor filtrado
+            ->entity('roles')
+            ->attribute('name')
+            ->model('Spatie\Permission\Models\Role')
+            ->pivot(true)
+            ->options((function ($query) use ($isSuper) {
+                // Si NO es superadmin, ocultamos el rol de superadmin de la lista de Spatie
+                return $isSuper ? $query->get() : $query->where('name', '!=', 'superadmin')->get();
+            }));
     }
 
     protected function setupUpdateOperation()
     {
         $this->setupCreateOperation();
+        
+        // Al editar, la contraseña es opcional
+        $this->crud->modifyField('password', [
+            'hint' => 'Déjalo vacío para mantener la contraseña actual.',
+        ]);
+
+        // Evitar que un admin normal acceda a editar a un superadmin mediante la URL (ID)
+        $userActual = backpack_user();
+        $targetUser = $this->crud->getCurrentEntry();
+        if ($targetUser && $targetUser->role === 'superadmin' && $userActual->role !== 'superadmin' && $userActual->email !== 'admin@ragon.com') {
+            abort(403, 'No tienes permisos para editar a un Super Administrador.');
+        }
     }
 }
