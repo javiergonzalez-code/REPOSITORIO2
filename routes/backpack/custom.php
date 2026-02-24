@@ -2,32 +2,29 @@
 
 use Illuminate\Support\Facades\Route;
 
-// --------------------------
-// Custom Backpack Routes
-// --------------------------
-// This route file is loaded automatically by Backpack\CRUD.
-// Routes you generate using Backpack\Generators will be placed here.
-
 Route::group([
     'prefix' => config('backpack.base.route_prefix', 'admin'),
     'middleware' => array_merge(
         (array) config('backpack.base.web_middleware', 'web'),
-        (array) config('backpack.base.middleware_key', 'admin')
+        (array) config('backpack.base.middleware_key', 'admin') // Aquí entran TODOS los admins
     ),
     'namespace' => 'App\Http\Controllers\Admin',
-], function () { // custom admin routes
-    Route::crud('user', 'UserCrudController');
-
-    Route::crud('role', 'RoleCrudController');
-    Route::crud('permission', 'PermissionCrudController');
-
-    Route::crud('log', 'LogCrudController');
+], function () { 
+    
+    // ---------------------------------------------------------
+    // RUTAS PARA ADMINISTRADORES NORMALES
+    // ---------------------------------------------------------
     Route::crud('archivo', 'ArchivoCrudController');
     
-
+    // ---------------------------------------------------------
+    // RUTAS EXCLUSIVAS PARA EL SÚPER USUARIO
+    // ---------------------------------------------------------
+    // Aplicamos el middleware que acabamos de crear a este subgrupo
+    Route::group(['middleware' => [\App\Http\Middleware\CheckIfSuperAdmin::class]], function () {
+        Route::crud('user', 'UserCrudController');
+        Route::crud('role', 'RoleCrudController');
+        Route::crud('permission', 'PermissionCrudController');
+        Route::crud('log', 'LogCrudController');
+    });
     
-}); // this should be the absolute last line of this file
-
-/**
- * DO NOT ADD ANYTHING HERE.
- */
+});

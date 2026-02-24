@@ -13,7 +13,6 @@ class LogCrudController extends CrudController
 
 public function setup()
     {
-        // 2. CAMBIO AQUÍ: Cambiamos \App\Models\Log::class por Activity::class
         CRUD::setModel(Activity::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/log');
         CRUD::setEntityNameStrings('auditoría', 'auditorías');

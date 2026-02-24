@@ -39,8 +39,6 @@ class ArchivoCrudController extends CrudController
             CRUD::denyAccess(['delete']);
         }
 
-        // Generalmente no editamos archivos, solo los subimos o borramos.
-        // Si no quieres permitir editar la metadata del archivo:
         CRUD::denyAccess(['update']);
     }
 

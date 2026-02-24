@@ -36,10 +36,7 @@ class UserCrudController extends CrudController
         CRUD::column('email')->label('Correo');
         CRUD::column('role')->label('Rol Base'); // Agregamos visualización de tu columna
 
-        CRUD::column('roles')
-            ->type('relationship_count')
-            ->label('Roles Spatie')
-            ->suffix(' rol(es)');
+
 
         CRUD::column('created_at')->label('Creado')->type('date');
     }
@@ -50,8 +47,6 @@ class UserCrudController extends CrudController
 
         // --- Bloque 1: Datos Personales ---
         
-        // CORRECCIÓN: Se eliminó el field('id'), Backpack lo maneja solo.
-
         CRUD::field('name')->label('Nombre Completo')->size(6);
         CRUD::field('email')->type('email')->label('Correo Electrónico')->size(6);
 
@@ -61,7 +56,6 @@ class UserCrudController extends CrudController
             ->size(6)
             ->hint('Déjalo vacío para mantener la contraseña actual (solo al editar).');
 
-        // IMPORTANTE: Campo para editar tu columna física 'role'
         CRUD::field('role')
             ->label('Rol (Columna Base de Datos)')
             ->type('select_from_array')
