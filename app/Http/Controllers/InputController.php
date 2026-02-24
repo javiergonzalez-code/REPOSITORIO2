@@ -2,90 +2,108 @@
 
 namespace App\Http\Controllers;
 
-// Importación de herramientas de Laravel
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;     // Para interactuar con el disco duro/nube
-use App\Models\Log;                         // Para registrar auditoría de lo que pasa
-use App\Models\Archivo;                     // El modelo para la tabla donde guardamos los nombres de archivos
-use Illuminate\Support\Facades\Validator;   // Para validar que los datos sean correctos
+use Illuminate\Support\Facades\Storage;
+use App\Models\Log;
+use App\Models\Archivo;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Database\QueryException; // Para atrapar caídas de base de datos
 
 class InputController extends Controller
 {
-    /**
-     * Muestra la vista principal del formulario de subida.
-     */
     public function index()
     {
-        // Retorna la vista ubicada en resources/views/inputs/index.blade.php
         return view('inputs.index');
     }
 
-    /**
-     * Procesa la subida del archivo y su registro.
-     */
     public function store(Request $request)
     {
-        // 1. VALIDACIÓN INICIAL: 
-        // Verifica que el campo 'archivo' esté presente, sea un archivo real y no pese más de 10MB (10240 KB)
+        // 1. VALIDACIÓN ESTRICTA (QA)
         $validator = Validator::make($request->all(), [
-            'archivo' => 'required|file|max:5120',
+            'archivo' => [
+                'required',
+                'file',
+                'mimes:csv,xlsx,xls,xml,txt', // Valida la firma interna (evita que un .exe se renombre a .csv)
+                'min:1',                      // Evita archivos vacíos (0 bytes)
+                'max:5120',                   // Límite máximo de 5MB
+            ]
+        ], [
+            // Mensajes personalizados para ser más claros en el Log y en la vista
+            'archivo.mimes' => 'El contenido del archivo no coincide con su extensión o tiene formato malicioso.',
+            'archivo.min' => 'El archivo está dañado o vacío (0 bytes).',
+            'archivo.max' => 'El archivo supera el límite máximo de 5MB.'
         ]);
 
-        // 2. VALIDACIÓN DE EXTENSIÓN: 
-        // ?-> es un operador seguro: si no hay archivo, no intenta sacar la extensión (evita errores)
-        $extension = $request->file('archivo')?->getClientOriginalExtension();
-        $allowedExtensions = ['csv', 'xlsx', 'xls', 'xml'];
-
-        // Si la validación de Laravel falla O la extensión no está en nuestra lista blanca
-        if ($validator->fails() || !in_array(strtolower($extension), $allowedExtensions)) {
-
-            // Auditoría: Registramos que alguien intentó subir algo no permitido
+        // Si falla la validación
+        if ($validator->fails()) {
+            $errores = implode(' | ', $validator->errors()->all());
+            
+            // Auditoría: Registramos el error de validación o intento de vulneración
             Log::create([
-                'user_id' => auth()->id(), // Quién fue (null si no está logueado)
-                'accion' => 'Intento fallido: Formato .' . $extension . ' no permitido',
-                'modulo' => 'INPUTS',
-                'ip' => $request->ip() // Guardamos su dirección IP por seguridad
+                'user_id' => auth()->id(),
+                'accion'  => 'Intento fallido (Validación/Seguridad): ' . $errores,
+                'modulo'  => 'INPUTS',
             ]);
 
-            // Regresa a la página anterior con un mensaje de error para el usuario
-            return back()->with('error', 'El archivo .' . $extension . ' no es válido. Solo CSV o Excel.');
+            return back()->with('error', 'Error en el archivo: ' . $errores);
         }
 
         try {
-            // 3. PROCESAMIENTO DEL ARCHIVO:
-            if ($request->hasFile('archivo')) {
-                $file = $request->file('archivo');
-                $originalName = $file->getClientOriginalName();
-                $extension = $file->getClientOriginalExtension(); // Extraer extensión
-
-                $systemName = time() . '_' . $originalName;
-                $file->storeAs('uploads', $systemName, 'public');
-
-                // REGISTRO EN BASE DE DATOS CORREGIDO
-                Archivo::create([
-                    'user_id'         => auth()->id(),
-                    'nombre_original' => $originalName,
-                    'nombre_sistema'  => $systemName,
-                    'tipo_archivo'    => $extension, // <--- CAMBIO: Guardar la extensión
-                    'ruta'            => 'uploads/' . $systemName,
-                    'modulo'          => 'OC',        // <--- CAMBIO: Asignar el módulo
-                ]);
-
-                // 7. LOG DE ÉXITO: 
-                // Guardamos en el historial que todo salió bien
-                Log::create([
-                    'user_id' => auth()->id(),
-                    'accion' => 'Subió con éxito: ' . $originalName,
-                    'modulo' => 'INPUTS',
-                    'ip' => $request->ip()
-                ]);
-
-                return back()->with('success', 'Archivo subido correctamente.');
+            // 2. PROCESAMIENTO SEGURO DEL ARCHIVO
+            $file = $request->file('archivo');
+            
+            // Sanitización del nombre: Quitar caracteres raros y limitar longitud
+            $originalName = preg_replace('/[^a-zA-Z0-9-_\.]/', '', $file->getClientOriginalName());
+            if (strlen($originalName) > 200) {
+                $originalName = substr($originalName, -200); // Evitar colapso en la base de datos por nombre muy largo
             }
+            
+            $extension = $file->getClientOriginalExtension(); 
+            $systemName = time() . '_' . uniqid() . '_' . $originalName; // uniqid evita sobrescritura si suben 2 al mismo milisegundo
+
+            // Guardado en disco
+            $path = $file->storeAs('uploads', $systemName, 'public');
+            
+            if (!$path) {
+                throw new \Exception("El servidor denegó el permiso de escritura en el disco duro.");
+            }
+
+            // Registro en Base de datos
+            Archivo::create([
+                'user_id'         => auth()->id(),
+                'nombre_original' => $originalName,
+                'nombre_sistema'  => $systemName,
+                'tipo_archivo'    => $extension, 
+                'ruta'            => 'uploads/' . $systemName,
+                'modulo'          => 'OC',        
+            ]);
+
+            // LOG DE ÉXITO
+            Log::create([
+                'user_id' => auth()->id(),
+                'accion'  => 'Subió con éxito: ' . $originalName,
+                'modulo'  => 'INPUTS',
+            ]);
+
+            return back()->with('success', 'Archivo subido y verificado correctamente.');
+
+        } catch (QueryException $e) {
+            // Error si se pierde la conexión a la base de datos en el último segundo
+            Log::create([
+                'user_id' => auth()->id(),
+                'accion'  => 'Error interno (Base de Datos): ' . $e->getMessage(),
+                'modulo'  => 'INPUTS'
+                ]);
+            return back()->with('error', 'Error crítico: No se pudo registrar en la base de datos.');
+
         } catch (\Exception $e) {
-            // 8. CONTROL DE EMERGENCIAS:
-            // Si algo falla (ej: disco lleno, error de BD), atrapamos el error para que la web no "explote"
-            return back()->with('error', 'Error interno: ' . $e->getMessage());
+            // Error de servidor (disco lleno, permisos, timeout)
+            Log::create([
+                'user_id' => auth()->id(),
+                'accion'  => 'Error interno (Servidor): ' . $e->getMessage(),
+                'modulo'  => 'INPUTS',
+            ]);
+            return back()->with('error', 'Error de infraestructura al procesar el archivo.');
         }
     }
 }
