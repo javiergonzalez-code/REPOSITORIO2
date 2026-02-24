@@ -15,7 +15,7 @@ class CheckIfAdmin
         }
     }
 
-public function handle($request, Closure $next)
+    public function handle($request, Closure $next)
     {
         if (backpack_auth()->guest()) {
             return $this->respondToUnauthorizedRequest($request);
@@ -23,8 +23,9 @@ public function handle($request, Closure $next)
 
         $user = backpack_auth()->user();
 
-        // Validamos usando TU columna 'role' en la base de datos
-        if ($user->role === 'admin' || $user->email === 'admin@ragon.com') {
+        // ACTUALIZACIÓN: Permitimos el paso si el rol es 'admin' O 'superadmin'
+        // También mantenemos la validación por correo como respaldo
+        if ($user->role === 'admin' || $user->role === 'superadmin' || $user->email === 'admin@ragon.com') {
             return $next($request);
         }
 
