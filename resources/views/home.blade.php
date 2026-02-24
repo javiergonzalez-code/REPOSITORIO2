@@ -41,20 +41,22 @@
                     <h3 class="fw-bold">OC</h3>
                 </a>
 
-                {{-- Cambia @hasrole('admin') o @if (auth()->user()->hasRole(...)) por esto: --}}
-                @if (auth()->user()->role === 'admin')
-                    {{-- Tarjeta para Manejo de usuarios y privilegios --}}
+                {{-- Tarjeta para Manejo de usuarios (Visible para admin y superadmin) --}}
+                @if (auth()->user()->role === 'admin' || auth()->user()->role === 'superadmin' || auth()->user()->email === 'admin@ragon.com')
                     <a href="{{ route('users.index') }}" class="dashboard-card">
                         <i class="fas fa-user fa-2x"></i>
                         <h3 class="fw-bold">Usuarios</h3>
                     </a>
+                @endif
 
-                    {{-- Tarjeta para Superusuario (Backpack Admin) --}}
+                {{-- Tarjeta para Superusuario (Backpack Admin - Visible SOLO para el correo específico o superadmin) --}}
+                @if (backpack_user() && (backpack_user()->email === 'admin@ragon.com' || backpack_user()->role === 'superadmin'))
                     <a href="{{ url('admin') }}" class="dashboard-card">
                         <i class="fas fa-user-shield fa-2x"></i>
                         <h3 class="fw-bold">Superusuario</h3>
                     </a>
                 @endif
+
             </div>
         </div>
     </main>
