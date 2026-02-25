@@ -5,6 +5,8 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 // 1. Importamos el Trait del paquete
 use Elegant\Sanitizer\Laravel\SanitizesInput;
+// Importamos nuestra nueva regla personalizada
+use App\Rules\ValidRFC;
 
 class UserRequest extends FormRequest
 {
@@ -16,7 +18,7 @@ class UserRequest extends FormRequest
         return backpack_auth()->check();
     }
 
-public function rules()
+    public function rules()
     {
         // Obtiene el ID del usuario desde la ruta para la excepción de email único
         $userId = request()->route('id') ?? request()->route('user');
@@ -28,10 +30,12 @@ public function rules()
             
             // Reglas para los nuevos campos detectados en UserCrudController:
             'codigo'   => 'nullable|string|max:50', 
-            'rfc'      => 'nullable|string|min:12|max:13', 
+            // Implementamos la regla ValidRFC aquí pasándola en un array
+            'rfc'      => ['nullable', 'string', 'min:12', 'max:13', new ValidRFC()], 
             'telefono' => 'nullable|string|max:20', 
         ];
     }
+
     /**
      * 3. Definimos los filtros de Sanitización.
      * Estos se ejecutan ANTES de las reglas de validación (rules).
