@@ -100,7 +100,7 @@
 
                         @auth
 
-                            <a class="nav-link  text-white d-flex align-items-center" href="#"
+                            <a class="nav-link  text-white d-flex align-items-center"
                                 role="button" data-bs-toggle="dropdown">
                                 <i class="fas fa-user-circle fa-lg me-2"></i>
                                 <span class="d-none d-sm-inline">{{ Auth::user()->name }}</span>

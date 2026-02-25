@@ -4,11 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+// 1. Importamos las clases necesarias de Spatie Activitylog
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Archivo extends Model
 {
     use HasFactory;
     use \Backpack\CRUD\app\Models\Traits\CrudTrait;
+    // 2. Usamos el Trait para habilitar el registro de actividades
+    use LogsActivity;
+
     /**
      * Atributos que se pueden asignar de manera masiva.
      * Esto es una medida de seguridad (Mass Assignment) para evitar que 
@@ -22,6 +28,22 @@ class Archivo extends Model
         'modulo',
         'ruta'
     ];
+
+    /**
+     * 3. Configuración de las opciones del Log para el modelo Archivo
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            // Definimos qué campos queremos auditar si cambian
+            ->logOnly(['user_id', 'nombre_original', 'tipo_archivo', 'modulo', 'ruta'])
+            // Evitamos que se registre el log si no hubo cambios reales
+            ->logOnlyDirty()
+            // No guardamos logs vacíos
+            ->dontSubmitEmptyLogs()
+            // Le damos un nombre específico a esta bitácora para filtrarla fácilmente
+            ->useLogName('archivo');
+    }
 
     /**
      * Define la relación "pertenece a" (Muchos a Uno).
@@ -39,8 +61,7 @@ class Archivo extends Model
         $disk = "public";
         $destination_path = "uploads/archivos";
 
-        // CORRECCIÓN PARA QUE EL SEEDER FUNCIONE:
-        // Si el valor es un string (viene del Seeder o Factory), lo guardamos directo.
+
         if (is_string($value) && $value != null) {
             $this->attributes[$attribute_name] = $value;
             return;
