@@ -18,19 +18,19 @@ class InputController extends Controller
 
     public function store(Request $request)
     {
-        // 1. VALIDACIÓN ESTRICTA (QA)
+        // 1. VALIDACIÓN ESTRICTA (QA y Seguridad)
         $validator = Validator::make($request->all(), [
             'archivo' => [
                 'required',
                 'file',
-                'mimes:csv,xlsx,xls,xml,txt', // Valida la firma interna (evita que un .exe se renombre a .csv)
-                //'min:1',                      // Evita archivos vacíos (0 bytes)
-                'max:5120',                   // Límite máximo de 5MB
+                'mimes:csv,xlsx,xls,xml,txt',      // Valida la firma interna (MIME type real del archivo)
+                'extensions:csv,xlsx,xls,xml,txt', // Valida ESTRICTAMENTE la extensión (Laravel 11+)
+                'max:5120',                        // Límite máximo de 5MB
             ]
         ], [
             // Mensajes personalizados para ser más claros en el Log y en la vista
             'archivo.mimes' => 'El contenido del archivo no coincide con su extensión o tiene formato malicioso.',
-            'archivo.min' => 'El archivo está dañado o vacío (0 bytes).',
+            'archivo.extensions' => 'La extensión del archivo no está permitida por políticas de seguridad.',
             'archivo.max' => 'El archivo supera el límite máximo de 5MB.'
         ]);
 
@@ -59,10 +59,18 @@ class InputController extends Controller
             }
             
             $extension = $file->getClientOriginalExtension(); 
-            $systemName = time() . '_' . uniqid() . '_' . $originalName; // uniqid evita sobrescritura si suben 2 al mismo milisegundo
+            
+            // Doble validación manual de extensión (Capa de defensa en profundidad)
+            $allowedExtensions = ['csv', 'xlsx', 'xls', 'xml', 'txt'];
+            if (!in_array(strtolower($extension), $allowedExtensions)) {
+                throw new \Exception("Extensión de archivo maliciosa detectada.");
+            }
 
-            // Guardado en disco
-            $path = $file->storeAs('uploads', $systemName, 'public');
+            $systemName = time() . '_' . uniqid() . '_' . $originalName; // uniqid evita sobrescritura
+
+            // Guardado en disco PRIVADO ('local' en lugar de 'public')
+            // Esto evita que un atacante ejecute el archivo navegando a misitio.com/uploads/archivo.php
+            $path = $file->storeAs('uploads', $systemName, 'local');
             
             if (!$path) {
                 throw new \Exception("El servidor denegó el permiso de escritura en el disco duro.");
@@ -73,7 +81,7 @@ class InputController extends Controller
                 'user_id'         => auth()->id(),
                 'nombre_original' => $originalName,
                 'nombre_sistema'  => $systemName,
-                'tipo_archivo'    => $extension, 
+                'tipo_archivo'    => strtolower($extension), 
                 'ruta'            => 'uploads/' . $systemName,
                 'modulo'          => 'OC',        
             ]);
@@ -93,17 +101,47 @@ class InputController extends Controller
                 'user_id' => auth()->id(),
                 'accion'  => 'Error interno (Base de Datos): ' . $e->getMessage(),
                 'modulo'  => 'INPUTS'
-                ]);
+            ]);
             return back()->with('error', 'Error crítico: No se pudo registrar en la base de datos.');
 
         } catch (\Exception $e) {
-            // Error de servidor (disco lleno, permisos, timeout)
+            // Error de servidor (disco lleno, permisos, timeout) o validación manual
             Log::create([
                 'user_id' => auth()->id(),
-                'accion'  => 'Error interno (Servidor): ' . $e->getMessage(),
+                'accion'  => 'Error interno (Seguridad/Servidor): ' . $e->getMessage(),
                 'modulo'  => 'INPUTS',
             ]);
-            return back()->with('error', 'Error de infraestructura al procesar el archivo.');
+            return back()->with('error', 'Error al procesar el archivo: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Descarga segura de archivos desde el almacenamiento privado
+     */
+    public function download($id)
+    {
+        // 1. Buscar el registro del archivo en la base de datos
+        $archivo = Archivo::findOrFail($id);
+
+        // (OPCIONAL - RECOMENDADO) Validar permisos: 
+        // Verificar que el usuario actual sea el dueño del archivo o un administrador
+        /*
+        if ($archivo->user_id !== auth()->id()) {
+            abort(403, 'Acceso denegado. No tienes permiso para descargar este archivo.');
+        }
+        */
+
+        // 2. Verificar que el archivo físico realmente exista en el disco 'local'
+        if (!Storage::disk('local')->exists($archivo->ruta)) {
+            abort(404, 'El archivo físico no se encuentra en el servidor.');
+        }
+
+        // 3. Retornar el archivo para su descarga
+        // Esto fuerza la descarga en el navegador con el nombre original seguro
+        return Storage::disk('local')->download($archivo->ruta, $archivo->nombre_original);
+
+        // ALTERNATIVA: Si quisieras que el archivo (como un TXT o PDF) se abra en el navegador 
+        // en lugar de forzar la descarga, usarías esto en vez del return anterior:
+        // return Storage::disk('local')->response($archivo->ruta);
     }
 }

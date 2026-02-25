@@ -142,9 +142,10 @@
                                                 <a href="{{ route('oc.preview', $oc->id) }}"
                                                     class="btn btn-gradient rounded-pill " title="Ver"><i
                                                         class="fas fa-eye text-muted"></i></a>
-                                                <a href="{{ route('oc.download', $oc->id) }}"
-                                                    class="btn btn-gradient rounded-pill" title="Bajar"><i
-                                                        class="fas fa-download text-primary"></i></a>
+                                                <a href="{{ route('archivos.download', $oc->id) }}"
+                                                    class="btn btn-gradient rounded-pill" title="Bajar de forma segura">
+                                                    <i class="fas fa-download text-primary"></i>
+                                                </a>
                                             </div>
                                         </td>
                                     </tr>

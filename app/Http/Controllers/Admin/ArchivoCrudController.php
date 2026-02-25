@@ -62,7 +62,7 @@ class ArchivoCrudController extends CrudController
         CRUD::field('nombre_original')->label('Nombre Original');
         CRUD::field('modulo')->label('Módulo');
 
-        CRUD::field('ruta')->type('upload')->upload(true)->disk('public')->label('Archivo Adjunto');
+        CRUD::field('ruta')->type('upload')->upload(true)->disk('local  ')->label('Archivo Adjunto');
     }
 
     protected function setupUpdateOperation()

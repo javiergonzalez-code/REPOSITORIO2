@@ -47,7 +47,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/oc', [OcController::class, 'index'])->name('oc.index');
     Route::get('/oc/download/{id}', [OcController::class, 'download'])->name('oc.download');
     Route::get('/oc/preview/{id}', [OcController::class, 'preview'])->name('oc.preview');
-
+    
+    // Ruta para descargar archivos de forma segura
+    Route::get('/archivos/descargar/{id}', [InputController::class, 'download'])->name('archivos.download');
     /**
      * GESTIÓN DE USUARIOS (PROTEGIDA POR PERMISOS)
      * Aquí aplicamos la lógica de "can:nombre-del-permiso"
