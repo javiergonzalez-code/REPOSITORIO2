@@ -24,7 +24,7 @@ class InputController extends Controller
                 'required',
                 'file',
                 'mimes:csv,xlsx,xls,xml,txt', // Valida la firma interna (evita que un .exe se renombre a .csv)
-                'min:1',                      // Evita archivos vacíos (0 bytes)
+                //'min:1',                      // Evita archivos vacíos (0 bytes)
                 'max:5120',                   // Límite máximo de 5MB
             ]
         ], [
