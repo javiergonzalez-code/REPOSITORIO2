@@ -26,7 +26,7 @@ class OcController extends Controller
         if ($esProveedor) {
             // El proveedor solo ve sus propias órdenes
             $query->where('user_id', $user->id);
-            $usuarios_filtro = collect([$user]); 
+            $usuarios_filtro = collect([$user]);
         } else {
             // Admin y Superadmin ven todo
             $usuarios_filtro = User::orderBy('name')->get();
@@ -37,7 +37,7 @@ class OcController extends Controller
         }
 
         if ($userFilter) {
-            $query->whereHas('user', function($q) use ($userFilter) {
+            $query->whereHas('user', function ($q) use ($userFilter) {
                 $q->where('name', $userFilter);
             });
         }
@@ -110,5 +110,51 @@ class OcController extends Controller
         }
 
         return view('oc.preview', compact('data', 'oc', 'extension'));
+    }
+
+    public function destroy($id)
+    {
+        $oc = Archivo::findOrFail($id);
+        $user = auth()->user();
+        $esProveedor = $user->hasRole('proveedor') || $user->role === 'proveedor';
+
+        // Seguridad: Evita que un proveedor elimine archivos ajenos
+        if ($esProveedor && $oc->user_id !== $user->id) {
+            abort(403, 'No tienes permiso para eliminar este archivo.');
+        }
+
+        try {
+            // Guardamos el nombre original para ponerlo en el log
+            $nombreOriginal = $oc->nombre_original;
+
+            // Ruta del archivo físico (basado en cómo lo lees en preview/download)
+            $path = storage_path('app/public/' . $oc->ruta);
+
+            // 1. Eliminar el archivo físico del disco si existe
+            if (file_exists($path)) {
+                unlink($path);
+            }
+
+            // 2. Eliminar el registro de la base de datos
+            $oc->delete();
+
+            // 3. Generar el Log manual para tu tabla 'logs'
+            \App\Models\Log::create([
+                'user_id' => auth()->id(),
+                'accion'  => 'Eliminó con éxito la OC: ' . $nombreOriginal,
+                'modulo'  => 'OC',
+            ]);
+
+            return back()->with('success', 'La orden de compra ha sido eliminada correctamente.');
+        } catch (\Exception $e) {
+            // Generar un log en caso de error
+            \App\Models\Log::create([
+                'user_id' => auth()->id(),
+                'accion'  => 'Error al intentar eliminar OC: ' . $e->getMessage(),
+                'modulo'  => 'OC',
+            ]);
+
+            return back()->with('error', 'Error al eliminar el archivo: ' . $e->getMessage());
+        }
     }
 }

@@ -61,7 +61,7 @@ class InputController extends Controller
             $extension = $file->getClientOriginalExtension(); 
             
             // Doble validación manual de extensión (Capa de defensa en profundidad)
-            $allowedExtensions = ['csv', 'xlsx', 'xls', 'xml', 'txt'];
+            $allowedExtensions = ['csv', 'xlsx', 'xls', 'xml'];
             if (!in_array(strtolower($extension), $allowedExtensions)) {
                 throw new \Exception("Extensión de archivo maliciosa detectada.");
             }

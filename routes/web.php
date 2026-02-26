@@ -47,6 +47,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/oc', [OcController::class, 'index'])->name('oc.index');
     Route::get('/oc/download/{id}', [OcController::class, 'download'])->name('oc.download');
     Route::get('/oc/preview/{id}', [OcController::class, 'preview'])->name('oc.preview');
+    Route::delete('/oc/{id}', [App\Http\Controllers\OcController::class, 'destroy'])->name('oc.destroy');
     
     // Ruta para descargar archivos de forma segura
     Route::get('/archivos/descargar/{id}', [InputController::class, 'download'])->name('archivos.download');

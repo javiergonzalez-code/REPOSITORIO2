@@ -140,12 +140,24 @@
                                         <td class="text-end pe-4">
                                             <div class="btn-group rounded-3">
                                                 <a href="{{ route('oc.preview', $oc->id) }}"
-                                                    class="btn btn-gradient rounded-pill " title="Ver"><i
-                                                        class="fas fa-eye text-muted"></i></a>
+                                                    class="btn btn-gradient rounded-pill" title="Ver">
+                                                    <i class="fas fa-eye text-muted"></i>
+                                                </a>
                                                 <a href="{{ route('archivos.download', $oc->id) }}"
                                                     class="btn btn-gradient rounded-pill" title="Bajar de forma segura">
                                                     <i class="fas fa-download text-primary"></i>
                                                 </a>
+
+                                                <form action="{{ route('oc.destroy', $oc->id) }}" method="POST"
+                                                    style="display:inline;">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-gradient rounded-pill"
+                                                        title="Eliminar orden"
+                                                        onclick="return confirm('¿Estás seguro de que deseas eliminar esta OC? Esta acción no se puede deshacer.');">
+                                                        <i class="fas fa-trash text-danger"></i>
+                                                    </button>
+                                                </form>
                                             </div>
                                         </td>
                                     </tr>
