@@ -86,7 +86,8 @@ class OcController extends Controller
             abort(403, 'No tienes permiso para previsualizar este archivo.');
         }
 
-        $path = storage_path('app/public/' . $oc->ruta);
+        // CORRECCIÓN: Usar la misma ruta exacta que usas en el método download
+        $path = storage_path('app/private/uploads/' . $oc->nombre_sistema);
 
         if (!file_exists($path)) {
             return back()->with('error', 'El archivo físico no existe en el servidor.');
@@ -102,6 +103,10 @@ class OcController extends Controller
             } elseif ($extension === 'xml') {
                 $xmlContent = simplexml_load_file($path);
                 $data = json_decode(json_encode($xmlContent), true);
+            } elseif ($extension === 'json') {
+                // BONUS: Soporte para previsualizar JSON
+                $jsonContent = file_get_contents($path);
+                $data = json_decode($jsonContent, true);
             } else {
                 return back()->with('error', 'Formato de previsualización no soportado.');
             }
@@ -124,11 +129,8 @@ class OcController extends Controller
         }
 
         try {
-            // Guardamos el nombre original para ponerlo en el log
             $nombreOriginal = $oc->nombre_original;
-
-            // Ruta del archivo físico (basado en cómo lo lees en preview/download)
-            $path = storage_path('app/public/' . $oc->ruta);
+            $path = storage_path('app/public/uploads/' . $oc->nombre_sistema);
 
             // 1. Eliminar el archivo físico del disco si existe
             if (file_exists($path)) {
@@ -138,23 +140,24 @@ class OcController extends Controller
             // 2. Eliminar el registro de la base de datos
             $oc->delete();
 
-            // 3. Generar el Log manual para tu tabla 'logs'
+            // 3. Generar el Log
             \App\Models\Log::create([
                 'user_id' => auth()->id(),
                 'accion'  => 'Eliminó con éxito la OC: ' . $nombreOriginal,
                 'modulo'  => 'OC',
             ]);
 
-            return back()->with('success', 'La orden de compra ha sido eliminada correctamente.');
+            // CORRECCIÓN: Forzamos la redirección a oc.index en lugar de usar back()
+            return redirect()->route('oc.index')->with('success', 'La orden de compra ha sido eliminada correctamente.');
         } catch (\Exception $e) {
-            // Generar un log en caso de error
             \App\Models\Log::create([
                 'user_id' => auth()->id(),
                 'accion'  => 'Error al intentar eliminar OC: ' . $e->getMessage(),
                 'modulo'  => 'OC',
             ]);
 
-            return back()->with('error', 'Error al eliminar el archivo: ' . $e->getMessage());
+            // Si hay error, también es mejor mandarlo al index
+            return redirect()->route('oc.index')->with('error', 'Error al eliminar el archivo: ' . $e->getMessage());
         }
     }
 }

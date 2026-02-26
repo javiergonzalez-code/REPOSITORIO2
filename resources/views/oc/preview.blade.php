@@ -27,13 +27,28 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="header-actions">
-                            <a href="{{ route('oc.index') }}" class="btn-ragon-outline shadow-sm me-2">
-                                <i class="fas fa-arrow-left me-2"></i> VOLVER AL LISTADO
+                        
+                        {{-- AQUÍ ESTÁN LOS BOTONES --}}
+                        <div class="header-actions d-flex align-items-center gap-2">
+                            <a href="{{ route('oc.index') }}" class="btn-ragon-outline shadow-sm">
+                                <i class="fas fa-arrow-left me-2"></i> VOLVER
                             </a>
-                            <a href="{{ route('oc.download', $oc->id) }}" class="btn btn-gradient rounded-pill">
+                            
+                            {{-- NOTA: Validar si tu ruta es oc.download o archivos.download según tu web.php --}}
+                            <a href="{{ route('archivos.download', $oc->id) }}" class="btn btn-gradient rounded-pill">
                                 <i class="fas fa-download me-2"></i> DESCARGAR
                             </a>
+
+                            {{-- NUEVO BOTÓN DE ELIMINAR --}}
+                            <form action="{{ route('oc.destroy', $oc->id) }}" method="POST" class="m-0 p-0">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" 
+                                        class="btn btn-danger rounded-pill shadow-sm" 
+                                        onclick="return confirm('¿Estás seguro de que deseas eliminar esta Orden de Compra? Esta acción no se puede deshacer.');">
+                                    <i class="fas fa-trash-alt me-2"></i> ELIMINAR
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -63,7 +78,7 @@
 
                                             @foreach ($row as $cell)
                                                 <td class="p-3 border-end text-main" style="min-width: 150px">
-                                                    {{ $cell }}
+                                                    {{ is_array($cell) ? json_encode($cell) : $cell }}
                                                 </td>
                                             @endforeach
                                         </tr>
