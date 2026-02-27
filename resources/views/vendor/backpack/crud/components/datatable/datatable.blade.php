@@ -8,31 +8,54 @@
           <p class="ms-2 ml-2 mb-0" id="datatable_info_stack_{{$tableId}}" bp-section="page-subheading">{!! $crud->getSubheading() ?? '' !!}</p>
         </section>
 <div class="row mb-2 align-items-center">
-  <div class="col-sm-9">
+  <div class="col-sm-4">
     @if ( $crud->buttons()->where('stack', 'top')->count() ||  $crud->exportButtons())
       <div class="d-print-none {{ $crud->hasAccess('create')?'with-border':'' }} top_buttons_{{$tableId}}">
         @include('crud::inc.button_stack', ['stack' => 'top', 'crudTableId' => $tableId])
       </div>
     @endif
   </div>
-  @if($crud->getOperationSetting('searchableTable'))
-  <div class="col-sm-3">
-    <div id="datatable_search_stack_{{ $tableId }}" class="mt-sm-0 mt-2 d-print-none datatable_search_stack">
-      <div class="input-icon">
-        <span class="input-icon-addon">
+
+  <div class="col-sm-8 d-flex justify-content-end gap-2 align-items-center d-print-none">
+    
+    <div style="width: 200px;">
+        <input list="names_list" id="custom_name_filter" class="form-control form-control-sm" placeholder="Filtrar por Nombre...">
+        <datalist id="names_list">
+            @foreach(\App\Models\User::orderBy('name')->pluck('name')->unique() as $name)
+                <option value="{{ $name }}">
+            @endforeach
+        </datalist>
+    </div>
+
+    <div style="width: 200px;">
+        <input list="emails_list" id="custom_email_filter" class="form-control form-control-sm" placeholder="Filtrar por Correo...">
+        <datalist id="emails_list">
+            @foreach(\App\Models\User::orderBy('email')->pluck('email')->unique() as $email)
+                <option value="{{ $email }}">
+            @endforeach
+        </datalist>
+    </div>
+
+    @if($crud->getOperationSetting('searchableTable'))
+    <div id="datatable_search_stack_{{ $tableId }}" class="datatable_search_stack" style="width: 250px;">
+      <div class="input-group input-group-sm">
+        <span class="input-group-text text-muted bg-transparent">
           <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"></path><path d="M21 21l-6 -6"></path></svg>
         </span>
-        <input type="search" class="form-control datatable-search-input" data-table-id="{{ $tableId }}" placeholder="{{ trans('backpack::crud.search') }}..."/>
+        <input type="search" class="form-control datatable-search-input border-start-0 ps-0" data-table-id="{{ $tableId }}" placeholder="{{ trans('backpack::crud.search') }}..."/>
       </div>
     </div>
+    @endif
+    
   </div>
-  @endif
 </div>
 
 {{-- Backpack List Filters --}}
 @if ($crud->filtersEnabled())
   @include('crud::inc.filters_navbar', ['componentId' => $tableId])
 @endif
+
+
 <div class="{{ backpack_theme_config('classes.tableWrapper') }}">
   <table
       id="{{ $tableId }}"
@@ -151,3 +174,39 @@
   {{-- CRUD LIST CONTENT - crud_list_scripts stack --}}
   @stack('crud_list_scripts')
 @endsection
+
+@push('crud_list_scripts')
+  <script>
+    $(document).ready(function() {
+        // 1. Evitar que la tecla Enter recargue la página por error
+        $('#custom_name_filter, #custom_email_filter').on('keydown', function(e) {
+            if (e.key === 'Enter' || e.keyCode === 13) {
+                e.preventDefault();
+            }
+        });
+
+        // 2. Esperar a que Backpack construya completamente su objeto de tabla (crud.table)
+        let initFilters = setInterval(function() {
+            if (typeof crud !== 'undefined' && crud.table) {
+                clearInterval(initFilters); // Detenemos la espera
+
+                // 3. Antes de que Datatables vaya al servidor (Ajax), inyectamos nuestros filtros
+                crud.table.on('preXhr.dt', function (e, settings, data) {
+                    data.custom_name = $('#custom_name_filter').val();
+                    data.custom_email = $('#custom_email_filter').val();
+                });
+
+                // 4. Cada vez que el usuario escriba, recargamos la tabla automáticamente
+                let searchTimer;
+                $('#custom_name_filter, #custom_email_filter').on('input', function() {
+                    clearTimeout(searchTimer);
+                    // Agregamos un pequeño retraso de 400ms para no saturar tu servidor en cada tecla
+                    searchTimer = setTimeout(function() {
+                        crud.table.ajax.reload();
+                    }, 400); 
+                });
+            }
+        }, 100);
+    });
+  </script>
+@endpush

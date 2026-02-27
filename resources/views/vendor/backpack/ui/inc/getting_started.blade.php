@@ -1,12 +1,12 @@
 <div class="card">
     <div class="card-header border-0">
-        <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex justify-content-between align-items-center margin-left-2">
             {{-- Saludo Personalizado --}}
             <h3 class="mb-0">
                 <i class="la la-user-shield text-primary me-2"></i>
                 Bienvenido al Panel de Control, {{ backpack_user()->name ?? 'Superusuario' }}
             </h3>
-            <span class="badge bg-primary">Super Usuario</span>
+            
         </div>
     </div>
 

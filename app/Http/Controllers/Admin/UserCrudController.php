@@ -22,9 +22,7 @@ class UserCrudController extends CrudController
 
         $user = backpack_user();
 
-        // SEGURIDAD: Solo admin o superadmin entran aquí
-        // Nota: Agregamos 'superadmin' a la validación
-        if ($user->role !== 'admin' && $user->role !== 'superadmin' && $user->email !== 'admin@ragon.com') {
+        if ($user->role !== 'superadmin' && $user->email !== 'admin@ragon.com') {
             CRUD::denyAccess(['list', 'show', 'create', 'update', 'delete']);
         }
     }
@@ -43,7 +41,22 @@ class UserCrudController extends CrudController
         CRUD::column('email')->label('Correo');
         CRUD::column('role')->label('Rol Base'); 
         CRUD::column('created_at')->label('Creado')->type('date');
+
+        // ==========================================
+        // FILTROS MANUALES (Compatibles con versión Free)
+        // ==========================================
+
+        // Filtrar por Nombre
+        if (request()->has('custom_name') && request()->filled('custom_name')) {
+            $this->crud->addClause('where', 'name', 'like', '%' . request()->input('custom_name') . '%');
+        }
+
+        // Filtrar por Correo
+        if (request()->has('custom_email') && request()->filled('custom_email')) {
+            $this->crud->addClause('where', 'email', 'like', '%' . request()->input('custom_email') . '%');
+        }
     }
+
 
     protected function setupCreateOperation()
     {

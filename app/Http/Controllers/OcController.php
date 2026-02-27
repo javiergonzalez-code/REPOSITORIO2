@@ -147,7 +147,6 @@ class OcController extends Controller
                 'modulo'  => 'OC',
             ]);
 
-            // CORRECCIÓN: Forzamos la redirección a oc.index en lugar de usar back()
             return redirect()->route('oc.index')->with('success', 'La orden de compra ha sido eliminada correctamente.');
         } catch (\Exception $e) {
             \App\Models\Log::create([
