@@ -135,3 +135,48 @@
         </div>
     </div>
 @endsection
+
+@push('crud_list_scripts')
+  <script>
+    $(document).ready(function() {
+        let tableId = '{{ $tableId }}';
+        
+        // 1. Evitar que la tecla Enter recargue la página al usar nuestros filtros
+        $('#custom_name_filter, #custom_email_filter').on('keydown', function(e) {
+            if (e.key === 'Enter' || e.keyCode === 13) {
+                e.preventDefault();
+            }
+        });
+
+        // 2. Esperamos un instante a que Backpack inicialice completamente la tabla en el DOM
+        let checkTable = setInterval(function() {
+            if ($.fn.DataTable.isDataTable('#' + tableId)) {
+                clearInterval(checkTable); // Detenemos la espera
+                let table = $('#' + tableId).DataTable();
+
+                // 3. Evento para el filtro Nombre (dispara al teclear, borrar o pegar)
+                let nameTimer;
+                $('#custom_name_filter').on('input', function() {
+                    clearTimeout(nameTimer);
+                    let val = $(this).val();
+                    // Usamos un pequeño retraso de 400ms para no saturar tu servidor en cada pulsación
+                    nameTimer = setTimeout(function() {
+                        // table.column('name:name') busca de forma exacta la columna sin importar si hay columnas ocultas
+                        table.column('name:name').search(val).draw();
+                    }, 400); 
+                });
+
+                // 4. Evento para el filtro Correo
+                let emailTimer;
+                $('#custom_email_filter').on('input', function() {
+                    clearTimeout(emailTimer);
+                    let val = $(this).val();
+                    emailTimer = setTimeout(function() {
+                        table.column('email:name').search(val).draw();
+                    }, 400); 
+                });
+            }
+        }, 100); // Revisa cada 100ms hasta que la tabla exista
+    });
+  </script>
+@endpush
