@@ -9,3 +9,45 @@
 .container-xl {
     margin-top: 0 !important;
 }
+
+/* Paginación estilo Pills moderno */
+.custom-pagination {
+    gap: 4px; /* Separación limpia entre botones */
+}
+
+/* .custom-pagination .page-item .page-link {
+    border: none;
+    border-radius: 6px !important;
+    color: #475569;
+    font-weight: 500;
+    font-size: 0.875rem;
+    min-width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 10px;
+    background-color: transparent;
+    transition: all 0.2s ease-in-out;
+} */
+
+/* Efecto hover sobre los números */
+.custom-pagination .page-item:not(.active):not(.disabled) .page-link:hover {
+    background-color: #f1f5f9;
+    color: #1e293b;
+}
+
+/* Página actual activa */
+.custom-pagination .page-item.active .page-link {
+    background-color: #206bc4; /* Azul de Tabler */
+    color: white;
+    box-shadow: 0 2px 5px rgba(32, 107, 196, 0.3); /* Sombra suave para resaltar */
+}
+
+/* Estado deshabilitado (flechas de los extremos) */
+.custom-pagination .page-item.disabled .page-link {
+    color: #cbd5e1;
+    background-color: transparent;
+}
+
+

@@ -28,24 +28,20 @@
                             </div>
                         </div>
                         
-                        {{-- AQUÍ ESTÁN LOS BOTONES --}}
                         <div class="header-actions d-flex align-items-center gap-2">
                             <a href="{{ route('oc.index') }}" class="btn-ragon-outline shadow-sm">
                                 <i class="fas fa-arrow-left me-2"></i> VOLVER
                             </a>
                             
-                            {{-- NOTA: Validar si tu ruta es oc.download o archivos.download según tu web.php --}}
                             <a href="{{ route('archivos.download', $oc->id) }}" class="btn btn-gradient rounded-pill">
                                 <i class="fas fa-download me-2"></i> DESCARGAR
                             </a>
 
-                            {{-- NUEVO BOTÓN DE ELIMINAR --}}
-                            <form action="{{ route('oc.destroy', $oc->id) }}" method="POST" class="m-0 p-0">
+                            {{-- FORMULARIO DE ELIMINAR ACTUALIZADO --}}
+                            <form action="{{ route('oc.destroy', $oc->id) }}" method="POST" class="m-0 p-0 form-eliminar">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" 
-                                        class="btn btn-danger rounded-pill shadow-sm" 
-                                        onclick="return confirm('¿Estás seguro de que deseas eliminar esta Orden de Compra? Esta acción no se puede deshacer.');">
+                                <button type="submit" class="btn btn-danger rounded-pill shadow-sm">
                                     <i class="fas fa-trash-alt me-2"></i> ELIMINAR
                                 </button>
                             </form>
@@ -64,13 +60,11 @@
                         </div>
                     </div>
                     <div class="card-body p-0">
-                        {{-- Contenedor con scroll personalizado --}}
                         <div class="table-responsive" style="max-height: 650px; overflow-y: auto;">
                             <table class="table table-hover align-middle mb-0">
                                 <tbody class="font-monospace" style="font-size: 0.85rem;">
                                     @forelse($data as $index => $row)
                                         <tr class="log-row">
-                                            {{-- Indicador de número de fila --}}
                                             <td class="text-center text-muted border-end p-2"
                                                 style="width: 50px; font-size: 0.7rem; font-weight: 800; background: rgba(0,0,0,0.02);">
                                                 {{ $index + 1 }}
@@ -101,4 +95,37 @@
             </div>
         </div>
     </div>
+
+    {{-- SCRIPT PARA EL SWEETALERT --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const forms = document.querySelectorAll('.form-eliminar');
+            
+            forms.forEach(form => {
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    
+                    Swal.fire({
+                        title: '¿Confirmar eliminación?',
+                        text: "Esta acción borrará permanentemente la Orden de Compra y no se puede deshacer.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#dc3545', // Rojo peligro
+                        cancelButtonColor: '#6c757d',  // Gris neutral
+                        confirmButtonText: '<i class="fas fa-trash-alt me-1"></i> Sí, eliminar ahora',
+                        cancelButtonText: 'Cancelar',
+                        customClass: {
+                            confirmButton: 'btn btn-danger px-4 rounded-pill',
+                            cancelButton: 'btn btn-secondary px-4 rounded-pill me-2'
+                        },
+                        buttonsStyling: false
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            this.submit();
+                        }
+                    });
+                });
+            });
+        });
+    </script>
 @endsection

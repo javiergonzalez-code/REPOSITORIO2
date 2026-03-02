@@ -4,23 +4,7 @@
     <div class="container py-4">
         <div class="row justify-content-center">
             <div class="col-12 col-xl-11">
-                {{-- ALERTAS DE ÉXITO O ERROR --}}
-                @if(session('success'))
-                    <div class="alert alert-success alert-dismissible fade show shadow-sm border-0 rounded-3" role="alert">
-                        <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                @endif
-
-                @if(session('error'))
-                    <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0 rounded-3" role="alert">
-                        <i class="fas fa-exclamation-triangle me-2"></i> {{ session('error') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                @endif
-                {{-- FIN ALERTAS --}}
-
-                {{-- RECUADRO 1: ENCABEZADO --}}
+                
                 <div class="card border-0 shadow-sm rounded-4 mb-4 bg-white">
                     <div class="card-body p-4 d-flex justify-content-between align-items-center">
                         <div class="d-flex align-items-center">
@@ -128,10 +112,13 @@
                                             <div class="d-flex justify-content-end gap-2">
                                                 <a href="{{ route('oc.preview', $oc->id) }}" class="action-btn btn-view" title="Ver"><i class="fas fa-eye"></i></a>
                                                 <a href="{{ route('archivos.download', $oc->id) }}" class="action-btn btn-download" title="Descargar"><i class="fas fa-cloud-download-alt"></i></a>
-                                                <form action="{{ route('oc.destroy', $oc->id) }}" method="POST" class="d-inline">
+                                                
+                                                {{-- SE AGREGA LA CLASE 'form-eliminar' AL FORMULARIO --}}
+                                                <form action="{{ route('oc.destroy', $oc->id) }}" method="POST" class="d-inline form-eliminar">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="action-btn btn-delete" title="Eliminar" onclick="return confirm('¿Seguro que deseas eliminar esta OC?');">
+                                                    {{-- SE QUITA EL ONCLICK --}}
+                                                    <button type="submit" class="action-btn btn-delete" title="Eliminar">
                                                         <i class="fas fa-trash-alt"></i>
                                                     </button>
                                                 </form>
@@ -152,7 +139,6 @@
         </div>
     </div>
 
-    {{-- LOS ESTILOS SE PONEN UNA SOLA VEZ AL FINAL --}}
     <style>
         .action-btn {
             width: 35px;
@@ -188,4 +174,40 @@
         }
         .bg-blue-ragon-gradient { background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); }
     </style>
+
+    {{-- SCRIPTS PARA LA CONFIRMACIÓN DE SWEETALERT --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Seleccionar todos los formularios de eliminación
+            const formulariosEliminar = document.querySelectorAll('.form-eliminar');
+
+            formulariosEliminar.forEach(formulario => {
+                formulario.addEventListener('submit', function (e) {
+                    e.preventDefault(); // Detenemos el envío inmediato
+
+                    // Lanzar el modal interactivo
+                    Swal.fire({
+                        title: '¿Estás seguro?',
+                        text: "¡El archivo será eliminado permanentemente del sistema!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#f43f5e', // Color rojo haciendo match con tu estilo
+                        cancelButtonColor: '#64748b',  // Color gris neutral
+                        confirmButtonText: '<i class="fas fa-trash-alt me-1"></i> Sí, eliminar',
+                        cancelButtonText: 'Cancelar',
+                        customClass: {
+                            confirmButton: 'btn btn-danger px-4 rounded-pill',
+                            cancelButton: 'btn btn-secondary px-4 rounded-pill me-2'
+                        },
+                        buttonsStyling: false // Permite usar las clases de Bootstrap/Tabler
+                    }).then((result) => {
+                        // Si el usuario hace clic en "Sí, eliminar"
+                        if (result.isConfirmed) {
+                            this.submit(); // Ahora sí enviamos el formulario
+                        }
+                    });
+                });
+            });
+        });
+    </script>
 @endsection

@@ -35,7 +35,7 @@
                                 <div class="search-container flex-grow-1 position-relative">
                                     <i class="fas fa-search text-muted position-absolute top-50 start-0 translate-middle-y ms-3"></i>
                                     <input type="text" name="search" class="search-input w-100 ps-5"
-                                        placeholder="Buscar por nombre, email, ID o RFC..." value="{{ $search }}">
+                                        placeholder="Buscar por nombre, email, ID o RFC..." value="{{ request('search') }}">
                                 </div>
                                 <button type="submit" class="btn btn-gradient px-4 py-2 rounded-pill fw-bold">
                                     <i class="fas fa-filter me-2"></i>Aplicar Filtros
@@ -83,8 +83,8 @@
         <div class="card border-0 shadow-sm rounded-4 custom-card overflow-hidden">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead>
-                        <tr class="text-uppercase" style="font-size: 0.7rem; font-weight: 800; letter-spacing: 0.5px;">
+                    <thead style="background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+                        <tr class="text-uppercase" style="font-size: 0.7rem; font-weight: 800; letter-spacing: 0.5px; color: #64748b;">
                             <th class="ps-4 py-3">ID Proveedor</th>
                             <th class="py-3">Nombre y correo</th>
                             <th class="py-3">Perfil / Rol</th>
@@ -93,10 +93,10 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($users as $user)
+                        @forelse ($users as $user)
                             <tr class="log-row">
                                 <td class="ps-4">
-                                    <span class="font-monospace text-muted small">#{{ $user->id }}</span>
+                                    <span class="font-monospace text-muted small">#{{ str_pad($user->id, 4, '0', STR_PAD_LEFT) }}</span>
                                 </td>
                                 <td>
                                     <div class="fw-bold text-main">{{ $user->name }}</div>
@@ -108,75 +108,68 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <span class="text-main small">{{ $user->created_at->format('M d, Y') }}</span>
+                                    <span class="text-main small fw-bold">{{ $user->created_at->format('M d, Y') }}</span>
                                 </td>
                                 <td class="text-end pe-4">
                                     <div class="d-flex justify-content-end gap-2">
-                                        <a href="{{ route('users.edit', $user->id) }}" class="btn btn-sm btn-light border rounded-3 text-primary shadow-sm">
+                                        <a href="{{ route('users.edit', $user->id) }}" class="btn btn-sm btn-light border rounded-3 text-primary shadow-sm" title="Editar">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <form action="{{ route('users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('¿Revocar acceso a este usuario?')">
-                                            @csrf @method('DELETE')
-                                            <button class="btn btn-sm btn-light border rounded-3 text-danger shadow-sm">
+                                        
+                                        {{-- FORMULARIO CON SWEETALERT (Clase form-eliminar-usuario) --}}
+                                        <form action="{{ route('users.destroy', $user->id) }}" method="POST" class="d-inline form-eliminar-usuario">
+                                            @csrf 
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-light border rounded-3 text-danger shadow-sm" title="Revocar Acceso">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </form>
                                     </div>
                                 </td>
                             </tr>
-                        @endforeach
+                        @empty
+                            <tr><td colspan="5" class="text-center py-5 text-muted">No se encontraron usuarios.</td></tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
         </div>
 
         <div class="mt-4 d-flex justify-content-center">
-            {{ $users->links() }}
+            {{ $users->appends(request()->query())->links('pagination::bootstrap-5') }}
         </div>
     </div>
-@endsection
 
-@push('crud_list_scripts')
-  <script>
-    $(document).ready(function() {
-        let tableId = '{{ $tableId }}';
-        
-        // 1. Evitar que la tecla Enter recargue la página al usar nuestros filtros
-        $('#custom_name_filter, #custom_email_filter').on('keydown', function(e) {
-            if (e.key === 'Enter' || e.keyCode === 13) {
-                e.preventDefault();
-            }
+    {{-- SCRIPT PARA EL SWEETALERT DE USUARIOS --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const formsEliminar = document.querySelectorAll('.form-eliminar-usuario');
+            
+            formsEliminar.forEach(form => {
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    
+                    Swal.fire({
+                        title: '¿Revocar acceso?',
+                        text: "El usuario será eliminado del sistema y no podrá volver a iniciar sesión.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#dc3545',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: '<i class="fas fa-user-times me-1"></i> Sí, revocar acceso',
+                        cancelButtonText: 'Cancelar',
+                        customClass: {
+                            confirmButton: 'btn btn-danger px-4 rounded-pill',
+                            cancelButton: 'btn btn-secondary px-4 rounded-pill me-2'
+                        },
+                        buttonsStyling: false
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            this.submit();
+                        }
+                    });
+                });
+            });
         });
-
-        // 2. Esperamos un instante a que Backpack inicialice completamente la tabla en el DOM
-        let checkTable = setInterval(function() {
-            if ($.fn.DataTable.isDataTable('#' + tableId)) {
-                clearInterval(checkTable); // Detenemos la espera
-                let table = $('#' + tableId).DataTable();
-
-                // 3. Evento para el filtro Nombre (dispara al teclear, borrar o pegar)
-                let nameTimer;
-                $('#custom_name_filter').on('input', function() {
-                    clearTimeout(nameTimer);
-                    let val = $(this).val();
-                    // Usamos un pequeño retraso de 400ms para no saturar tu servidor en cada pulsación
-                    nameTimer = setTimeout(function() {
-                        // table.column('name:name') busca de forma exacta la columna sin importar si hay columnas ocultas
-                        table.column('name:name').search(val).draw();
-                    }, 400); 
-                });
-
-                // 4. Evento para el filtro Correo
-                let emailTimer;
-                $('#custom_email_filter').on('input', function() {
-                    clearTimeout(emailTimer);
-                    let val = $(this).val();
-                    emailTimer = setTimeout(function() {
-                        table.column('email:name').search(val).draw();
-                    }, 400); 
-                });
-            }
-        }, 100); // Revisa cada 100ms hasta que la tabla exista
-    });
-  </script>
-@endpush
+    </script>
+@endsection

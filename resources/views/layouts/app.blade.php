@@ -99,9 +99,7 @@
                         </button>
 
                         @auth
-
-                            <a class="nav-link  text-white d-flex align-items-center"
-                                role="button" data-bs-toggle="dropdown">
+                            <a class="nav-link text-white d-flex align-items-center" role="button" data-bs-toggle="dropdown">
                                 <i class="fas fa-user-circle fa-lg me-2"></i>
                                 <span class="d-none d-sm-inline">{{ Auth::user()->name }}</span>
                             </a>
@@ -109,12 +107,8 @@
                             <a class="dropdown-item dropdown-item-danger d-flex align-items-center"
                                 href="{{ route('logout') }}"
                                 onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                <i class="fas fa-sign-out-alt me-2"></i> Cerrar
-                                Sesión
+                                <i class="fas fa-sign-out-alt me-2"></i> Cerrar Sesión
                             </a>
-                            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                @csrf
-                            </form>
                             <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                                 @csrf
                             </form>
@@ -129,10 +123,21 @@
         </main>
     </div>
 
-    {{-- Scripts
+    {{-- ========================================== --}}
+    {{-- SCRIPTS NECESARIOS                         --}}
+    {{-- ========================================== --}}
+
+    {{-- Script de Bootstrap (Descomentado para que sirva el navbar en móviles) --}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    {{-- Script de SweetAlert2 (Para que funcione el modal de Confirmar Eliminación) --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    {{-- Directiva para las alertas que vienen desde el Controlador --}}
+    @include('sweetalert::alert')
+
+    {{-- Tu script para el modo oscuro
     <script>
-        // Lógica simple para el Modo Oscuro
         const btn = document.getElementById('dark-mode-toggle');
         const icon = document.getElementById('dark-mode-icon');
         const body = document.body;
@@ -140,20 +145,22 @@
         // Cargar preferencia guardada
         if (localStorage.getItem('theme') === 'dark') {
             body.classList.add('dark-mode');
-            icon.classList.replace('fa-moon', 'fa-sun');
+            if(icon) icon.classList.replace('fa-moon', 'fa-sun');
         }
 
-        btn.addEventListener('click', () => {
-            body.classList.toggle('dark-mode');
-            if (body.classList.contains('dark-mode')) {
-                icon.classList.replace('fa-moon', 'fa-sun');
-                localStorage.setItem('theme', 'dark');
-            } else {
-                icon.classList.replace('fa-sun', 'fa-moon');
-                localStorage.setItem('theme', 'light');
-            }
-        });
-    </script> --}}
+        if(btn) {
+            btn.addEventListener('click', () => {
+                body.classList.toggle('dark-mode');
+                if (body.classList.contains('dark-mode')) {
+                    icon.classList.replace('fa-moon', 'fa-sun');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    icon.classList.replace('fa-sun', 'fa-moon');
+                    localStorage.setItem('theme', 'light');
+                }
+            });
+        } --}}
+    </script>
 </body>
 
 </html>

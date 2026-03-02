@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use RealRashid\SweetAlert\Facades\Alert; // <-- Importamos SweetAlert
 
 class UserController extends Controller
 {
@@ -103,7 +104,9 @@ class UserController extends Controller
         // Sincronizar con Spatie (Backpack)
         $user->assignRole($validatedData['role']);
 
-        return redirect()->route('users.index')->with('success', 'Usuario creado correctamente.');
+        // <-- Nueva alerta de éxito
+        Alert::success('¡Usuario Creado!', 'El usuario ha sido registrado exitosamente en el sistema.');
+        return redirect()->route('users.index');
     }
 
     public function edit(User $user)
@@ -111,7 +114,9 @@ class UserController extends Controller
         // Seguridad: Si un admin intenta editar a un superadmin por URL directa
         $rolesPermitidos = $this->getRolesPermitidos();
         if ($user->role === 'superadmin' && !in_array('superadmin', $rolesPermitidos)) {
-            abort(403, 'No tienes permisos para editar a un Superusuario.');
+            // <-- Usamos alerta en lugar de página de error 403
+            Alert::error('Acceso Denegado', 'No tienes permisos para editar a un Superusuario.');
+            return redirect()->route('users.index');
         }
 
         $roles = $rolesPermitidos;
@@ -141,21 +146,30 @@ class UserController extends Controller
         // Actualizar el rol en Spatie/Backpack también
         $user->syncRoles([$validatedData['role']]);
 
-        return redirect()->route('users.index')->with('success', 'Usuario actualizado correctamente.');
+        // <-- Nueva alerta de éxito
+        Alert::success('¡Actualización Exitosa!', 'Los datos del usuario han sido modificados correctamente.');
+        return redirect()->route('users.index');
     }
 
     public function destroy(User $user)
     {
         if (auth()->id() === $user->id) {
-            return back()->with('error', 'Operación no permitida: No puedes eliminar tu propio acceso.');
+            // <-- Nueva alerta de error
+            Alert::error('Operación Denegada', 'No puedes revocar tu propio acceso del sistema.');
+            return back();
         }
 
         // Seguridad: No permitir que un admin normal borre a un superadmin
         if ($user->role === 'superadmin' && auth()->user()->role !== 'superadmin') {
-            abort(403);
+            // <-- Usamos alerta en lugar de página de error 403
+            Alert::error('Acceso Denegado', 'No tienes permisos para eliminar a un Superusuario.');
+            return back();
         }
 
         $user->delete();
-        return redirect()->route('users.index')->with('success', 'Usuario eliminado.');
+        
+        // <-- Nueva alerta de éxito
+        Alert::success('¡Acceso Revocado!', 'El usuario ha sido eliminado correctamente del sistema.');
+        return redirect()->route('users.index');
     }
 }

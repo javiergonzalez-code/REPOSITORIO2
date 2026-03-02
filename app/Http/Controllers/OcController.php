@@ -7,6 +7,7 @@ use App\Models\Archivo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class OcController extends Controller
 {
@@ -20,15 +21,12 @@ class OcController extends Controller
         $user = auth()->user();
         $query = Archivo::with('user')->where('modulo', 'OC');
 
-        // Validar si el usuario es proveedor
         $esProveedor = $user->hasRole('proveedor') || $user->role === 'proveedor';
 
         if ($esProveedor) {
-            // El proveedor solo ve sus propias órdenes
             $query->where('user_id', $user->id);
             $usuarios_filtro = collect([$user]);
         } else {
-            // Admin y Superadmin ven todo
             $usuarios_filtro = User::orderBy('name')->get();
         }
 
@@ -61,15 +59,16 @@ class OcController extends Controller
         $user = auth()->user();
         $esProveedor = $user->hasRole('proveedor') || $user->role === 'proveedor';
 
-        // Seguridad: Evita que un proveedor descargue archivos ajenos
         if ($esProveedor && $oc->user_id !== $user->id) {
             abort(403, 'No tienes permiso para descargar este archivo.');
         }
 
-        $path = storage_path('app/public/uploads/' . $oc->nombre_sistema);
+        $path = storage_path('app/private/uploads/' . $oc->nombre_sistema);
 
         if (!file_exists($path)) {
-            return back()->with('error', 'El archivo físico no existe.');
+            // <-- Nueva alerta de error
+            Alert::error('Extraviado', 'El archivo físico no existe.');
+            return back();
         }
 
         return response()->download($path, $oc->nombre_original);
@@ -81,16 +80,15 @@ class OcController extends Controller
         $user = auth()->user();
         $esProveedor = $user->hasRole('proveedor') || $user->role === 'proveedor';
 
-        // Seguridad: Evita que un proveedor previsualice archivos ajenos
         if ($esProveedor && $oc->user_id !== $user->id) {
             abort(403, 'No tienes permiso para previsualizar este archivo.');
         }
 
-        // CORRECCIÓN: Usar la misma ruta exacta que usas en el método download
         $path = storage_path('app/private/uploads/' . $oc->nombre_sistema);
 
         if (!file_exists($path)) {
-            return back()->with('error', 'El archivo físico no existe en el servidor.');
+            Alert::error('Extraviado', 'El archivo físico no existe en el servidor.');
+            return back();
         }
 
         $extension = strtolower(pathinfo($oc->nombre_original, PATHINFO_EXTENSION));
@@ -104,14 +102,15 @@ class OcController extends Controller
                 $xmlContent = simplexml_load_file($path);
                 $data = json_decode(json_encode($xmlContent), true);
             } elseif ($extension === 'json') {
-                // BONUS: Soporte para previsualizar JSON
                 $jsonContent = file_get_contents($path);
                 $data = json_decode($jsonContent, true);
             } else {
-                return back()->with('error', 'Formato de previsualización no soportado.');
+                Alert::warning('No Soportado', 'Formato de previsualización no soportado.');
+                return back();
             }
         } catch (\Exception $e) {
-            return back()->with('error', 'Error al leer el archivo: ' . $e->getMessage());
+            Alert::error('Error de Lectura', 'Error al leer el archivo: ' . $e->getMessage());
+            return back();
         }
 
         return view('oc.preview', compact('data', 'oc', 'extension'));
@@ -123,31 +122,29 @@ class OcController extends Controller
         $user = auth()->user();
         $esProveedor = $user->hasRole('proveedor') || $user->role === 'proveedor';
 
-        // Seguridad: Evita que un proveedor elimine archivos ajenos
         if ($esProveedor && $oc->user_id !== $user->id) {
             abort(403, 'No tienes permiso para eliminar este archivo.');
         }
 
         try {
             $nombreOriginal = $oc->nombre_original;
-            $path = storage_path('app/public/uploads/' . $oc->nombre_sistema);
+            $path = storage_path('app/private/uploads/' . $oc->nombre_sistema);
 
-            // 1. Eliminar el archivo físico del disco si existe
             if (file_exists($path)) {
                 unlink($path);
             }
 
-            // 2. Eliminar el registro de la base de datos
             $oc->delete();
 
-            // 3. Generar el Log
             \App\Models\Log::create([
                 'user_id' => auth()->id(),
                 'accion'  => 'Eliminó con éxito la OC: ' . $nombreOriginal,
                 'modulo'  => 'OC',
             ]);
 
-            return redirect()->route('oc.index')->with('success', 'La orden de compra ha sido eliminada correctamente.');
+            Alert::success('¡Eliminado!', 'La orden de compra ha sido eliminada correctamente.');
+            return redirect()->route('oc.index');
+            
         } catch (\Exception $e) {
             \App\Models\Log::create([
                 'user_id' => auth()->id(),
@@ -155,8 +152,8 @@ class OcController extends Controller
                 'modulo'  => 'OC',
             ]);
 
-            // Si hay error, también es mejor mandarlo al index
-            return redirect()->route('oc.index')->with('error', 'Error al eliminar el archivo: ' . $e->getMessage());
+            Alert::error('Error', 'Error al eliminar el archivo: ' . $e->getMessage());
+            return redirect()->route('oc.index');
         }
     }
 }

@@ -25,7 +25,7 @@ class ErroresController extends Controller
             $query->where('user_id', $user->id);
         }
 
-        $errores = $query->latest()->paginate(20);
+        $errores = $query->latest()->paginate(10);
 
         return view('errores.index', compact('errores')); 
     }
