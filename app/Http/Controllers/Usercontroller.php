@@ -6,7 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
-use RealRashid\SweetAlert\Facades\Alert; // <-- Importamos SweetAlert
+use RealRashid\SweetAlert\Facades\Alert;
 
 class UserController extends Controller
 {
@@ -17,58 +17,18 @@ class UserController extends Controller
     {
         $user = auth()->user();
 
-        // El Superadmin ve todo
         if ($user->role === 'superadmin' || $user->email === 'admin@ragon.com') {
             return ['superadmin', 'admin', 'proveedor'];
         }
 
-        // El Admin normal solo ve roles inferiores
         return ['admin', 'proveedor'];
     }
 
-    public function index(Request $request)
+    public function index()
     {
-        $search = $request->input('search');
-        $roleFilter = $request->input('role');
-        $rolesPermitidos = $this->getRolesPermitidos();
-
-        $query = User::query();
-
-        // 1. Restricción de visibilidad: Un admin NO superadmin no puede ver a los superadmins en la lista
-        if (!in_array('superadmin', $rolesPermitidos)) {
-            $query->where('role', '!=', 'superadmin');
-        }
-
-        // 2. Buscador general
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhere('id', 'like', "%{$search}%")
-                    ->orWhere('rfc', 'like', "%{$search}%");
-            });
-        }
-
-        // 3. Filtro por nombre
-        if ($request->filled('user')) {
-            $query->where('name', 'like', '%' . $request->user . '%');
-        }
-
-        // 4. Filtro por Rol (Validando que el rol filtrado esté entre sus permitidos)
-        if ($request->filled('role') && in_array($roleFilter, $rolesPermitidos)) {
-            $query->where('role', $roleFilter);
-        }
-
-        $users = $query->orderBy('name', 'asc')
-            ->paginate(5)
-            ->withQueryString();
-
-        $usuarios_filtro = User::select('name')->orderBy('name', 'asc')->get();
-        
-        // Pasamos los roles filtrados a la vista para el dropdown del filtro
-        $roles = $rolesPermitidos;
-
-        return view('users.index', compact('users', 'search', 'usuarios_filtro', 'roles'));
+        // La tabla interactiva y los filtros de seguridad 
+        // ahora están manejados por el componente Livewire
+        return view('users.index');
     }
 
     public function create()
@@ -78,48 +38,39 @@ class UserController extends Controller
     }
 
     public function store(Request $request)
-{
-    $rolesPermitidos = $this->getRolesPermitidos();
+    {
+        $rolesPermitidos = $this->getRolesPermitidos();
 
-    $validator = Validator::make($request->all(), [
-        'name'     => ['required', 'string', 'max:255'],
-        'id'       => ['required', 'string', 'unique:users'],
-        'rfc'      => ['nullable', 'string', 'max:13', 'unique:users'],
-        'email'    => ['required', 'string', 'email', 'max:255', 'unique:users'],
-        'telefono' => ['nullable', 'string', 'max:20'],
-        'password' => ['required', 'string', 'min:8', 'confirmed'],
-        'role'     => ['required', Rule::in($rolesPermitidos)], 
-    ]);
+        $validatedData = $request->validate([
+            'name'     => ['required', 'string', 'max:255'],
+            'id'       => ['required', 'string', 'unique:users'],
+            'rfc'      => ['nullable', 'string', 'max:13', 'unique:users'],
+            'email'    => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'telefono' => ['nullable', 'string', 'max:20'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'role'     => ['required', Rule::in($rolesPermitidos)],
+        ]);
 
-    if ($validator->fails()) {
-        Alert::error('Error de Validación', implode(' | ', $validator->errors()->all()));
-        return back()->withInput();
+        $user = User::create([
+            'name'     => $validatedData['name'],
+            'id'       => $validatedData['id'],
+            'rfc'      => $validatedData['rfc'],
+            'email'    => $validatedData['email'],
+            'telefono' => $validatedData['telefono'],
+            'password' => Hash::make($validatedData['password']),
+            'role'     => $validatedData['role'],
+        ]);
+
+        $user->assignRole($validatedData['role']);
+
+        Alert::success('¡Usuario Creado!', 'El usuario ha sido registrado exitosamente en el sistema.');
+        return redirect()->route('users.index');
     }
-
-    $validatedData = $validator->validated();
-
-    $user = User::create([
-        'name'     => $validatedData['name'],
-        'id'       => $validatedData['id'],
-        'rfc'      => $validatedData['rfc'],
-        'email'    => $validatedData['email'],
-        'telefono' => $validatedData['telefono'],
-        'password' => Hash::make($validatedData['password']),
-        'role'     => $validatedData['role'],
-    ]);
-
-    $user->assignRole($validatedData['role']);
-
-    Alert::success('¡Usuario Creado!', 'El usuario ha sido registrado exitosamente en el sistema.');
-    return redirect()->route('users.index');
-}
 
     public function edit(User $user)
     {
-        // Seguridad: Si un admin intenta editar a un superadmin por URL directa
         $rolesPermitidos = $this->getRolesPermitidos();
         if ($user->role === 'superadmin' && !in_array('superadmin', $rolesPermitidos)) {
-            // <-- Usamos alerta en lugar de página de error 403
             Alert::error('Acceso Denegado', 'No tienes permisos para editar a un Superusuario.');
             return redirect()->route('users.index');
         }
@@ -128,56 +79,45 @@ class UserController extends Controller
         return view('users.edit', compact('user', 'roles'));
     }
 
-public function update(Request $request, User $user)
-{
-    $rolesPermitidos = $this->getRolesPermitidos();
+    public function update(Request $request, User $user)
+    {
+        $rolesPermitidos = $this->getRolesPermitidos();
 
-    $validator = Validator::make($request->all(), [
-        'name'     => ['required', 'string', 'max:255'],
-        'rfc'      => ['nullable', Rule::unique('users')->ignore($user->id)],
-        'email'    => ['required', 'email', Rule::unique('users')->ignore($user->id)],
-        'role'     => ['required', Rule::in($rolesPermitidos)],
-        'password' => ['nullable', 'min:8', 'confirmed'],
-    ]);
+        $validatedData = $request->validate([
+            'name'     => ['required', 'string', 'max:255'],
+            'rfc'      => ['nullable', Rule::unique('users')->ignore($user->id)],
+            'email'    => ['required', 'email', Rule::unique('users')->ignore($user->id)],
+            'role'     => ['required', Rule::in($rolesPermitidos)],
+            'password' => ['nullable', 'min:8', 'confirmed'],
+        ]);
 
-    if ($validator->fails()) {
-        Alert::error('Error de Validación', implode(' | ', $validator->errors()->all()));
-        return back()->withInput();
+        $user->fill($request->except('password'));
+
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->password);
+        }
+
+        $user->save();
+        $user->syncRoles([$validatedData['role']]);
+
+        Alert::success('¡Actualización Exitosa!', 'Los datos del usuario han sido modificados correctamente.');
+        return redirect()->route('users.index');
     }
-
-    $validatedData = $validator->validated();
-
-    $user->fill($request->except('password'));
-
-    if ($request->filled('password')) {
-        $user->password = Hash::make($request->password);
-    }
-
-    $user->save();
-    $user->syncRoles([$validatedData['role']]);
-
-    Alert::success('¡Actualización Exitosa!', 'Los datos del usuario han sido modificados correctamente.');
-    return redirect()->route('users.index');
-}
 
     public function destroy(User $user)
     {
         if (auth()->id() === $user->id) {
-            // <-- Nueva alerta de error
             Alert::error('Operación Denegada', 'No puedes revocar tu propio acceso del sistema.');
             return back();
         }
 
-        // Seguridad: No permitir que un admin normal borre a un superadmin
         if ($user->role === 'superadmin' && auth()->user()->role !== 'superadmin') {
-            // <-- Usamos alerta en lugar de página de error 403
             Alert::error('Acceso Denegado', 'No tienes permisos para eliminar a un Superusuario.');
             return back();
         }
 
         $user->delete();
         
-        // <-- Nueva alerta de éxito
         Alert::success('¡Acceso Revocado!', 'El usuario ha sido eliminado correctamente del sistema.');
         return redirect()->route('users.index');
     }

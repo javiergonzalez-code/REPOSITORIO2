@@ -2,55 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Models\Archivo;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class OcController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $search = $request->input('search');
-        $userFilter = $request->input('user');
-        $extension = $request->input('extension');
-        $fecha = $request->input('fecha');
-
-        $user = auth()->user();
-        $query = Archivo::with('user')->where('modulo', 'OC');
-
-        $esProveedor = $user->hasRole('proveedor') || $user->role === 'proveedor';
-
-        if ($esProveedor) {
-            $query->where('user_id', $user->id);
-            $usuarios_filtro = collect([$user]);
-        } else {
-            $usuarios_filtro = User::orderBy('name')->get();
-        }
-
-        if ($search) {
-            $query->where('nombre_original', 'like', "%{$search}%");
-        }
-
-        if ($userFilter) {
-            $query->whereHas('user', function ($q) use ($userFilter) {
-                $q->where('name', $userFilter);
-            });
-        }
-
-        if ($extension) {
-            $query->where('tipo_archivo', $extension);
-        }
-
-        if ($fecha) {
-            $query->whereDate('created_at', $fecha);
-        }
-
-        $ordenes = $query->latest()->paginate(10);
-
-        return view('oc.index', compact('ordenes', 'search', 'usuarios_filtro'));
+        // La consulta a la BD y filtros se movieron a Livewire
+        return view('oc.index');
     }
 
     public function download($id)
@@ -66,7 +28,6 @@ class OcController extends Controller
         $path = storage_path('app/private/uploads/' . $oc->nombre_sistema);
 
         if (!file_exists($path)) {
-            // <-- Nueva alerta de error
             Alert::error('Extraviado', 'El archivo físico no existe.');
             return back();
         }
