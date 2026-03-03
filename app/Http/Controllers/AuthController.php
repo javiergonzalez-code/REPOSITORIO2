@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;                 
 use Illuminate\Support\Facades\Hash; 
 use RealRashid\SweetAlert\Facades\Alert;
+use Illuminate\Support\Facades\Validator; // <-- Esta es la línea que faltaba
 
 class AuthController extends Controller
 {
@@ -20,10 +21,18 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->validate([
+        // Cambiamos validate() por Validator::make()
+        $validator = Validator::make($request->all(), [
             'email' => 'required|email',
             'password' => 'required|min:8',
         ]);
+
+        if ($validator->fails()) {
+            Alert::error('Datos incompletos', 'Por favor verifica que tu correo y contraseña cumplan con el formato.');
+            return back()->withInput();
+        }
+
+        $credentials = $validator->validated();
 
         if (Auth::attempt($credentials)) {
             
@@ -35,12 +44,11 @@ class AuthController extends Controller
                 'modulo'  => 'AUTH'
             ]);
 
-            // (Opcional) Alerta de éxito al entrar
+            // Alerta de éxito al entrar
             Alert::success('¡Bienvenido!', 'Has iniciado sesión correctamente.');
             return redirect()->route('home');
         }
 
-        // <-- REEMPLAZO: Alerta de credenciales inválidas en lugar de withErrors
         Alert::error('Error de acceso', 'Las credenciales ingresadas son incorrectas.');
         return back();
     }
@@ -51,7 +59,6 @@ class AuthController extends Controller
             return view('home');
         }
 
-        // <-- REEMPLAZO: Alerta de acceso denegado en lugar de withErrors
         Alert::warning('Acceso Restringido', 'Por favor inicia sesión para continuar.');
         return redirect("/");
     }

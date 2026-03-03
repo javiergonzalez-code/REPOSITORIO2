@@ -4,20 +4,21 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use RealRashid\SweetAlert\Facades\Alert; // <-- 1. Importar la fachada
+use RealRashid\SweetAlert\Facades\Alert; 
 
 class LogoutController extends Controller
 {
-    public function logout(Request $request) // o el nombre del método que tengas
+    // Cambiamos el nombre de 'logout' a 'destroy' para que coincida con tu web.php
+    public function destroy(Request $request) 
     {
         Auth::logout();
         
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        // <-- 2. Añadir la alerta antes de redirigir
-        Alert::success('Sesión cerrada con éxito');
+        // Aquí agregamos la alerta
+        Alert::success('Sesión Cerrada', 'Has salido del sistema de forma segura.');
 
-        return redirect('/login'); // o la ruta a la que redirijas normalmente
+        return redirect('/login'); 
     }
 }
