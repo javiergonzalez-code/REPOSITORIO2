@@ -133,33 +133,27 @@
     {{-- Script de SweetAlert2 (Para que funcione el modal de Confirmar Eliminación) --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    {{-- Directiva para las alertas que vienen desde el Controlador --}}
+{{-- Directiva para las alertas que vienen desde el Controlador --}}
     @include('sweetalert::alert')
 
-    {{-- Tu script para el modo oscuro
-    <script>
-        const btn = document.getElementById('dark-mode-toggle');
-        const icon = document.getElementById('dark-mode-icon');
-        const body = document.body;
-
-        // Cargar preferencia guardada
-        if (localStorage.getItem('theme') === 'dark') {
-            body.classList.add('dark-mode');
-            if(icon) icon.classList.replace('fa-moon', 'fa-sun');
-        }
-
-        if(btn) {
-            btn.addEventListener('click', () => {
-                body.classList.toggle('dark-mode');
-                if (body.classList.contains('dark-mode')) {
-                    icon.classList.replace('fa-moon', 'fa-sun');
-                    localStorage.setItem('theme', 'dark');
-                } else {
-                    icon.classList.replace('fa-sun', 'fa-moon');
-                    localStorage.setItem('theme', 'light');
-                }
+    {{-- NUEVO: Capturador global de errores de validación nativos de Laravel --}}
+    @if ($errors->any())
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Verifica tus datos',
+                    html: '<ul class="text-start mb-0">' + 
+                          @foreach($errors->all() as $error)
+                              '<li>{{ $error }}</li>' + 
+                          @endforeach
+                          '</ul>',
+                    confirmButtonColor: '#0f172a'
+                });
             });
-        } --}}
+        </script>
+    @endif
+
     </script>
 </body>
 

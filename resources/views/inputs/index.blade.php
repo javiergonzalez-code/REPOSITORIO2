@@ -3,36 +3,6 @@
 @section('content')
     <div class="login-wrapper">
         <div class="card login-card card-large shadow-lg">
-
-            {{-- Área de Notificaciones --}}
-            @if (session('success'))
-                <div class="alert alert-custom alert-success-ragon animate__animated animate__fadeInDown">
-                    <i class="fas fa-check-circle me-3 fa-2x"></i>
-                    <div>
-                        <strong>¡Éxito!</strong>
-                        <p class="mb-0">{{ session('success') }}</p>
-                    </div>
-                </div>
-            @endif
-
-            {{-- Notificación Roja (Error) --}}
-            @if (session('error') || $errors->any())
-                <div class="alert alert-custom alert-error-ragon animate__animated animate__fadeInDown">
-                    <i class="fas fa-exclamation-triangle me-3 fa-2x"></i>
-                    <div>
-                        <strong>Archivo No Válido</strong>
-                        <p class="mb-0">
-                            @if (session('error'))
-                                {{ session('error') }}
-                            @else
-                                {{ $errors->first() }} {{-- Muestra el primer error de validación --}}
-                            @endif
-                        </p>
-                    </div>
-                </div>
-            @endif
-
-
             <div class="card-header login-header-modern ">
                 <div class="brand-icon-wrapper ">
                     <i class="fas fa-file-import"></i>
@@ -89,19 +59,6 @@
                         </label>
                     </div>
 
-                    {{-- Mostrar Errores de Validación fuera de la zona de clic --}}
-                    @if ($errors->any())
-                        <div class="alert alert-danger shadow-sm border-0 rounded-3 animate__animated animate__shakeX">
-                            <div class="d-flex align-items-center">
-                                <i class="fas fa-ban me-3 fa-2x"></i>
-                                <ul class="mb-0 list-unstyled">
-                                    @foreach ($errors->all() as $error)
-                                        <li><strong>Error:</strong> {{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        </div>
-                    @endif
 
                     {{-- Botón de subida (Inicia deshabilitado hasta que se ponga un archivo) --}}
                     <button type="submit" id="btnSubir" class="btn-ragon-modern w-100 py-3 shadow" disabled>
