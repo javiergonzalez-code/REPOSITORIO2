@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;                 
 use Illuminate\Support\Facades\Hash; 
-use RealRashid\SweetAlert\Facades\Alert; // <-- Importar la fachada
+use RealRashid\SweetAlert\Facades\Alert;
 
 class AuthController extends Controller
 {
