@@ -87,7 +87,7 @@ $ordenes = computed(function () {
                     </div>
                 </div>
 
-                {{-- Filtro de Usuario con Dropdown (Oculto para Proveedores) --}}
+                {{-- Filtro de Usuario con Dropdown --}}
                 @if(!$this->esProveedor)
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom text-uppercase x-small fw-bold">Cargado por</label>
@@ -133,11 +133,9 @@ $ordenes = computed(function () {
 
                 {{-- Botón Limpiar --}}
                 <div class="{{ $this->esProveedor ? 'col-lg-5' : 'col-lg-2' }} col-md-12">
-                    <div class="d-flex gap-2">
-                        <button wire:click="$set('search', ''); $set('userFilter', ''); $set('extension', ''); $set('fecha', '')" class="btn btn-outline-secondary rounded-pill w-100 fw-bold">
-                            <i class="fas fa-eraser me-1"></i> Limpiar
-                        </button>
-                    </div>
+                    <button wire:click="$set('search', ''); $set('userFilter', ''); $set('extension', ''); $set('fecha', '')" class="btn btn-outline-secondary rounded-pill w-100 fw-bold">
+                        <i class="fas fa-eraser me-1"></i> Limpiar
+                    </button>
                 </div>
             </div>
         </div>
@@ -165,15 +163,8 @@ $ordenes = computed(function () {
                                 </span>
                             </td>
                             <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="avatar-pill bg-blue-ragon-gradient shadow-sm">
-                                        {{ strtoupper(substr($oc->user->name ?? '?', 0, 1)) }}
-                                    </div>
-                                    <div class="ms-3">
-                                        <div class="fw-bold text-dark mb-0">{{ $oc->user->name }}</div>
-                                        <div class="x-small text-muted">ID: #{{ str_pad($oc->user->id, 4, '0', STR_PAD_LEFT) }}</div>
-                                    </div>
-                                </div>
+                                {{-- LLAMADA AL COMPONENTE DE AVATAR --}}
+                                <x-user-avatar :name="$oc->user->name ?? '?'" :userId="$oc->user->id" />
                             </td>
                             <td>
                                 <div class="d-flex align-items-center">
@@ -187,18 +178,12 @@ $ordenes = computed(function () {
                                 <span class="text-muted font-monospace small">{{ $oc->created_at->format('H:i') }} hrs</span>
                             </td>
                             <td class="text-end pe-4">
-                                <div class="d-flex justify-content-end gap-2">
-                                    <a href="{{ route('oc.preview', $oc->id) }}" class="action-btn btn-view" title="Ver"><i class="fas fa-eye"></i></a>
-                                    <a href="{{ route('archivos.download', $oc->id) }}" class="action-btn btn-download" title="Descargar"><i class="fas fa-cloud-download-alt"></i></a>
-                                    
-                                    <form action="{{ route('oc.destroy', $oc->id) }}" method="POST" class="d-inline form-eliminar-oc">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="action-btn btn-delete" title="Eliminar">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </form>
-                                </div>
+                                {{-- LLAMADA AL COMPONENTE DE BOTONES --}}
+                                <x-table-actions 
+                                    viewRoute="{{ route('oc.preview', $oc->id) }}" 
+                                    downloadRoute="{{ route('archivos.download', $oc->id) }}" 
+                                    deleteRoute="{{ route('oc.destroy', $oc->id) }}" 
+                                />
                             </td>
                         </tr>
                     @empty
@@ -213,46 +198,7 @@ $ordenes = computed(function () {
         {{ $this->ordenes->links('pagination::bootstrap-5') }}
     </div>
 
-    {{-- Estilos y Script de SweetAlert --}}
-    <style>
-        .action-btn { width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; border-radius: 8px; transition: all 0.2s ease; border: none; text-decoration: none; font-size: 0.9rem; }
-        .btn-view { background-color: #f1f5f9; color: #64748b; } .btn-view:hover { background-color: #e2e8f0; transform: translateY(-2px); }
-        .btn-download { background-color: #ecfdf5; color: #10b981; } .btn-download:hover { background-color: #10b981; color: white; transform: translateY(-2px); }
-        .btn-delete { background-color: #fff1f2; color: #f43f5e; } .btn-delete:hover { background-color: #f43f5e; color: white; transform: translateY(-2px); }
-        .avatar-pill { width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.8rem; }
-        .bg-blue-ragon-gradient { background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); }
-    </style>
+    {{-- LLAMADA AL SCRIPT GLOBAL DE ELIMINACIÓN --}}
+    <x-delete-confirm-script />
 
-    <script>
-        document.addEventListener('livewire:navigated', () => { initSweetAlertOC(); });
-        document.addEventListener('livewire:load', () => { initSweetAlertOC(); });
-        document.addEventListener('livewire:update', () => { initSweetAlertOC(); });
-
-        function initSweetAlertOC() {
-            const formulariosEliminar = document.querySelectorAll('.form-eliminar-oc');
-            formulariosEliminar.forEach(formulario => {
-                formulario.removeEventListener('submit', handleFormSubmitOC);
-                formulario.addEventListener('submit', handleFormSubmitOC);
-            });
-        }
-
-        function handleFormSubmitOC(e) {
-            e.preventDefault();
-            Swal.fire({
-                title: '¿Estás seguro?',
-                text: "¡El archivo será eliminado permanentemente del sistema!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#f43f5e',
-                cancelButtonColor: '#64748b',
-                confirmButtonText: '<i class="fas fa-trash-alt me-1"></i> Sí, eliminar',
-                cancelButtonText: 'Cancelar',
-                customClass: { confirmButton: 'btn btn-danger px-4 rounded-pill', cancelButton: 'btn btn-secondary px-4 rounded-pill me-2' },
-                buttonsStyling: false
-            }).then((result) => {
-                if (result.isConfirmed) { this.submit(); }
-            });
-        }
-        initSweetAlertOC();
-    </script>
 </div>
