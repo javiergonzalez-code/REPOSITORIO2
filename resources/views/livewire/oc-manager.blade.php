@@ -62,14 +62,16 @@ $ordenes = computed(function () {
 });
 ?>
 
+{{-- DIV PADRE ÚNICO (ESTO EVITA EL ERROR 500) --}}
 <div>
+    
     {{-- Indicador de total de registros --}}
     <div class="mb-3 text-end" style="font-size: 0.8rem; color: #64748b; font-weight: 700;">
         {{ $this->ordenes->total() }} DOCUMENTOS ENCONTRADOS
     </div>
 
     {{-- RECUADRO 2: FILTROS --}}
-    <div class="card border-0 shadow-sm rounded-4 mb-4 bg-white custom-card">
+    <div class="card border-0 shadow-sm rounded-4 mb-4 bg-white custom-card" style="overflow: visible; position: relative; z-index: 1050;">
         <div class="card-header bg-transparent border-0 pt-4 px-4">
             <h6 class="text-uppercase fw-black mb-0 text-muted" style="font-size: 1rem; letter-spacing: 1px;">
                 <i class="fas fa-filter me-2"></i> Filtros de búsqueda
@@ -82,47 +84,38 @@ $ordenes = computed(function () {
                 <div class="col-lg-3 col-md-6">
                     <label class="form-label-custom text-uppercase x-small fw-bold">Búsqueda General</label>
                     <div class="position-relative">
-                        <i
-                            class="fas fa-search text-muted position-absolute top-50 start-0 translate-middle-y ms-3"></i>
-                        <input type="text" wire:model.live.debounce.300ms="search" class="form-control ps-5"
-                            placeholder="Nombre del archivo...">
+                        <i class="fas fa-search text-muted position-absolute top-50 start-0 translate-middle-y ms-3"></i>
+                        <input type="text" wire:model.live.debounce.300ms="search" class="form-control ps-5" placeholder="Nombre del archivo...">
                     </div>
                 </div>
 
-                {{-- Filtro de Usuario con Dropdown --}}
+                {{-- Filtro de Usuario con Dropdown (CORREGIDO: Sin inputs duplicados) --}}
                 @if (!$this->esProveedor)
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom text-uppercase x-small fw-bold">Cargado por</label>
-                        <div class="position-relative">
-                            <input type="text" wire:model.live.debounce.300ms="userFilter" class="form-control"
-                                placeholder="Escribir usuario..." autocomplete="off">
-
-                            <div class="position-relative">
-                                <i
-                                    class="fas fa-user text-muted position-absolute top-50 start-0 translate-middle-y ms-3"></i>
-                                <input type="text" wire:model.live.debounce.300ms="userFilter"
-                                    class="form-control ps-5" placeholder="Escribir nombre..." autocomplete="off">
-
-                                {{-- LISTA DESPLEGABLE FLOTANTE --}}
-                                @if (count($this->sugerencias_usuarios) > 0)
-                                    <div class="position-absolute w-100 border rounded-3 shadow-lg custom-dropdown-box"
-                                        style="top: 100%; left: 0; margin-top: 4px; z-index: 9999; overflow: hidden;">
-                                        <ul class="list-unstyled mb-0">
-                                            @foreach ($this->sugerencias_usuarios as $sugerencia)
-                                                <li>
-                                                    <button type="button"
-                                                        class="w-100 border-0 text-start px-3 py-2 custom-dropdown-btn"
-                                                        style="font-size: 0.9rem;"
-                                                        wire:click="$set('userFilter', '{{ $sugerencia->name }}')">
-                                                        <i class="fas fa-user-circle text-primary me-2"></i>
-                                                        {{ $sugerencia->name }}
-                                                    </button>
-                                                </li>
-                                            @endforeach
-                                        </ul>
-                                    </div>
-                                @endif
-                            </div>
+                        <div style="position: relative !important;">
+                            <i class="fas fa-user text-muted position-absolute top-50 start-0 translate-middle-y ms-3" style="z-index: 10;"></i>
+                            <input type="text" wire:model.live.debounce.300ms="userFilter" class="form-control ps-5" placeholder="Escribir nombre..." autocomplete="off">
+                            
+                            {{-- LISTA DESPLEGABLE FLOTANTE CON FONDO BLANCO FORZADO --}}
+    @if(count($this->sugerencias_usuarios) > 0)
+        <div class="w-100 border rounded-3 shadow-lg" 
+             style="position: absolute !important; top: 100% !important; left: 0 !important; margin-top: 5px !important; z-index: 10000 !important; overflow: hidden; display: block !important; background-color: #ffffff !important;">
+            <ul class="list-unstyled mb-0">
+                @foreach($this->sugerencias_usuarios as $sugerencia)
+                    <li>
+                        <button type="button" class="w-100 border-0 text-start px-3 py-2" 
+                                style="font-size: 0.9rem; background-color: transparent; color: #1e293b; transition: all 0.2s;"
+                                wire:click="$set('userFilter', '{{ $sugerencia->name }}')"
+                                onmouseover="this.style.backgroundColor='#f1f5f9'"
+                                onmouseout="this.style.backgroundColor='transparent'">
+                            <i class="fas fa-user-circle text-primary me-2"></i> {{ $sugerencia->name }}
+                        </button>
+                    </li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
                         </div>
                     </div>
                 @endif
@@ -145,9 +138,7 @@ $ordenes = computed(function () {
 
                 {{-- Botón Limpiar --}}
                 <div class="{{ $this->esProveedor ? 'col-lg-5' : 'col-lg-2' }} col-md-12">
-                    <button
-                        wire:click="$set('search', ''); $set('userFilter', ''); $set('extension', ''); $set('fecha', '')"
-                        class="btn btn-outline-secondary rounded-pill w-100 fw-bold">
+                    <button wire:click="$set('search', ''); $set('userFilter', ''); $set('extension', ''); $set('fecha', '')" class="btn btn-outline-secondary rounded-pill w-100 fw-bold">
                         <i class="fas fa-eraser me-1"></i> Limpiar
                     </button>
                 </div>
@@ -156,8 +147,7 @@ $ordenes = computed(function () {
     </div>
 
     {{-- RECUADRO 3: TABLA --}}
-    <div class="card border-0 shadow-sm rounded-4 mb-4 bg-white custom-card"
-        style="overflow: visible; position: relative; z-index: 1050;">
+    <div class="card border-0 shadow-sm rounded-4 mb-4 bg-white custom-card">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
                 <thead style="background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
@@ -178,25 +168,20 @@ $ordenes = computed(function () {
                                 </span>
                             </td>
                             <td>
-                                {{-- LLAMADA AL COMPONENTE DE AVATAR --}}
                                 <x-user-avatar :name="$oc->user->name ?? '?'" :userId="$oc->user->id" />
                             </td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     @php $ext = pathinfo($oc->nombre_original, PATHINFO_EXTENSION); @endphp
-                                    <i
-                                        class="fas {{ strtolower($ext) == 'csv' ? 'fa-file-csv text-success' : 'fa-file-code text-info' }} fs-5 me-2"></i>
+                                    <i class="fas {{ strtolower($ext) == 'csv' ? 'fa-file-csv text-success' : 'fa-file-code text-info' }} fs-5 me-2"></i>
                                     <span class="text-primary fw-semibold small">{{ $oc->nombre_original }}</span>
                                 </div>
                             </td>
                             <td class="text-center">
-                                <span
-                                    class="fw-bold d-block text-dark mb-0 small">{{ $oc->created_at->format('d/m/Y') }}</span>
-                                <span class="text-muted font-monospace small">{{ $oc->created_at->format('H:i') }}
-                                    hrs</span>
+                                <span class="fw-bold d-block text-dark mb-0 small">{{ $oc->created_at->format('d/m/Y') }}</span>
+                                <span class="text-muted font-monospace small">{{ $oc->created_at->format('H:i') }} hrs</span>
                             </td>
                             <td class="text-end pe-4">
-                                {{-- LLAMADA AL COMPONENTE DE BOTONES --}}
                                 <x-table-actions viewRoute="{{ route('oc.preview', $oc->id) }}"
                                     downloadRoute="{{ route('archivos.download', $oc->id) }}"
                                     deleteRoute="{{ route('oc.destroy', $oc->id) }}" />
@@ -216,7 +201,6 @@ $ordenes = computed(function () {
         {{ $this->ordenes->links('pagination::bootstrap-5') }}
     </div>
 
-    {{-- LLAMADA AL SCRIPT GLOBAL DE ELIMINACIÓN --}}
     <x-delete-confirm-script />
 
-</div>
+</div> {{-- FIN DEL DIV PADRE --}}
