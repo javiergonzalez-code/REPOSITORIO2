@@ -1,35 +1,20 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container py-5">
+    <div class="container py-4">
         <div class="row justify-content-center">
-            <div class="col-md-10 col-lg-8">
-                <div class="card login-card shadow-lg overflow-hidden">
+            <div class="col-12 col-xl-10">
 
-                    <div class="d-flex justify-content-center align-items-center py-4 gap-3">
-                        <div class="header-actions">
-                            <a href="{{ route('home') }}" class="btn-ragon-outline">
-                                <i class="fas fa-th-large me-2"></i> PANEL DE CONTROL
-                            </a>
-                        </div>
+                {{-- ENCABEZADO ESTANDARIZADO --}}
+                <x-module-header 
+                    icon="fas fa-user-plus" 
+                    title="NUEVO USUARIO" 
+                    subtitle="FORMULARIO DE REGISTRO DE MIEMBROS"
+                    backRoute="{{ route('users.index') }}"
+                />
 
-                        <div class="header-actions">
-                            <a href="{{ route('users.index') }}" class="btn-ragon-outline">
-                                <i class="fas fa-arrow-left me-2"></i> ATRÁS
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="login-header-modern py-4 text-center">
-                        <div class="d-flex justify-content-center mb-3">
-                            <div class="brand-icon-wrapper" style="width: 50px; height: 50px; font-size: 1.5rem;">
-                                <i class="fas fa-user-plus"></i>
-                            </div>
-                        </div>
-                        <h3 class="fw-bold mb-1 text-white text-uppercase" style="letter-spacing: 1px;">Nuevo Usuario</h3>
-                        <p class="text-white-50 mb-0" style="font-size: 0.9rem;">Complete el formulario para registrar un miembro</p>
-                    </div>
-
+                {{-- TARJETA DEL FORMULARIO --}}
+                <div class="card border-0 shadow-sm rounded-4 bg-white custom-card">
                     <div class="card-body p-4 p-md-5">
                         <form method="POST" action="{{ route('users.store') }}">
                             @csrf
@@ -47,7 +32,7 @@
                                             id="name" name="name" value="{{ old('name') }}"
                                             placeholder="Ej. Juan Pérez" required autofocus>
                                     </div>
-                                    @error('name') <div class="error-msg">{{ $message }}</div> @enderror
+                                    @error('name') <div class="error-msg text-danger small mt-1">{{ $message }}</div> @enderror
                                 </div>
 
                                 <div class="col-md-6">
@@ -58,7 +43,7 @@
                                             id="id" name="id" value="{{ old('id') }}"
                                             placeholder="Ej. EMP-001" required>
                                     </div>
-                                    @error('id') <div class="error-msg">{{ $message }}</div> @enderror
+                                    @error('id') <div class="error-msg text-danger small mt-1">{{ $message }}</div> @enderror
                                 </div>
 
                                 <div class="col-md-6">
@@ -68,7 +53,7 @@
                                         <input type="text" class="form-input @error('rfc') is-invalid @enderror"
                                             id="rfc" name="rfc" value="{{ old('rfc') }}" placeholder="Clave RFC">
                                     </div>
-                                    @error('rfc') <div class="error-msg">{{ $message }}</div> @enderror
+                                    @error('rfc') <div class="error-msg text-danger small mt-1">{{ $message }}</div> @enderror
                                 </div>
                             </div>
 
@@ -85,7 +70,7 @@
                                             id="email" name="email" value="{{ old('email') }}"
                                             placeholder="usuario@empresa.com" required>
                                     </div>
-                                    @error('email') <div class="error-msg">{{ $message }}</div> @enderror
+                                    @error('email') <div class="error-msg text-danger small mt-1">{{ $message }}</div> @enderror
                                 </div>
 
                                 <div class="col-md-5">
@@ -96,7 +81,7 @@
                                             id="telefono" name="telefono" value="{{ old('telefono') }}"
                                             placeholder="55 1234 5678">
                                     </div>
-                                    @error('telefono') <div class="error-msg">{{ $message }}</div> @enderror
+                                    @error('telefono') <div class="error-msg text-danger small mt-1">{{ $message }}</div> @enderror
                                 </div>
 
                                 <div class="col-12">
@@ -106,14 +91,14 @@
                                         <select class="form-input @error('role') is-invalid @enderror" id="role"
                                             name="role" required style="background-color: #f8fafc;">
                                             <option value="" selected disabled>Seleccione un nivel de acceso...</option>
-                                            @foreach ($roles as $roleOption)
+                                            @foreach ($roles ?? ['superadmin', 'admin', 'proveedor'] as $roleOption)
                                                 <option value="{{ $roleOption }}" {{ old('role') == $roleOption ? 'selected' : '' }}>
-                                                    {{ $roleOption }}
+                                                    {{ ucfirst($roleOption) }}
                                                 </option>
                                             @endforeach
                                         </select>
                                     </div>
-                                    @error('role') <div class="error-msg">{{ $message }}</div> @enderror
+                                    @error('role') <div class="error-msg text-danger small mt-1">{{ $message }}</div> @enderror
                                 </div>
                             </div>
 
@@ -125,7 +110,7 @@
                                         <input type="password" class="form-input @error('password') is-invalid @enderror"
                                             id="password" name="password" placeholder="********" required>
                                     </div>
-                                    @error('password') <div class="error-msg">{{ $message }}</div> @enderror
+                                    @error('password') <div class="error-msg text-danger small mt-1">{{ $message }}</div> @enderror
                                 </div>
                                 <div class="col-md-6">
                                     <label for="password-confirm" class="form-label-custom">Confirmar Contraseña</label>
@@ -137,20 +122,19 @@
                                 </div>
                             </div>
 
-                            <div class="d-flex flex-column flex-md-row justify-content-center align-items-center pt-4 mt-4 border-top gap-3">
-                                <a href="{{ route('users.index') }}" class="btn-ragon-outline px-5 py-3 shadow-lg">
-                                    <i class="fas fa-times me-2"></i> CANCELAR
+                            <div class="d-flex flex-column flex-md-row justify-content-end align-items-center pt-4 mt-4 border-top gap-3">
+                                <a href="{{ route('users.index') }}" class="btn btn-light border fw-bold text-secondary px-4 py-2 rounded-pill">
+                                    Cancelar
                                 </a>
-
-                                <button type="submit" class="btn btn-ragon-modern px-5 py-3 shadow-lg">
-                                    <span>Guardar Usuario</span>
-                                    <i class="fas fa-save ms-3"></i>
+                                <button type="submit" class="btn btn-primary px-5 py-2 rounded-pill shadow-sm fw-bold">
+                                    <i class="fas fa-save me-2"></i> Guardar Usuario
                                 </button>
                             </div>
 
                         </form>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>

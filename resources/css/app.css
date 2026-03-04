@@ -1547,8 +1547,85 @@ body.dark-mode .card {
 .btn-download:hover { background-color: #10b981; color: white; transform: translateY(-2px); }
 .btn-delete { background-color: #fff1f2; color: #f43f5e; } 
 .btn-delete:hover { background-color: #f43f5e; color: white; transform: translateY(-2px); }
+.btn-edit { background-color: #fffbeb; color: #d97706; } 
+.btn-edit:hover { background-color: #d97706; color: white; transform: translateY(-2px); }
 
 .avatar-pill { width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.8rem; }
 .bg-blue-ragon-gradient { background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); }
 
 
+/* Textos y badges personalizados */
+.text-main { color: #1e293b; }
+
+/* Estilos para los Indicadores de Estado (Puntitos) */
+.status-indicator {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-indicator .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+/* Colores de los estados */
+.status-upload { background-color: #e0f2fe; color: #0284c7; }
+.status-upload .dot { background-color: #0ea5e9; }
+
+.status-error { background-color: #ffe4e6; color: #e11d48; }
+.status-error .dot { background-color: #f43f5e; }
+
+.status-general { background-color: #f1f5f9; color: #475569; }
+.status-general .dot { background-color: #64748b; }
+
+/* ==========================================
+   LISTAS DESPLEGABLES (AUTOCOMPLETADO)
+   ========================================== */
+.custom-dropdown-menu {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    z-index: 1050;
+}
+.custom-dropdown-item {
+    background-color: transparent;
+    color: #1e293b;
+    transition: background 0.2s;
+}
+.custom-dropdown-item:hover {
+    background-color: #f8fafc;
+}
+
+/* ==========================================
+   COLORES DE ROLES (MODO CLARO)
+   ========================================== */
+.role-superadmin { background-color: #ede9fe; color: #6d28d9; border: 1px solid rgba(0,0,0,0.02); }
+.role-admin      { background-color: #ffe4e6; color: #b91c1c; border: 1px solid rgba(0,0,0,0.02); }
+.role-proveedor  { background-color: #ccfbf1; color: #0f766e; border: 1px solid rgba(0,0,0,0.02); }
+.role-default    { background-color: #f1f5f9; color: #475569; border: 1px solid rgba(0,0,0,0.02); }
+
+/* ==========================================
+   MODO OSCURO (SOBREESCRITURAS)
+   ========================================== */
+body.dark-mode .custom-dropdown-menu {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+}
+body.dark-mode .custom-dropdown-item {
+    color: #f8fafc !important;
+}
+body.dark-mode .custom-dropdown-item:hover {
+    background-color: #0f172a !important;
+}
+
+/* Colores de roles brillantes para que resalten en fondo oscuro */
+body.dark-mode .role-superadmin { background-color: rgba(109, 40, 217, 0.25); color: #c4b5fd; border: 1px solid rgba(255,255,255,0.1); }
+body.dark-mode .role-admin      { background-color: rgba(225, 29, 72, 0.25); color: #fda4af; border: 1px solid rgba(255,255,255,0.1); }
+body.dark-mode .role-proveedor  { background-color: rgba(15, 118, 110, 0.25); color: #5eead4; border: 1px solid rgba(255,255,255,0.1); }
+body.dark-mode .role-default    { background-color: rgba(71, 85, 105, 0.25); color: #cbd5e1; border: 1px solid rgba(255,255,255,0.1); }
