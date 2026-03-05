@@ -9,11 +9,7 @@
                     <div class="login-wrapper">
                         <div class="card login-card">
                             <div class="card-header login-header-modern">
-                                <div class="brand-icon-wrapper">
-                                    <i class="fas fa-shield-alt"></i>
-                                </div>
-                                <h2 class="h4 fw-bold mb-0 mt-3">REPOSITORIO</h2>
-                                <span class="badge bg-blue-ragon mt-2">SISTEMA INTERNO</span>
+                                <img src="{{ asset('img/logo.png') }}" alt="Logo" class="img-fluid mt-3" style="max-height: 150px; object-fit: contain;">
                             </div>
 
                             <div class="card-body p-4 p-md-5">

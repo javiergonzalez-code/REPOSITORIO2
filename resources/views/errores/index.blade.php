@@ -4,19 +4,16 @@
     <div class="container py-4">
         <div class="row justify-content-center">
             <div class="col-12 col-xl-11">
-                
+
                 {{-- RECUADRO 1: TÍTULO (Usando nuestro componente reutilizable) --}}
-                <x-module-header 
-                    icon="fas fa-bug" 
-                    title="REGISTRO DE ERRORES" 
-                    subtitle="MÓDULO DE MONITOREO DEL SISTEMA"
-                />
+                <x-module-header icon="fas fa-bug" title="REGISTRO DE ERRORES" subtitle="MÓDULO DE MONITOREO DEL SISTEMA" />
 
                 {{-- RECUADRO 2: TABLA DE ERRORES (DISEÑO PREMIUM) --}}
                 <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden custom-card">
-                    
+
                     {{-- Encabezado de la tabla --}}
-                    <div class="card-header bg-transparent border-0 pt-4 px-4 pb-2 d-flex justify-content-between align-items-center">
+                    <div
+                        class="card-header bg-transparent border-0 pt-4 px-4 pb-2 d-flex justify-content-between align-items-center">
                         <h6 class="text-uppercase fw-black mb-0 text-danger" style="font-size: 0.9rem; letter-spacing: 1px;">
                             <i class="fas fa-exclamation-triangle me-2"></i> Excepciones Detectadas
                         </h6>
@@ -27,7 +24,8 @@
                             <table class="table table-hover align-middle mb-0 border-top-0">
                                 {{-- Quitamos el background fijo para que se adapte al dark mode --}}
                                 <thead>
-                                    <tr class="text-uppercase" style="font-size: 0.7rem; font-weight: 700; color: #64748b; letter-spacing: 0.5px;">
+                                    <tr class="text-uppercase"
+                                        style="font-size: 0.7rem; font-weight: 700; color: #64748b; letter-spacing: 0.5px;">
                                         <th class="ps-4 py-3 border-0">Nivel / Estado</th>
                                         <th class="py-3 border-0">Usuario Afectado</th>
                                         <th class="py-3 border-0">Detalle del Error</th>
@@ -37,7 +35,7 @@
                                 <tbody class="border-top-0">
                                     @forelse($logs ?? $errores as $error)
                                         <tr style="transition: all 0.2s ease;">
-                                            
+
                                             {{-- COLUMNA 1: Nivel de Error --}}
                                             <td class="ps-4 py-3">
                                                 <div class="status-indicator status-error">
@@ -47,22 +45,20 @@
 
                                             {{-- COLUMNA 2: Usuario --}}
                                             <td class="py-3">
-                                                <x-user-avatar 
-                                                    :name="$error->user->name ?? 'Desconocido'" 
-                                                    :userId="$error->user->id ?? 0" 
-                                                    :subtitle="$error->user->role ?? 'SISTEMA'" 
-                                                />
+                                                <x-user-avatar :name="$error->user->name ?? 'Desconocido'" :userId="$error->user->id ?? 0" :subtitle="$error->user->role ?? 'SISTEMA'" />
                                             </td>
 
                                             {{-- COLUMNA 3: Descripción del Error --}}
                                             <td class="py-3" style="max-width: 320px;">
-                                                <div class="text-danger fw-bold mb-1" style="font-size: 0.85rem; line-height: 1.4;">
-                                                    <i class="fas fa-times-circle me-1"></i> {{ $error->descripcion ?? 'Error no especificado' }}
+                                                <div class="text-danger fw-bold mb-1"
+                                                    style="font-size: 0.85rem; line-height: 1.4;">
+                                                    <i class="fas fa-times-circle me-1"></i>
+                                                    {{ $error->accion ?? 'Error no especificado' }}
                                                 </div>
-                                                {{-- Se eliminó bg-light para no chocar con el dark mode --}}
-                                                <div class="d-inline-flex align-items-center rounded px-2 py-1 shadow-sm mt-1 border" 
-                                                     style="font-size: 0.7rem; font-family: monospace;">
-                                                    <i class="fas fa-cube me-2" style="opacity: 0.6;"></i> Módulo: {{ $error->modulo ?? 'Global' }}
+                                                <div class="d-inline-flex align-items-center rounded px-2 py-1 shadow-sm mt-1 border"
+                                                    style="font-size: 0.7rem; font-family: monospace;">
+                                                    <i class="fas fa-cube me-2" style="opacity: 0.6;"></i> Módulo:
+                                                    {{ $error->modulo ?? 'Global' }}
                                                 </div>
                                             </td>
 
@@ -73,8 +69,10 @@
                                                     <span class="fw-bold mb-1" style="font-size: 0.85rem;">
                                                         {{ $error->created_at->format('d M, Y') }}
                                                     </span>
-                                                    <span class="badge border font-monospace shadow-sm" style="font-size: 0.75rem; padding: 4px 8px; color: #64748b; background-color: transparent;">
-                                                        <i class="far fa-clock me-1 opacity-50"></i> {{ $error->created_at->format('H:i:s') }}
+                                                    <span class="badge border font-monospace shadow-sm"
+                                                        style="font-size: 0.75rem; padding: 4px 8px; color: #64748b; background-color: transparent;">
+                                                        <i class="far fa-clock me-1 opacity-50"></i>
+                                                        {{ $error->created_at->format('H:i:s') }}
                                                     </span>
                                                 </div>
                                             </td>
@@ -86,7 +84,8 @@
                                                 <div class="py-4">
                                                     <i class="fas fa-check-circle fa-3x text-success mb-3 opacity-50"></i>
                                                     <h5 class="text-muted fw-bold">Sistema Estable</h5>
-                                                    <p class="text-muted small">No se han registrado errores o excepciones recientemente.</p>
+                                                    <p class="text-muted small">No se han registrado errores o excepciones
+                                                        recientemente.</p>
                                                 </div>
                                             </td>
                                         </tr>
@@ -96,9 +95,9 @@
                         </div>
                     </div>
                 </div>
-                
+
                 {{-- Paginación --}}
-                @if(isset($logs) && method_exists($logs, 'links'))
+                @if (isset($logs) && method_exists($logs, 'links'))
                     <div class="mt-4 d-flex justify-content-center">
                         {{ $logs->links('pagination::bootstrap-5') }}
                     </div>

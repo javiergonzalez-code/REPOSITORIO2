@@ -1,7 +1,8 @@
 <nav class="navbar navbar-expand-md navbar-dark navbar-custom shadow-lg">
     <div class="container-fluid px-4">
         <a class="navbar-brand fw-bold" href="{{ url('/home') }}">
-            <i class="fas fa-database me-2"></i> REPOSITORIO
+            <img src="{{ asset('img/logo.png') }}" alt="Logo" class="img-fluid mt-3"
+                style="max-height: 50px; object-fit: contain;">
         </a>
 
         {{-- Botón de Hamburguesa para Móvil --}}
@@ -21,8 +22,7 @@
                     {{-- IMPLEMENTACIÓN DE ROLES Y PERMISOS --}}
                     @can('list users')
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->is('users*') ? 'active' : '' }}"
-                                href="{{ route('users.index') }}">
+                            <a class="nav-link {{ request()->is('users*') ? 'active' : '' }}" href="{{ route('users.index') }}">
                                 <i class="fas me-1"></i> Usuarios
                             </a>
                         </li>
