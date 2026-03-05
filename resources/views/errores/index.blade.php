@@ -25,7 +25,8 @@
                     <div class="card-body p-0">
                         <div class="table-responsive">
                             <table class="table table-hover align-middle mb-0 border-top-0">
-                                <thead style="background: #f8fafc;">
+                                {{-- Quitamos el background fijo para que se adapte al dark mode --}}
+                                <thead>
                                     <tr class="text-uppercase" style="font-size: 0.7rem; font-weight: 700; color: #64748b; letter-spacing: 0.5px;">
                                         <th class="ps-4 py-3 border-0">Nivel / Estado</th>
                                         <th class="py-3 border-0">Usuario Afectado</th>
@@ -34,7 +35,6 @@
                                     </tr>
                                 </thead>
                                 <tbody class="border-top-0">
-                                    {{-- Asumiendo que tu controlador pasa la variable $logs o $errores --}}
                                     @forelse($logs ?? $errores as $error)
                                         <tr style="transition: all 0.2s ease;">
                                             
@@ -59,8 +59,9 @@
                                                 <div class="text-danger fw-bold mb-1" style="font-size: 0.85rem; line-height: 1.4;">
                                                     <i class="fas fa-times-circle me-1"></i> {{ $error->descripcion ?? 'Error no especificado' }}
                                                 </div>
-                                                <div class="d-inline-flex align-items-center rounded bg-light text-secondary px-2 py-1 shadow-sm mt-1" 
-                                                     style="font-size: 0.7rem; font-family: monospace; border: 1px solid #e2e8f0;">
+                                                {{-- Se eliminó bg-light para no chocar con el dark mode --}}
+                                                <div class="d-inline-flex align-items-center rounded px-2 py-1 shadow-sm mt-1 border" 
+                                                     style="font-size: 0.7rem; font-family: monospace;">
                                                     <i class="fas fa-cube me-2" style="opacity: 0.6;"></i> Módulo: {{ $error->modulo ?? 'Global' }}
                                                 </div>
                                             </td>
@@ -68,11 +69,12 @@
                                             {{-- COLUMNA 4: Fecha y Hora --}}
                                             <td class="text-center py-3 pe-4">
                                                 <div class="d-flex flex-column align-items-center justify-content-center">
-                                                    <span class="fw-bold text-dark mb-1" style="font-size: 0.85rem;">
+                                                    {{-- Se eliminó text-dark para que las letras se vuelvan blancas en modo oscuro --}}
+                                                    <span class="fw-bold mb-1" style="font-size: 0.85rem;">
                                                         {{ $error->created_at->format('d M, Y') }}
                                                     </span>
-                                                    <span class="badge bg-light text-secondary border font-monospace shadow-sm" style="font-size: 0.75rem; padding: 4px 8px;">
-                                                        <i class="far fa-clock me-1 text-muted"></i> {{ $error->created_at->format('H:i:s') }}
+                                                    <span class="badge border font-monospace shadow-sm" style="font-size: 0.75rem; padding: 4px 8px; color: #64748b; background-color: transparent;">
+                                                        <i class="far fa-clock me-1 opacity-50"></i> {{ $error->created_at->format('H:i:s') }}
                                                     </span>
                                                 </div>
                                             </td>
@@ -95,7 +97,7 @@
                     </div>
                 </div>
                 
-                {{-- Paginación (Si aplica) --}}
+                {{-- Paginación --}}
                 @if(isset($logs) && method_exists($logs, 'links'))
                     <div class="mt-4 d-flex justify-content-center">
                         {{ $logs->links('pagination::bootstrap-5') }}

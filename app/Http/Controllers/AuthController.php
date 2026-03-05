@@ -44,8 +44,6 @@ class AuthController extends Controller
                 'modulo'  => 'AUTH'
             ]);
 
-            // Alerta de éxito al entrar
-            Alert::success('¡Bienvenido!', 'Has iniciado sesión correctamente.');
             return redirect()->route('home');
         }
 

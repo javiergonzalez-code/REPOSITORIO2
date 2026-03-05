@@ -16,8 +16,6 @@ class LogoutController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        // Aquí agregamos la alerta
-        Alert::success('Sesión Cerrada', 'Has salido del sistema de forma segura.');
 
         return redirect('/login'); 
     }
