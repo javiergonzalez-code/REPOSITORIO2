@@ -155,7 +155,6 @@ $logs = computed(function () {
                         <th class="text-center py-3 border-0">Actividad</th>
                         <th class="py-3 border-0">Módulo</th>
                         <th class="text-center py-3 border-0">Fecha y Hora</th>
-                        <th class="text-end pe-4 py-3 border-0">Acción</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -192,12 +191,7 @@ $logs = computed(function () {
                                 <span
                                     class="x-small text-muted font-monospace">{{ $log->created_at->format('h:i A') }}</span>
                             </td>
-                            <td class="text-end pe-4 py-3">
-                                <button class="btn btn-sm btn-light border rounded-3 text-primary shadow-sm px-3"
-                                    style="transition: all 0.2s;">
-                                    <i class="fas fa-terminal me-2"></i> Ver
-                                </button>
-                            </td>
+
                         </tr>
                     @empty
                         <tr>

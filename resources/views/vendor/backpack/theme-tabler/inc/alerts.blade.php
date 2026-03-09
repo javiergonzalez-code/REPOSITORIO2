@@ -12,8 +12,8 @@
             });
 
             // get alerts from the alert bag
-            var $alerts_from_php = JSON.parse('@json(\Alert::getMessages())');
-
+            // get alerts from the alert bag
+            var $alerts_from_php = JSON.parse('@json(\Prologue\Alerts\Facades\Alert::getMessages())');
             // get the alerts from the localstorage
             var $alerts_from_localstorage = JSON.parse(localStorage.getItem('backpack_alerts')) ?
                 JSON.parse(localStorage.getItem('backpack_alerts')) : {};
