@@ -57,7 +57,6 @@ Route::middleware(['auth'])->group(function () {
             ]);
             $nuevoEstado = !$setting->en_mantenimiento;
         } else {
-            // Si no existía, lo creamos y lo encendemos
             \DB::table('modulo_settings')->insert([
                 'nombre_modulo' => $modulo,
                 'en_mantenimiento' => true,

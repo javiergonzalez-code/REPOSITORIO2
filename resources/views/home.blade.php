@@ -78,17 +78,6 @@
                                         <div class="small text-muted">Bloquear vista del registro de errores</div>
                                     </div>
                                 </div>
-
-                                {{-- Switch Super Usuario --}}
-                                <div class="col-md-6 mb-3">
-                                    <div class="form-check form-switch fs-6">
-                                        <input class="form-check-input cursor-pointer" type="checkbox" id="switchSuperusuario" 
-                                               {{ $mantenimientoSuperusuario ? 'checked' : '' }} 
-                                               onchange="toggleMantenimiento('superuser')">
-                                        <label class="form-check-label fw-bold text-dark" for="switchSuperusuario">Módulo Super Usuario</label>
-                                        <div class="small text-muted">Bloquear panel de super administración</div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
