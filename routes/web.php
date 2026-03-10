@@ -8,6 +8,7 @@ use App\Http\Controllers\InputController;
 use App\Http\Controllers\OcController;
 use App\Http\Controllers\LogsController;
 use App\Http\Controllers\Usercontroller;
+use App\Http\Controllers\HomeController;
 
 /**
  * REDIRECCIÓN INICIAL
@@ -27,18 +28,14 @@ Route::post('/login', [AuthController::class, 'login'])->name('login.post');
  */
 Route::middleware(['auth'])->group(function () {
 
-    // Dashboard o página de inicio
+    // Dashboard o página de inicio (Apunta a HomeController ahora)
     Route::get('/home', [AuthController::class, 'home'])->name('home');
 
     // Cierre de sesión
     Route::post('/logout', [LogoutController::class, 'destroy'])->name('logout');
 
-    // Gestión de Errores (puedes añadir middleware 'can' si lo deseas)
+    // Gestión de Errores
     Route::get('/errores', [ErroresController::class, 'index'])->name('errores.index');
-
-    // Módulo de Carga de Archivos (Inputs)
-    Route::get('/inputs', [InputController::class, 'index'])->name('input.index');
-    Route::post('/inputs/store', [InputController::class, 'store'])->name('input.store');
 
     // ==========================================
     // RUTA PARA EL SWITCH DE MANTENIMIENTO (AJAX)
@@ -74,8 +71,23 @@ Route::middleware(['auth'])->group(function () {
 
         return response()->json(['success' => true, 'message' => $mensaje]);
     })->name('mantenimiento.toggle');
-// Módulo de Auditoría (Logs)
-    Route::get('/logs', [LogsController::class, 'index'])->name('logs.index');
+
+    // ==========================================
+    // MÓDULO DE CARGA DE ARCHIVOS (INPUTS) - PROTEGIDO
+    // ==========================================
+    Route::middleware(['mantenimiento:inputs'])->group(function () {
+        Route::get('/inputs', [InputController::class, 'index'])->name('input.index');
+        Route::post('/inputs/store', [InputController::class, 'store'])->name('input.store');
+        // Ruta para descargar archivos de forma segura
+        Route::get('/archivos/descargar/{id}', [InputController::class, 'download'])->name('archivos.download');
+    });
+
+    // ==========================================
+    // MÓDULO DE AUDITORÍA (LOGS) - PROTEGIDO
+    // ==========================================
+    Route::middleware(['mantenimiento:logs'])->group(function () {
+        Route::get('/logs', [LogsController::class, 'index'])->name('logs.index');
+    });
 
     // ==========================================
     // MÓDULO DE ÓRDENES DE COMPRA (OC) - PROTEGIDO
@@ -84,42 +96,42 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/oc', [OcController::class, 'index'])->name('oc.index');
         Route::get('/oc/download/{id}', [OcController::class, 'download'])->name('oc.download');
         Route::get('/oc/preview/{id}', [OcController::class, 'preview'])->name('oc.preview');
-        Route::delete('/oc/{id}', [App\Http\Controllers\OcController::class, 'destroy'])->name('oc.destroy');
+        Route::delete('/oc/{id}', [OcController::class, 'destroy'])->name('oc.destroy');
     });
     
-    // Ruta para descargar archivos de forma segura
-    Route::get('/archivos/descargar/{id}', [InputController::class, 'download'])->name('archivos.download');
-    /**
-     * GESTIÓN DE USUARIOS (PROTEGIDA POR PERMISOS)
-     * Aquí aplicamos la lógica de "can:nombre-del-permiso"
-     */
+    // ==========================================
+    // GESTIÓN DE USUARIOS (PROTEGIDA POR MANTENIMIENTO)
+    // ==========================================
+    Route::middleware(['mantenimiento:users'])->group(function () {
+        
+        // Ver lista de usuarios
+        Route::get('users', [Usercontroller::class, 'index'])
+            ->name('users.index')
+            ->middleware('can:list users');
 
-    // Ver lista de usuarios
-    Route::get('users', [Usercontroller::class, 'index'])
-        ->name('users.index')
-        ->middleware('can:list users');
+        // Crear usuarios
+        Route::get('users/create', [Usercontroller::class, 'create'])
+            ->name('users.create')
+            ->middleware('can:create users');
 
-    // Crear usuarios
-    Route::get('users/create', [Usercontroller::class, 'create'])
-        ->name('users.create')
-        ->middleware('can:create users');
+        Route::post('users', [Usercontroller::class, 'store'])
+            ->name('users.store')
+            ->middleware('can:create users');
 
-    Route::post('users', [Usercontroller::class, 'store'])
-        ->name('users.store')
-        ->middleware('can:create users');
+        // Editar usuarios
+        Route::get('users/{user}/edit', [Usercontroller::class, 'edit'])
+            ->name('users.edit')
+            ->middleware('can:edit users'); 
 
-    // Editar usuarios
-    Route::get('users/{user}/edit', [Usercontroller::class, 'edit'])
-        ->name('users.edit')
-        ->middleware('can:edit users'); // Nota: Asegúrate de añadir 'edit users' a tu Seeder
+        Route::put('users/{user}', [Usercontroller::class, 'update'])
+            ->name('users.update')
+            ->middleware('can:edit users');
 
-    Route::put('users/{user}', [Usercontroller::class, 'update'])
-        ->name('users.update')
-        ->middleware('can:edit users');
-
-    // Eliminar usuarios
-    Route::delete('users/{user}', [Usercontroller::class, 'destroy'])
-        ->name('users.destroy')
-        ->middleware('can:delete users'); // Nota: Asegúrate de añadir 'delete users' a tu Seeder
+        // Eliminar usuarios
+        Route::delete('users/{user}', [Usercontroller::class, 'destroy'])
+            ->name('users.destroy')
+            ->middleware('can:delete users'); 
+            
+    });
 
 });
