@@ -23,8 +23,8 @@ class InputController extends Controller
             'archivo' => [
                 'required',
                 'file',
-                'mimes:csv,xlsx,xls,xml,txt',
-                'extensions:csv,xlsx,xls,xml,txt',
+                'mimes:csv,xlsx,xls,xml',
+                'extensions:csv,xlsx,xls,xml',
                 'max:5120',
             ]
         ], [
@@ -42,7 +42,6 @@ class InputController extends Controller
                 'modulo'  => 'INPUTS',
             ]);
 
-            // <-- Nueva alerta de error
             Alert::error('Archivo no válido', $errores);
             return back();
         }

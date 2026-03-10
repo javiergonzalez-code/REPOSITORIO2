@@ -40,14 +40,52 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/inputs', [InputController::class, 'index'])->name('input.index');
     Route::post('/inputs/store', [InputController::class, 'store'])->name('input.store');
 
-    // Módulo de Auditoría (Logs)
+    // ==========================================
+    // RUTA PARA EL SWITCH DE MANTENIMIENTO (AJAX)
+    // ==========================================
+    Route::post('/mantenimiento/toggle/{modulo}', function ($modulo) {
+        // Validar que solo un administrador pueda hacer esto (Ajusta los roles según tu BD)
+        if (!auth()->user()->hasRole('Super Admin') && !auth()->user()->hasRole('Administrador') && auth()->user()->email !== 'admin@ragon.com') {
+            return response()->json(['success' => false, 'message' => 'No autorizado'], 403);
+        }
+
+        // Buscamos si ya existe el registro en la BD
+        $setting = \DB::table('modulo_settings')->where('nombre_modulo', $modulo)->first();
+
+        if ($setting) {
+            // Invertimos el valor actual
+            \DB::table('modulo_settings')->where('nombre_modulo', $modulo)->update([
+                'en_mantenimiento' => !$setting->en_mantenimiento,
+                'updated_at' => now()
+            ]);
+            $nuevoEstado = !$setting->en_mantenimiento;
+        } else {
+            // Si no existía, lo creamos y lo encendemos
+            \DB::table('modulo_settings')->insert([
+                'nombre_modulo' => $modulo,
+                'en_mantenimiento' => true,
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+            $nuevoEstado = true;
+        }
+
+        $mensaje = $nuevoEstado ? 'Módulo en mantenimiento' : 'Módulo abierto al público';
+
+        return response()->json(['success' => true, 'message' => $mensaje]);
+    })->name('mantenimiento.toggle');
+// Módulo de Auditoría (Logs)
     Route::get('/logs', [LogsController::class, 'index'])->name('logs.index');
 
-    // Módulo de Órdenes de Compra (OC)
-    Route::get('/oc', [OcController::class, 'index'])->name('oc.index');
-    Route::get('/oc/download/{id}', [OcController::class, 'download'])->name('oc.download');
-    Route::get('/oc/preview/{id}', [OcController::class, 'preview'])->name('oc.preview');
-    Route::delete('/oc/{id}', [App\Http\Controllers\OcController::class, 'destroy'])->name('oc.destroy');
+    // ==========================================
+    // MÓDULO DE ÓRDENES DE COMPRA (OC) - PROTEGIDO
+    // ==========================================
+    Route::middleware(['mantenimiento:oc'])->group(function () {
+        Route::get('/oc', [OcController::class, 'index'])->name('oc.index');
+        Route::get('/oc/download/{id}', [OcController::class, 'download'])->name('oc.download');
+        Route::get('/oc/preview/{id}', [OcController::class, 'preview'])->name('oc.preview');
+        Route::delete('/oc/{id}', [App\Http\Controllers\OcController::class, 'destroy'])->name('oc.destroy');
+    });
     
     // Ruta para descargar archivos de forma segura
     Route::get('/archivos/descargar/{id}', [InputController::class, 'download'])->name('archivos.download');
