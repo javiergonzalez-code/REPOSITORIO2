@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;                 
-use Illuminate\Support\Facades\Hash; 
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\Validator; // <-- Esta es la línea que faltaba
 
@@ -35,11 +35,11 @@ class AuthController extends Controller
         $credentials = $validator->validated();
 
         if (Auth::attempt($credentials)) {
-            
+
             $request->session()->regenerate();
 
             \App\Models\Log::create([
-                'user_id' => auth()->id(), 
+                'user_id' => auth()->id(),
                 'accion'  => 'Inicio de sesión exitoso',
                 'modulo'  => 'AUTH'
             ]);
@@ -51,13 +51,29 @@ class AuthController extends Controller
         return back();
     }
 
-    public function home()
+public function home()
     {
-        if (Auth::check()) {
-            return view('home');
-        }
+        // 1. Consultamos la tabla de configuraciones
+        $settings = \Illuminate\Support\Facades\DB::table('modulo_settings')->pluck('en_mantenimiento', 'nombre_modulo');
 
-        Alert::warning('Acceso Restringido', 'Por favor inicia sesión para continuar.');
-        return redirect("/");
+        // 2. Obtenemos los estados (si el módulo no existe, por defecto es false)
+        $mantenimientoOC = $settings->get('oc', false);
+        $mantenimientoInputs = $settings->get('inputs', false);
+        $mantenimientoUsers = $settings->get('users', false);
+        $mantenimientoLogs = $settings->get('logs', false);
+        
+        // NUEVOS:
+        $mantenimientoErrores = $settings->get('errores', false);
+        $mantenimientoSuperusuario = $settings->get('superuser', false);
+
+        // 3. Retornamos la vista enviando TODAS las variables
+        return view('home', compact(
+            'mantenimientoOC', 
+            'mantenimientoInputs', 
+            'mantenimientoUsers', 
+            'mantenimientoLogs',
+            'mantenimientoErrores',
+            'mantenimientoSuperusuario'
+        ));
     }
 }

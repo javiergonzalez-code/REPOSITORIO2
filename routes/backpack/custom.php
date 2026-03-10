@@ -3,19 +3,20 @@
 use Illuminate\Support\Facades\Route;
 
 Route::group([
-    'prefix' => config('backpack.base.route_prefix', 'admin'),
+    'prefix'     => config('backpack.base.route_prefix', 'admin'),
     'middleware' => array_merge(
         (array) config('backpack.base.web_middleware', 'web'),
-        (array) config('backpack.base.middleware_key', 'admin') // Aquí entran TODOS los admins
+        (array) config('backpack.base.middleware_key', 'admin'),
+        ['mantenimiento:superuser'] // <--- AGREGA ESTO AQUÍ
     ),
-    'namespace' => 'App\Http\Controllers\Admin',
-], function () { 
-    
+    'namespace'  => 'App\Http\Controllers\Admin',
+], function () {
+
     // ---------------------------------------------------------
     // RUTAS PARA ADMINISTRADORES NORMALES
     // ---------------------------------------------------------
     Route::crud('archivo', 'ArchivoCrudController');
-    
+
     // ---------------------------------------------------------
     // RUTAS EXCLUSIVAS PARA EL SÚPER USUARIO
     // ---------------------------------------------------------
@@ -26,7 +27,4 @@ Route::group([
         Route::crud('permission', 'PermissionCrudController');
         Route::crud('log', 'LogCrudController');
     });
-    
 });
-
-    
