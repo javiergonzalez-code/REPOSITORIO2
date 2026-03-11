@@ -18,6 +18,7 @@ class ArchivoCrudController extends CrudController
     use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
+    use \Backpack\CRUD\app\Http\Controllers\Operations\SoftDeleteOperation;
 
     /**
      * Configuración general del panel CRUD.
@@ -25,17 +26,12 @@ class ArchivoCrudController extends CrudController
      */
     public function setup()
     {
-        // Define el modelo al que apunta este controlador
-        CRUD::setModel(\App\Models\Archivo::class);
-        
-        // Define la ruta URL para acceder a este CRUD
-        CRUD::setRoute(config('backpack.base.route_prefix') . '/archivo');
-        
-        // Define las etiquetas para la entidad en singular y plural
-        CRUD::setEntityNameStrings('archivo', 'archivos');
+        $this->crud->setModel(\App\Models\Archivo::class);
+        $this->crud->setRoute(config('backpack.base.route_prefix') . '/archivo');
+        $this->crud->setEntityNameStrings('archivo', 'archivos');
 
         // --- LÓGICA DE SEGURIDAD Y PERMISOS ---
-        
+
         // 1. Control de visualización: Si el usuario no tiene permiso, se deniega ver la lista y el detalle.
         if (!backpack_user()->can('list archivos')) {
             CRUD::denyAccess(['list', 'show']);
@@ -65,11 +61,24 @@ class ArchivoCrudController extends CrudController
         CRUD::column('nombre_original')->label('Nombre Original'); // Nombre tal cual se subió el archivo
         CRUD::column('tipo_archivo')->label('Tipo');              // Extensión o MIME type
         CRUD::column('modulo')->label('Módulo');                  // Área del sistema a la que pertenece
-        
+
         // Columna de relación: Muestra el nombre del usuario dueño del archivo
         CRUD::column('user')->type('relationship')->label('Usuario');
-        
+
         CRUD::column('created_at')->label('Fecha de Subida');     // Timestamp de creación
+
+        // Filtro para ver registros eliminados
+        $this->crud->addFilter(
+            [
+                'type'  => 'simple',
+                'name'  => 'trashed',
+                'label' => 'Ver eliminados'
+            ],
+            false,
+            function () {
+                $this->crud->query = $this->crud->query->onlyTrashed();
+            }
+        );
     }
 
     /**

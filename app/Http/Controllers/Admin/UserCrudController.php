@@ -13,12 +13,13 @@ class UserCrudController extends CrudController
     use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
+    use \Backpack\CRUD\app\Http\Controllers\Operations\SoftDeleteOperation;
 
     public function setup()
     {
-        CRUD::setModel(\App\Models\User::class);
-        CRUD::setRoute(config('backpack.base.route_prefix') . '/user');
-        CRUD::setEntityNameStrings('usuario', 'usuarios');
+        $this->crud->setModel(\App\Models\User::class);
+        $this->crud->setRoute(config('backpack.base.route_prefix') . '/user');
+        $this->crud->setEntityNameStrings('usuario', 'usuarios');
 
         $user = backpack_user();
 
@@ -39,7 +40,7 @@ class UserCrudController extends CrudController
         CRUD::column('id')->label('ID');
         CRUD::column('name')->label('Nombre');
         CRUD::column('email')->label('Correo');
-        CRUD::column('role')->label('Rol Base'); 
+        CRUD::column('role')->label('Rol Base');
         CRUD::column('created_at')->label('Creado')->type('date');
 
         // ==========================================
@@ -55,6 +56,19 @@ class UserCrudController extends CrudController
         if (request()->has('custom_email') && request()->filled('custom_email')) {
             $this->crud->addClause('where', 'email', 'like', '%' . request()->input('custom_email') . '%');
         }
+
+        // Filtro para ver registros eliminados
+        $this->crud->addFilter(
+            [
+                'type'  => 'simple',
+                'name'  => 'trashed',
+                'label' => 'Ver eliminados'
+            ],
+            false,
+            function () {
+                $this->crud->query = $this->crud->query->onlyTrashed();
+            }
+        );
     }
 
 
@@ -109,7 +123,7 @@ class UserCrudController extends CrudController
     protected function setupUpdateOperation()
     {
         $this->setupCreateOperation();
-        
+
         // Al editar, la contraseña es opcional
         $this->crud->modifyField('password', [
             'hint' => 'Déjalo vacío para mantener la contraseña actual.',
