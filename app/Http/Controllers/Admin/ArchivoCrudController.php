@@ -18,8 +18,7 @@ class ArchivoCrudController extends CrudController
     use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
-    use \Backpack\CRUD\app\Http\Controllers\Operations\SoftDeleteOperation;
-
+use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     /**
      * Configuración general del panel CRUD.
      * Se ejecuta para todas las operaciones.
