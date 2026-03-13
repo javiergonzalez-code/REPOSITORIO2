@@ -23,7 +23,6 @@ class MantenimientoModulo
             // 1. Validar primero que haya un usuario en sesión para evitar errores si auth()->user() es null
             if (auth()->check()) {
                 // Usamos hasAnyRole de Spatie para validar múltiples opciones a la vez.
-                // Agregué opciones en minúscula por si en la base de datos están guardados así.
                 if (auth()->user()->hasAnyRole(['Super Admin', 'Administrador', 'super-admin', 'admin'])) {
                     return $next($request); // Permite pasar a los administradores
                 }

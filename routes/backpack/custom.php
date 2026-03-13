@@ -21,10 +21,10 @@ Route::group([
     // ---------------------------------------------------------
     // Aplicamos el middleware que acabamos de crear a este subgrupo
     Route::group(['middleware' => [\App\Http\Middleware\CheckIfSuperAdmin::class]], function () {
-        Route::crud('user', 'UserCrudController');
-        Route::crud('role', 'RoleCrudController');
-        Route::crud('permission', 'PermissionCrudController');
-        Route::crud('log', 'LogCrudController');
+        // Route::crud('user', 'UserCrudController');
+        // Route::crud('role', 'RoleCrudController');
+        // Route::crud('permission', 'PermissionCrudController');
+        // Route::crud('log', 'LogCrudController');
     });
     
 });

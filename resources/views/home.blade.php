@@ -164,6 +164,22 @@
                 @endif
 
             </div>
+
+            @role('Super_Admin')
+                <div class="mt-4 module-header">
+                    <h3>Panel de Administración General</h3>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        @livewire('user-manager')
+                    </div>
+
+                    <div class="col-md-12 mt-4">
+                        @livewire('logs-manager')
+                    </div>
+                </div>
+            @endrole
         </div>
     </main>
 
