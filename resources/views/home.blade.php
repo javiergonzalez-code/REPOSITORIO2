@@ -104,7 +104,7 @@
                                         <div class="flex-shrink-0 bg-danger-lt p-3 rounded">
                                             <i class="fas fa-user-slash fa-2x text-danger"></i>
                                         </div>
-                                        <div class="flex-grow-1 ms-3">
+                                        {{-- <div class="flex-grow-1 ms-3">
                                             <div class="text-uppercase text-muted fw-bold small">Usuarios en Papelera</div>
                                             <div class="h2 mb-0 fw-bold">{{ \App\Models\User::onlyTrashed()->count() }}
                                             </div>
@@ -113,32 +113,34 @@
                                                 <i class="fas fa-external-link-alt"></i> Gestionar en Backpack
                                             </a>
                                         </div>
+                                    </div> --}}
                                     </div>
                                 </div>
-                            </div>
 
-                            {{-- Archivos Eliminados --}}
-                            <div class="col-md-6 mb-3">
-                                <div class="card border-info shadow-sm h-100">
-                                    <div class="card-body d-flex align-items-center">
-                                        <div class="flex-shrink-0 bg-info-lt p-3 rounded">
-                                            <i class="fas fa-file-excel fa-2x text-info"></i>
-                                        </div>
-                                        <div class="flex-grow-1 ms-3">
-                                            <div class="text-uppercase text-muted fw-bold small">Archivos en Papelera</div>
-                                            <div class="h2 mb-0 fw-bold">{{ \App\Models\Archivo::onlyTrashed()->count() }}
+                                {{-- Archivos Eliminados --}}
+                                <div class="col-md-6 mb-3">
+                                    <div class="card border-info shadow-sm h-100">
+                                        <div class="card-body d-flex align-items-center">
+                                            <div class="flex-shrink-0 bg-info-lt p-3 rounded">
+                                                <i class="fas fa-file-excel fa-2x text-info"></i>
                                             </div>
-                                            <a href="{{ backpack_url('archivo') }}?trashed=1"
-                                                class="small text-info fw-bold">
-                                                <i class="fas fa-external-link-alt"></i> Ver archivos borrados
-                                            </a>
+                                            <div class="flex-grow-1 ms-3">
+                                                <div class="text-uppercase text-muted fw-bold small">Archivos en Papelera
+                                                </div>
+                                                <div class="h2 mb-0 fw-bold">
+                                                    {{ \App\Models\Archivo::onlyTrashed()->count() }}
+                                                </div>
+                                                <a href="{{ backpack_url('archivo') }}?trashed=1"
+                                                    class="small text-info fw-bold">
+                                                    <i class="fas fa-external-link-alt"></i> Ver archivos borrados
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
             @endif
             {{-- Contenedor de la Cuadrícula (Grid) --}}
             <div class="dashboard-grid">
@@ -158,14 +160,14 @@
                     <x-dashboard-card route="{{ route('users.index') }}" icon="fas fa-user" title="Usuarios" />
                 @endif
 
-                {{-- Tarjeta para Superusuario (Backpack) --}}
-                @if (backpack_user() && (backpack_user()->email === 'admin@ragon.com' || backpack_user()->role === 'superadmin'))
+                {{-- Tarjeta para Superusuario (Migrada a Laravel Auth) --}}
+                @if (auth()->user() && (auth()->user()->email === 'admin@ragon.com' || auth()->user()->hasRole('Super Admin')))
                     <x-dashboard-card route="{{ url('admin') }}" icon="fas fa-user-shield" title="Superusuario" />
                 @endif
 
             </div>
 
-            @role('Super_Admin')
+            @role('Super Admin')
                 <div class="mt-4 module-header">
                     <h3>Panel de Administración General</h3>
                 </div>

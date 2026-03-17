@@ -41,7 +41,6 @@ $usuarios = computed(function () {
 });
 ?>
 
-{{-- DIV PADRE ÚNICO (ESTO EVITA EL ERROR 500) --}}
 <div>
 
     <div class="mb-3 text-end" style="font-size: 0.8rem; color: #64748b; font-weight: 700;">
@@ -49,8 +48,10 @@ $usuarios = computed(function () {
     </div>
 
     {{-- RECUADRO DE FILTROS --}}
-    <div class="card border-0 shadow-sm rounded-4 mb-4 bg-white custom-card" style="overflow: visible; position: relative; z-index: 1050;">
-        <div class="card-header bg-transparent border-0 pt-4 px-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <div class="card border-0 shadow-sm rounded-4 mb-4 bg-white custom-card"
+        style="overflow: visible; position: relative; z-index: 1050;">
+        <div
+            class="card-header bg-transparent border-0 pt-4 px-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
             <h6 class="text-uppercase fw-black mb-0 text-muted" style="font-size: 1rem; letter-spacing: 1px;">
                 <i class="fas fa-filter me-2"></i> Gestión y Filtros
             </h6>
@@ -65,28 +66,31 @@ $usuarios = computed(function () {
                 <div class="col-lg-3 col-md-6">
                     <label class="form-label-custom text-uppercase x-small fw-bold">Nombre de Usuario</label>
                     <div style="position: relative !important;">
-                        <i class="fas fa-user text-muted position-absolute top-50 start-0 translate-middle-y ms-3" style="z-index: 10;"></i>
-                        <input type="text" wire:model.live.debounce.300ms="userFilter" class="form-control ps-5" placeholder="Escribir nombre..." autocomplete="off">
-                        
+                        <i class="fas fa-user text-muted position-absolute top-50 start-0 translate-middle-y ms-3"
+                            style="z-index: 10;"></i>
+                        <input type="text" wire:model.live.debounce.300ms="userFilter" class="form-control ps-5"
+                            placeholder="Escribir nombre..." autocomplete="off">
+
                         {{-- LISTA DESPLEGABLE FLOTANTE CON FONDO BLANCO FORZADO --}}
-    @if(count($this->sugerencias_usuarios) > 0)
-        <div class="w-100 border rounded-3 shadow-lg" 
-             style="position: absolute !important; top: 100% !important; left: 0 !important; margin-top: 5px !important; z-index: 10000 !important; overflow: hidden; display: block !important; background-color: #ffffff !important;">
-            <ul class="list-unstyled mb-0">
-                @foreach($this->sugerencias_usuarios as $sugerencia)
-                    <li>
-                        <button type="button" class="w-100 border-0 text-start px-3 py-2" 
-                                style="font-size: 0.9rem; background-color: transparent; color: #1e293b; transition: all 0.2s;"
-                                wire:click="$set('userFilter', '{{ $sugerencia->name }}')"
-                                onmouseover="this.style.backgroundColor='#f1f5f9'"
-                                onmouseout="this.style.backgroundColor='transparent'">
-                            <i class="fas fa-user-circle text-primary me-2"></i> {{ $sugerencia->name }}
-                        </button>
-                    </li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+                        @if (count($this->sugerencias_usuarios) > 0)
+                            <div class="w-100 border rounded-3 shadow-lg"
+                                style="position: absolute !important; top: 100% !important; left: 0 !important; margin-top: 5px !important; z-index: 10000 !important; overflow: hidden; display: block !important; background-color: #ffffff !important;">
+                                <ul class="list-unstyled mb-0">
+                                    @foreach ($this->sugerencias_usuarios as $sugerencia)
+                                        <li>
+                                            <button type="button" class="w-100 border-0 text-start px-3 py-2"
+                                                style="font-size: 0.9rem; background-color: transparent; color: #1e293b; transition: all 0.2s;"
+                                                wire:click="$set('userFilter', '{{ $sugerencia->name }}')"
+                                                onmouseover="this.style.backgroundColor='#f1f5f9'"
+                                                onmouseout="this.style.backgroundColor='transparent'">
+                                                <i class="fas fa-user-circle text-primary me-2"></i>
+                                                {{ $sugerencia->name }}
+                                            </button>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
                     </div>
                 </div>
 
@@ -95,7 +99,8 @@ $usuarios = computed(function () {
                     <label class="form-label-custom text-uppercase x-small fw-bold">Correo Electrónico</label>
                     <div class="position-relative">
                         <i class="fas fa-at text-muted position-absolute top-50 start-0 translate-middle-y ms-3"></i>
-                        <input type="text" wire:model.live.debounce.300ms="search" class="form-control ps-5" placeholder="Ej: admin@ragon.com...">
+                        <input type="text" wire:model.live.debounce.300ms="search" class="form-control ps-5"
+                            placeholder="Ej: admin@ragon.com...">
                     </div>
                 </div>
 
@@ -112,7 +117,8 @@ $usuarios = computed(function () {
 
                 {{-- 4. Botón Limpiar --}}
                 <div class="col-lg-2 col-md-12">
-                    <button wire:click="$set('search', ''); $set('userFilter', ''); $set('roleFilter', '')" class="btn btn-outline-secondary rounded-pill w-100 fw-bold">
+                    <button wire:click="$set('search', ''); $set('userFilter', ''); $set('roleFilter', '')"
+                        class="btn btn-outline-secondary rounded-pill w-100 fw-bold">
                         <i class="fas fa-eraser me-1"></i> Limpiar
                     </button>
                 </div>
@@ -125,7 +131,8 @@ $usuarios = computed(function () {
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0 border-top-0">
                 <thead style="background: #f8fafc;">
-                    <tr class="text-uppercase" style="font-size: 0.7rem; font-weight: 700; color: #64748b; letter-spacing: 0.5px;">
+                    <tr class="text-uppercase"
+                        style="font-size: 0.7rem; font-weight: 700; color: #64748b; letter-spacing: 0.5px;">
                         <th class="ps-4 py-3 border-0">Usuario</th>
                         <th class="py-3 border-0">Nivel de Acceso (Rol)</th>
                         <th class="text-center py-3 border-0">Fecha de Registro</th>
@@ -155,18 +162,23 @@ $usuarios = computed(function () {
                                         default => 'fa-user',
                                     };
                                 @endphp
-                                <span class="d-inline-flex align-items-center rounded-pill fw-bold shadow-sm px-3 py-1 {{ $roleClass }}" style="font-size: 0.75rem; letter-spacing: 0.5px;">
+                                <span
+                                    class="d-inline-flex align-items-center rounded-pill fw-bold shadow-sm px-3 py-1 {{ $roleClass }}"
+                                    style="font-size: 0.75rem; letter-spacing: 0.5px;">
                                     <i class="fas {{ $roleIcon }} me-2"></i> {{ strtoupper($user->role ?? 'N/A') }}
                                 </span>
                             </td>
 
                             <td class="text-center py-3">
-                                <span class="fw-bold d-block text-main mb-0" style="font-size: 0.85rem;">{{ $user->created_at->format('d/m/Y') }}</span>
-                                <span class="x-small text-muted font-monospace">Hace {{ $user->created_at->diffForHumans(null, true) }}</span>
+                                <span class="fw-bold d-block text-main mb-0"
+                                    style="font-size: 0.85rem;">{{ $user->created_at->format('d/m/Y') }}</span>
+                                <span class="x-small text-muted font-monospace">Hace
+                                    {{ $user->created_at->diffForHumans(null, true) }}</span>
                             </td>
 
                             <td class="text-end pe-4 py-3">
-                                <x-table-actions editRoute="{{ route('users.edit', $user->id) }}" deleteRoute="{{ route('users.destroy', $user->id) }}" />
+                                <x-table-actions editRoute="{{ route('users.edit', $user->id) }}"
+                                    deleteRoute="{{ route('users.destroy', $user->id) }}" />
                             </td>
                         </tr>
                     @empty
@@ -190,4 +202,4 @@ $usuarios = computed(function () {
 
     <x-delete-confirm-script />
 
-</div> {{-- FIN DEL DIV PADRE --}}
+</div>
