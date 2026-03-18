@@ -37,18 +37,12 @@ class User extends Authenticatable
     /**
      * LÓGICA MANUAL PARA SOFT DELETES
      */
-protected static function booted()
+/**
+     * LÓGICA MANUAL PARA SOFT DELETES
+     */
+    protected static function booted()
     {
-        // Cuando se ELIMINA un usuario, lo guardamos en tu tabla 'logs'
-        static::deleted(function ($user) {
-            if (auth()->check()) {
-                \App\Models\Log::create([
-                    'user_id' => auth()->id(), // El admin que está borrando
-                    'accion'  => 'ELIMINACION',
-                    'modulo'  => 'USUARIOS'
-                ]);
-            }
-        });
+        // Se ha eliminado el evento static::deleted para evitar registros duplicados de eliminación.
 
         // Cuando se CREA un usuario (CARGA)
         static::created(function ($user) {
@@ -61,7 +55,6 @@ protected static function booted()
             }
         });
     }
-    
     /**
      * Configuración del Log automático (Solo para Cargas y Actualizaciones)
      */

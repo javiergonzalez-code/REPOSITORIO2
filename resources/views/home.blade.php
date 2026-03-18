@@ -160,10 +160,7 @@
                     <x-dashboard-card route="{{ route('users.index') }}" icon="fas fa-user" title="Usuarios" />
                 @endif
 
-                {{-- Tarjeta para Superusuario (Migrada a Laravel Auth) --}}
-                @if (auth()->user() && (auth()->user()->email === 'admin@ragon.com' || auth()->user()->hasRole('Super Admin')))
-                    <x-dashboard-card route="{{ url('admin') }}" icon="fas fa-user-shield" title="Superusuario" />
-                @endif
+
 
             </div>
 
