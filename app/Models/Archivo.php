@@ -24,13 +24,22 @@ class Archivo extends Model
         'ruta'
     ];
 
-    public function getActivitylogOptions(): LogOptions
+    public function getActivitylogOptions(): \Spatie\Activitylog\LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['user_id', 'nombre_original', 'tipo_archivo', 'modulo', 'ruta'])
+            // 1. AÑADIMOS 'deleted_at' para que detecte la eliminación lógica
+            ->logOnly(['name', 'email', 'codigo', 'rfc', 'telefono', 'deleted_at'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
-            ->useLogName('archivo');
+            ->useLogName('user')
+            // 2. Traducimos el evento para que se guarde en español
+            ->setDescriptionForEvent(fn(string $eventName) => match ($eventName) {
+                'created' => 'Creación',
+                'updated' => 'Actualización',
+                'deleted' => 'Eliminación',
+                'restored' => 'Restauración',
+                default => $eventName,
+            });
     }
 
     public function user()

@@ -104,16 +104,16 @@
                                         <div class="flex-shrink-0 bg-danger-lt p-3 rounded">
                                             <i class="fas fa-user-slash fa-2x text-danger"></i>
                                         </div>
-                                        {{-- <div class="flex-grow-1 ms-3">
+                                        <div class="flex-grow-1 ms-3">
                                             <div class="text-uppercase text-muted fw-bold small">Usuarios en Papelera</div>
                                             <div class="h2 mb-0 fw-bold">{{ \App\Models\User::onlyTrashed()->count() }}
                                             </div>
-                                            <a href="{{ backpack_url('user') }}?trashed=1"
+                                            {{-- <a href="{{ backpack_url('user') }}?trashed=1"
                                                 class="small text-danger fw-bold">
                                                 <i class="fas fa-external-link-alt"></i> Gestionar en Backpack
-                                            </a>
+                                            </a> --}}
                                         </div>
-                                    </div> --}}
+                                    </div>
                                     </div>
                                 </div>
 
@@ -130,10 +130,10 @@
                                                 <div class="h2 mb-0 fw-bold">
                                                     {{ \App\Models\Archivo::onlyTrashed()->count() }}
                                                 </div>
-                                                <a href="{{ backpack_url('archivo') }}?trashed=1"
+                                                {{-- <a href="{{ backpack_url('archivo') }}?trashed=1"
                                                     class="small text-info fw-bold">
                                                     <i class="fas fa-external-link-alt"></i> Ver archivos borrados
-                                                </a>
+                                                </a> --}}
                                             </div>
                                         </div>
                                     </div>

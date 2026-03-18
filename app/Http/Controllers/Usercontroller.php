@@ -10,9 +10,6 @@ use RealRashid\SweetAlert\Facades\Alert;
 
 class UserController extends Controller
 {
-    /**
-     * Devuelve los roles que el usuario actual tiene permitido gestionar.
-     */
     private function getRolesPermitidos()
     {
         $user = auth()->user();
@@ -26,8 +23,6 @@ class UserController extends Controller
 
     public function index()
     {
-        // La tabla interactiva y los filtros de seguridad 
-        // ahora están manejados por el componente Livewire
         return view('users.index');
     }
 
@@ -51,20 +46,40 @@ class UserController extends Controller
             'role'     => ['required', Rule::in($rolesPermitidos)],
         ]);
 
-        $user = User::create([
-            'name'     => $validatedData['name'],
-            'id'       => $validatedData['id'],
-            'rfc'      => $validatedData['rfc'],
-            'email'    => $validatedData['email'],
-            'telefono' => $validatedData['telefono'],
-            'password' => Hash::make($validatedData['password']),
-            'role'     => $validatedData['role'],
-        ]);
+        try {
+            $user = User::create([
+                'name'     => $validatedData['name'],
+                'id'       => $validatedData['id'],
+                'rfc'      => $validatedData['rfc'],
+                'email'    => $validatedData['email'],
+                'telefono' => $validatedData['telefono'],
+                'password' => Hash::make($validatedData['password']),
+                'role'     => $validatedData['role'],
+            ]);
 
-        $user->assignRole($validatedData['role']);
+            $user->assignRole($validatedData['role']);
 
-        Alert::success('¡Usuario Creado!', 'El usuario ha sido registrado exitosamente en el sistema.');
-        return redirect()->route('users.index');
+            // LOG DE ÉXITO
+            \App\Models\Log::create([
+                'user_id' => auth()->id(),
+                'accion'  => 'CARGA - Registró con éxito al usuario: ' . $user->name,
+                'modulo'  => 'USUARIOS',
+            ]);
+
+            Alert::success('¡Usuario Creado!', 'El usuario ha sido registrado exitosamente en el sistema.');
+            return redirect()->route('users.index');
+
+        } catch (\Exception $e) {
+            // LOG DE ERROR
+            \App\Models\Log::create([
+                'user_id' => auth()->id(),
+                'accion'  => 'ERROR CARGA - Falló al crear usuario: ' . $e->getMessage(),
+                'modulo'  => 'USUARIOS',
+            ]);
+
+            Alert::error('Error', 'Ocurrió un error al crear el usuario.');
+            return redirect()->route('users.index');
+        }
     }
 
     public function edit(User $user)
@@ -91,17 +106,37 @@ class UserController extends Controller
             'password' => ['nullable', 'min:8', 'confirmed'],
         ]);
 
-        $user->fill($request->except('password'));
+        try {
+            $user->fill($request->except('password'));
 
-        if ($request->filled('password')) {
-            $user->password = Hash::make($request->password);
+            if ($request->filled('password')) {
+                $user->password = Hash::make($request->password);
+            }
+
+            $user->save();
+            $user->syncRoles([$validatedData['role']]);
+
+            // LOG DE ÉXITO
+            \App\Models\Log::create([
+                'user_id' => auth()->id(),
+                'accion'  => 'ACTUALIZACIÓN - Modificó los datos del usuario: ' . $user->name,
+                'modulo'  => 'USUARIOS',
+            ]);
+
+            Alert::success('¡Actualización Exitosa!', 'Los datos del usuario han sido modificados correctamente.');
+            return redirect()->route('users.index');
+
+        } catch (\Exception $e) {
+            // LOG DE ERROR
+            \App\Models\Log::create([
+                'user_id' => auth()->id(),
+                'accion'  => 'ERROR ACTUALIZACIÓN - Falló al modificar usuario ' . $user->name . ': ' . $e->getMessage(),
+                'modulo'  => 'USUARIOS',
+            ]);
+
+            Alert::error('Error', 'Ocurrió un error al actualizar los datos.');
+            return redirect()->route('users.index');
         }
-
-        $user->save();
-        $user->syncRoles([$validatedData['role']]);
-
-        Alert::success('¡Actualización Exitosa!', 'Los datos del usuario han sido modificados correctamente.');
-        return redirect()->route('users.index');
     }
 
     public function destroy(User $user)
@@ -116,9 +151,31 @@ class UserController extends Controller
             return back();
         }
 
-        $user->delete();
-        
-        Alert::success('¡Acceso Revocado!', 'El usuario ha sido eliminado correctamente del sistema.');
-        return redirect()->route('users.index');
+        try {
+            $nombreOriginal = $user->name; // Guardamos el nombre antes de borrar
+            
+            $user->delete();
+            
+            // LOG DE ÉXITO
+            \App\Models\Log::create([
+                'user_id' => auth()->id(),
+                'accion'  => 'ELIMINACION - Revocó acceso del usuario: ' . $nombreOriginal,
+                'modulo'  => 'USUARIOS',
+            ]);
+
+            Alert::success('¡Acceso Revocado!', 'El usuario ha sido eliminado correctamente del sistema.');
+            return redirect()->route('users.index');
+            
+        } catch (\Exception $e) {
+            // LOG DE ERROR
+            \App\Models\Log::create([
+                'user_id' => auth()->id(),
+                'accion'  => 'ERROR ELIMINACION - Falló al borrar usuario ' . $user->name . ': ' . $e->getMessage(),
+                'modulo'  => 'USUARIOS',
+            ]);
+
+            Alert::error('Error', 'Error al eliminar el usuario: ' . $e->getMessage());
+            return redirect()->route('users.index');
+        }
     }
 }

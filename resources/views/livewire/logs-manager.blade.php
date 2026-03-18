@@ -34,15 +34,24 @@ $logs = computed(function () {
     if ($this->esProveedor) {
         $query->where('user_id', $user->id);
     }
+    
+    // CORRECCIÓN: Buscar en 'accion' o 'modulo' ya que 'descripcion' no existe en tu tabla
     if ($this->search) {
-        $query->where('descripcion', 'like', "%{$this->search}%");
+        $query->where(function($q) {
+            $q->where('accion', 'like', "%{$this->search}%")
+              ->orWhere('modulo', 'like', "%{$this->search}%");
+        });
     }
+    
     if ($this->userFilter && !$this->esProveedor) {
         $query->whereHas('user', fn($q) => $q->where('name', 'like', "%{$this->userFilter}%"));
     }
-    if ($this->accion) {
-        $query->where('accion', $this->accion);
+    
+   if ($this->accion) {
+        $query->where('accion', 'like', "%{$this->accion}%");
+    
     }
+    
     if ($this->fecha) {
         $query->whereDate('created_at', $this->fecha);
     }
@@ -52,7 +61,7 @@ $logs = computed(function () {
 ?>
 
 {{-- REGLA DE ORO DE LIVEWIRE: UN SOLO DIV PADRE QUE ENVUELVE TODO --}}
-<div >
+<div>
 
     <div class="mb-3 text-end" style="font-size: 0.8rem; color: #64748b; font-weight: 700;">
         {{ $this->logs->total() }} REGISTROS ENCONTRADOS

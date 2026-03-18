@@ -5,35 +5,26 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\SoftDeletes; // 1. Importar SoftDeletes
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Spatie\Permission\Traits\HasRoles;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
-
 class User extends Authenticatable
 {
-    // 2. Agregar SoftDeletes al listado de Traits utilizados
     use HasFactory, Notifiable, CrudTrait, HasRoles, LogsActivity, SoftDeletes;
     
     protected $guard_name = 'web';
 
+    protected static $recordEvents = ['created', 'updated'];
+
     protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'codigo',
-        'rfc',
-        'telefono',
-        'role',
-        'roles',
-        'permissions',
+        'name', 'email', 'password', 'codigo', 'rfc', 'telefono', 'role', 'roles', 'permissions',
     ];
 
     protected $hidden = [
-        'password',
-        'remember_token',
+        'password', 'remember_token',
     ];
 
     protected function casts(): array
@@ -42,17 +33,50 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
         ];
     }
+
+    /**
+     * LÓGICA MANUAL PARA SOFT DELETES
+     */
+protected static function booted()
+    {
+        // Cuando se ELIMINA un usuario, lo guardamos en tu tabla 'logs'
+        static::deleted(function ($user) {
+            if (auth()->check()) {
+                \App\Models\Log::create([
+                    'user_id' => auth()->id(), // El admin que está borrando
+                    'accion'  => 'ELIMINACION',
+                    'modulo'  => 'USUARIOS'
+                ]);
+            }
+        });
+
+        // Cuando se CREA un usuario (CARGA)
+        static::created(function ($user) {
+            if (auth()->check()) {
+                \App\Models\Log::create([
+                    'user_id' => auth()->id(), // El admin que lo creó
+                    'accion'  => 'CARGA',
+                    'modulo'  => 'USUARIOS'
+                ]);
+            }
+        });
+    }
     
     /**
-     * 3. Configuración de las opciones del Log
+     * Configuración del Log automático (Solo para Cargas y Actualizaciones)
      */
     public function getActivitylogOptions(): \Spatie\Activitylog\LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['name', 'email', 'codigo', 'rfc', 'telefono'])
+            ->logOnly(['name', 'email', 'codigo', 'rfc', 'telefono', 'role'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
-            ->useLogName('user');
+            ->useLogName('user')
+            ->setDescriptionForEvent(fn(string $eventName) => match($eventName) {
+                'created' => 'Creación',
+                'updated' => 'Actualización',
+                default => $eventName,
+            });
     }
 
     public function setPasswordAttribute($value)

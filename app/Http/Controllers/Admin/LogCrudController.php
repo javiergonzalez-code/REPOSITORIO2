@@ -42,31 +42,114 @@ class LogCrudController extends CrudController
     /**
      * Configuración de la tabla principal de auditoría.
      */
-    protected function setupListOperation()
+protected function setupListOperation()
     {
-        // Muestra la fecha y hora exacta del movimiento realizado.
         CRUD::column('created_at')->type('datetime')->label('Fecha');
 
-        /**
-         * Columna del Usuario (Causer):
-         * Identifica a la persona que realizó la acción.
-         * Se usa una relación para traer el 'name' desde el modelo User.
-         */
         CRUD::column('causer_id')
             ->label('Usuario')
             ->type('select')
-            ->entity('causer') // Relación definida en el modelo Activity
+            ->entity('causer')
             ->attribute('name')
             ->model('App\Models\User');
 
-        // Descripción de la acción (ej: "created", "updated", "deleted").
-        CRUD::column('description')->label('Evento');
+        // BÚSQUEDA CORREGIDA PARA EVENTOS
+        CRUD::column('description')
+            ->label('Evento')
+            ->type('closure')
+            ->function(function($entry) {
+                $map = [
+                    'created' => 'Creación / Carga',
+                    'updated' => 'Actualización',
+                    'deleted' => 'Eliminación',
+                    'restored' => 'Restauración',
+                ];
+                return $map[strtolower($entry->description)] ?? ucfirst($entry->description);
+            })
+            ->searchLogic(function ($query, $column, $searchTerm) {
+                // El Closure interno ($q) evita que este "OR" rompa el filtro de Usuario
+                $query->orWhere(function($q) use ($searchTerm) {
+                    $term = strtolower($searchTerm);
+                    
+                    $q->where('description', 'like', '%'.$term.'%');
 
-        // Tipo de modelo que fue afectado (ej: App\Models\User, App\Models\Archivo).
-        CRUD::column('subject_type')->label('Módulo');
-        
-        // El ID único del registro que fue modificado o eliminado.
+                    if (str_contains('carga creación creacion', $term)) {
+                        $q->orWhereIn('description', ['created', 'Creación']);
+                    }
+                    if (str_contains('actualización actualizacion', $term)) {
+                        $q->orWhereIn('description', ['updated', 'Actualización']);
+                    }
+                    if (str_contains('eliminación eliminacion borrado', $term)) {
+                        $q->orWhereIn('description', ['deleted', 'Eliminación']);
+                    }
+                });
+            });
+
+        // BÚSQUEDA CORREGIDA PARA MÓDULOS
+        CRUD::column('subject_type')
+            ->label('Módulo')
+            ->type('closure')
+            ->function(function($entry) {
+                if (!$entry->subject_type) return '-';
+                $parts = explode('\\', $entry->subject_type);
+                return end($parts);
+            })
+            ->searchLogic(function ($query, $column, $searchTerm) {
+                // Closure interno de protección
+                $query->orWhere(function($q) use ($searchTerm) {
+                    $q->where('subject_type', 'like', '%'.$searchTerm.'%');
+                });
+            });
+            
         CRUD::column('subject_id')->label('ID Ref');
+
+        // ==========================================
+        // FILTROS LATERALES (Ya no chocarán con la búsqueda)
+        // ==========================================
+        
+        $this->crud->addFilter([
+            'name'  => 'causer_id',
+            'type'  => 'select2',
+            'label' => 'Filtro por Usuario'
+        ], function () {
+            return \App\Models\User::all()->pluck('name', 'id')->toArray();
+        }, function ($value) {
+            $this->crud->addClause('where', 'causer_id', $value);
+        });
+
+        $this->crud->addFilter([
+            'name'  => 'description',
+            'type'  => 'dropdown',
+            'label' => 'Filtro por Acción'
+        ], [
+            'created' => 'Carga / Creación',
+            'updated' => 'Actualización',
+            'deleted' => 'Eliminación',
+        ], function ($value) {
+            // Soporte para registros viejos (inglés) y nuevos (español)
+            $terminos = [$value, ucfirst($value)];
+            if ($value == 'created') array_push($terminos, 'Creación', 'Carga');
+            if ($value == 'updated') array_push($terminos, 'Actualización');
+            if ($value == 'deleted') array_push($terminos, 'Eliminación');
+            
+            $this->crud->addClause('whereIn', 'description', $terminos);
+        });
+
+        $this->crud->addFilter([
+            'name'  => 'subject_type',
+            'type'  => 'select2',
+            'label' => 'Filtro por Módulo'
+        ], function () {
+            $types = \App\Models\Activity::select('subject_type')->whereNotNull('subject_type')->distinct()->get();
+            $options = [];
+            foreach($types as $type) {
+                $parts = explode('\\', $type->subject_type);
+                $options[$type->subject_type] = end($parts);
+            }
+            return $options;
+        }, function ($value) {
+            $this->crud->addClause('where', 'subject_type', $value);
+        });
     }
 
     /**
