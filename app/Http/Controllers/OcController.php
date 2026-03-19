@@ -15,22 +15,44 @@ class OcController extends Controller
         return view('oc.index');
     }
 
-    public function download($id)
+public function download($id)
     {
         $oc = Archivo::findOrFail($id);
         $user = auth()->user();
         $esProveedor = $user->hasRole('proveedor') || $user->role === 'proveedor';
 
         if ($esProveedor && $oc->user_id !== $user->id) {
+            // LOG: Intento no autorizado
+            \App\Models\Log::create([
+                'user_id' => auth()->id(),
+                'accion'  => 'Intento de descarga denegado (sin permisos): ' . $oc->nombre_original,
+                'modulo'  => 'OC',
+            ]);
+
             abort(403, 'No tienes permiso para descargar este archivo.');
         }
 
         $path = storage_path('app/private/uploads/' . $oc->nombre_sistema);
 
         if (!file_exists($path)) {
+            // LOG: Archivo no encontrado
+            \App\Models\Log::create([
+                'user_id' => auth()->id(),
+                'accion'  => 'Intento de descarga fallido (archivo físico extraviado): ' . $oc->nombre_original,
+                'modulo'  => 'OC',
+            ]);
+
             Alert::error('Extraviado', 'El archivo físico no existe.');
             return back();
         }
+
+        // LOG: DESCARGA EXITOSA (Agregado aquí)
+        // Utilizamos la palabra "Descargó" para que coincida con tu filtro Livewire
+        \App\Models\Log::create([
+            'user_id' => auth()->id(),
+            'accion'  => 'Descargó con éxito el archivo: ' . $oc->nombre_original,
+            'modulo'  => 'OC',
+        ]);
 
         return response()->download($path, $oc->nombre_original);
     }

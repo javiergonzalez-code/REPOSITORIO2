@@ -47,10 +47,38 @@ $logs = computed(function () {
         $query->whereHas('user', fn($q) => $q->where('name', 'like', "%{$this->userFilter}%"));
     }
     
-   if ($this->accion) {
-        $query->where('accion', 'like', "%{$this->accion}%");
-    
-    }
+if ($this->accion) {
+    $query->where(function($q) {
+        switch (strtoupper($this->accion)) {
+            case 'CARGA':
+                // Busca "ubió" (Subió) o "arga" (Carga/carga)
+                $q->where('accion', 'like', '%ubió%')
+                  ->orWhere('accion', 'like', '%arga%');
+                break;
+            case 'DESCARGA':
+                // Busca "escarg" (Descargó, descargó, Descarga, descarga)
+                $q->where('accion', 'like', '%escarg%');
+                break;
+            case 'ELIMINACION':
+                // Busca "limin" (Eliminó, eliminó, Eliminación) o "orrado" (borrado)
+                $q->where('accion', 'like', '%limin%')
+                  ->orWhere('accion', 'like', '%orrado%');
+                break;
+            case 'LOGIN':
+                // Busca "nici" (Inicio, inicio) o "ogin" (Login, login)
+                $q->where('accion', 'like', '%nici%')
+                  ->orWhere('accion', 'like', '%ogin%');
+                break;
+            case 'LOGOUT':
+                // Busca "ierr" (Cierre, cierre) o "ogout" (Logout, logout)
+                $q->where('accion', 'like', '%ierr%')
+                  ->orWhere('accion', 'like', '%ogout%');
+                break;
+            default:
+                $q->where('accion', 'like', "%{$this->accion}%");
+        }
+    });
+}
     
     if ($this->fecha) {
         $query->whereDate('created_at', $this->fecha);
