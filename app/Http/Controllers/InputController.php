@@ -112,13 +112,21 @@ class InputController extends Controller
         }
     }
 
-    public function download($id)
+public function download($id)
     {
         $archivo = Archivo::findOrFail($id);
 
         if (!Storage::disk('local')->exists($archivo->ruta)) {
             abort(404, 'El archivo físico no se encuentra en el servidor.');
         }
+
+        // --- ESTO ES LO QUE TE FALTA ---
+        \App\Models\Log::create([
+            'user_id' => auth()->id(),
+            'accion'  => 'Descargó con éxito el archivo: ' . $archivo->nombre_original,
+            'modulo'  => 'OC', // O el nombre del módulo donde estés
+        ]);
+        // ------------------------------
 
         return Storage::disk('local')->download($archivo->ruta, $archivo->nombre_original);
     }
