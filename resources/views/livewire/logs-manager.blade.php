@@ -48,37 +48,34 @@ $logs = computed(function () {
     }
     
 if ($this->accion) {
-    $query->where(function($q) {
-        switch (strtoupper($this->accion)) {
-            case 'CARGA':
-                // Busca "ubió" (Subió) o "arga" (Carga/carga)
-                $q->where('accion', 'like', '%ubió%')
-                  ->orWhere('accion', 'like', '%arga%');
-                break;
-            case 'DESCARGA':
-                // Busca "escarg" (Descargó, descargó, Descarga, descarga)
-                $q->where('accion', 'like', '%escarg%');
-                break;
-            case 'ELIMINACION':
-                // Busca "limin" (Eliminó, eliminó, Eliminación) o "orrado" (borrado)
-                $q->where('accion', 'like', '%limin%')
-                  ->orWhere('accion', 'like', '%orrado%');
-                break;
-            case 'LOGIN':
-                // Busca "nici" (Inicio, inicio) o "ogin" (Login, login)
-                $q->where('accion', 'like', '%nici%')
-                  ->orWhere('accion', 'like', '%ogin%');
-                break;
-            case 'LOGOUT':
-                // Busca "ierr" (Cierre, cierre) o "ogout" (Logout, logout)
-                $q->where('accion', 'like', '%ierr%')
-                  ->orWhere('accion', 'like', '%ogout%');
-                break;
-            default:
-                $q->where('accion', 'like', "%{$this->accion}%");
-        }
-    });
-}
+        $query->where(function($q) {
+            switch (strtoupper($this->accion)) {
+                case 'CARGA':
+                    $q->whereRaw('LOWER(accion) LIKE ?', ['%subió%'])
+                      ->orWhereRaw('LOWER(accion) LIKE ?', ['%subio%']) // Sin acento por si acaso
+                      ->orWhereRaw('LOWER(accion) LIKE ?', ['%carga%']);
+                    break;
+                case 'DESCARGA':
+                    $q->whereRaw('LOWER(accion) LIKE ?', ['%descarg%'])
+                      ->orWhereRaw('LOWER(accion) LIKE ?', ['%download%']);
+                    break;
+                case 'ELIMINACION':
+                    $q->whereRaw('LOWER(accion) LIKE ?', ['%elimin%'])
+                      ->orWhereRaw('LOWER(accion) LIKE ?', ['%borrad%']);
+                    break;
+                case 'LOGIN':
+                    $q->whereRaw('LOWER(accion) LIKE ?', ['%inicio%'])
+                      ->orWhereRaw('LOWER(accion) LIKE ?', ['%login%']);
+                    break;
+                case 'LOGOUT':
+                    $q->whereRaw('LOWER(accion) LIKE ?', ['%cierre%'])
+                      ->orWhereRaw('LOWER(accion) LIKE ?', ['%logout%']);
+                    break;
+                default:
+                    $q->whereRaw('LOWER(accion) LIKE ?', ['%' . strtolower($this->accion) . '%']);
+            }
+        });
+    }
     
     if ($this->fecha) {
         $query->whereDate('created_at', $this->fecha);
