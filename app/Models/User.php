@@ -42,7 +42,6 @@ class User extends Authenticatable
      */
     protected static function booted()
     {
-        // Se ha eliminado el evento static::deleted para evitar registros duplicados de eliminación.
 
         // Cuando se CREA un usuario (CARGA)
         static::created(function ($user) {
