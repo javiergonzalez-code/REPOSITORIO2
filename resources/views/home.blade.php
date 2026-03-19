@@ -158,6 +158,7 @@
                         auth()->user()->role === 'superadmin' ||
                         auth()->user()->email === 'admin@ragon.com')
                     <x-dashboard-card route="{{ route('users.index') }}" icon="fas fa-user" title="Usuarios" />
+                    <x-dashboard-card route="{{ route('papelera.index') }}" icon="fas fa-trash-restore" title="Papelera" />
                 @endif
 
 
