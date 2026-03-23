@@ -12,7 +12,6 @@ class Archivo extends Model
 {
     // 2. Agregar SoftDeletes a la clase
     use HasFactory, SoftDeletes;
-    use \Backpack\CRUD\app\Models\Traits\CrudTrait;
     use LogsActivity;
 
     protected $fillable = [
