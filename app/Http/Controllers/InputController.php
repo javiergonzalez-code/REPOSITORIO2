@@ -8,7 +8,7 @@ use App\Models\Log;
 use App\Models\Archivo;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\QueryException;
-use RealRashid\SweetAlert\Facades\Alert; // <-- Agregamos la fachada de SweetAlert
+use RealRashid\SweetAlert\Facades\Alert;
 
 class InputController extends Controller
 {
@@ -84,7 +84,6 @@ class InputController extends Controller
                 'modulo'  => 'INPUTS',
             ]);
 
-            // <-- Nueva alerta de éxito
             Alert::success('¡Subida Exitosa!', 'Archivo subido y verificado correctamente.');
             return back();
 
@@ -95,7 +94,6 @@ class InputController extends Controller
                 'modulo'  => 'INPUTS'
             ]);
             
-            // <-- Nueva alerta de error crítico
             Alert::error('Error Crítico', 'No se pudo registrar en la base de datos.');
             return back();
 
@@ -106,7 +104,6 @@ class InputController extends Controller
                 'modulo'  => 'INPUTS',
             ]);
             
-            // <-- Nueva alerta de error de servidor
             Alert::error('Error del Servidor', 'Error al procesar el archivo: ' . $e->getMessage());
             return back();
         }
@@ -120,13 +117,11 @@ public function download($id)
             abort(404, 'El archivo físico no se encuentra en el servidor.');
         }
 
-        // --- ESTO ES LO QUE TE FALTA ---
         \App\Models\Log::create([
             'user_id' => auth()->id(),
             'accion'  => 'Descargó con éxito el archivo: ' . $archivo->nombre_original,
-            'modulo'  => 'OC', // O el nombre del módulo donde estés
+            'modulo'  => 'OC',
         ]);
-        // ------------------------------
 
         return Storage::disk('local')->download($archivo->ruta, $archivo->nombre_original);
     }
