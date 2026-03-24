@@ -177,7 +177,8 @@ $usuarios = computed(function () {
                             </td>
 
                             <td class="text-end pe-4 py-3">
-                                <x-table-actions editRoute="{{ route('users.edit', $user->id) }}"
+                                <x-table-actions viewRoute="{{ route('users.show', $user->id) }}"
+                                    editRoute="{{ route('users.edit', $user->id) }}"
                                     deleteRoute="{{ route('users.destroy', $user->id) }}" />
                             </td>
                         </tr>

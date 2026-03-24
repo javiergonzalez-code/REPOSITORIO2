@@ -72,13 +72,13 @@ Route::middleware(['auth'])->group(function () {
     })->name('mantenimiento.toggle');
 
     // ==========================================
-// MÓDULO DE PAPELERA DE RECICLAJE
-// ==========================================
-Route::middleware(['auth'])->group(function () {
-    Route::get('/papelera', [App\Http\Controllers\PapeleraController::class, 'index'])->name('papelera.index');
-    Route::post('/papelera/restaurar/{tipo}/{id}', [App\Http\Controllers\PapeleraController::class, 'restaurar'])->name('papelera.restaurar');
-    Route::delete('/papelera/eliminar/{tipo}/{id}', [App\Http\Controllers\PapeleraController::class, 'eliminarPermanente'])->name('papelera.eliminar');
-});
+    // MÓDULO DE PAPELERA DE RECICLAJE
+    // ==========================================
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/papelera', [App\Http\Controllers\PapeleraController::class, 'index'])->name('papelera.index');
+        Route::post('/papelera/restaurar/{tipo}/{id}', [App\Http\Controllers\PapeleraController::class, 'restaurar'])->name('papelera.restaurar');
+        Route::delete('/papelera/eliminar/{tipo}/{id}', [App\Http\Controllers\PapeleraController::class, 'eliminarPermanente'])->name('papelera.eliminar');
+    });
     // ==========================================
     // MÓDULO DE CARGA DE ARCHIVOS (INPUTS) - PROTEGIDO
     // ==========================================
@@ -105,12 +105,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/oc/preview/{id}', [OcController::class, 'preview'])->name('oc.preview');
         Route::delete('/oc/{id}', [OcController::class, 'destroy'])->name('oc.destroy');
     });
-    
+
     // ==========================================
     // GESTIÓN DE USUARIOS (PROTEGIDA POR MANTENIMIENTO)
     // ==========================================
     Route::middleware(['mantenimiento:users'])->group(function () {
-        
+
         // Ver lista de usuarios
         Route::get('users', [Usercontroller::class, 'index'])
             ->name('users.index')
@@ -128,7 +128,7 @@ Route::middleware(['auth'])->group(function () {
         // Editar usuarios
         Route::get('users/{user}/edit', [Usercontroller::class, 'edit'])
             ->name('users.edit')
-            ->middleware('can:edit users'); 
+            ->middleware('can:edit users');
 
         Route::put('users/{user}', [Usercontroller::class, 'update'])
             ->name('users.update')
@@ -137,8 +137,9 @@ Route::middleware(['auth'])->group(function () {
         // Eliminar usuarios
         Route::delete('users/{user}', [Usercontroller::class, 'destroy'])
             ->name('users.destroy')
-            ->middleware('can:delete users'); 
-            
-    });
+            ->middleware('can:delete users');
 
+
+        Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');
+    });
 });
