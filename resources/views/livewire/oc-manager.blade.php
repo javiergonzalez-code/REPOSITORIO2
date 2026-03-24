@@ -214,4 +214,4 @@ $ordenes = computed(function () {
 
     <x-delete-confirm-script />
 
-</div> {{-- FIN DEL DIV PADRE --}}
+</div>

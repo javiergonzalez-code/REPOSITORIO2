@@ -140,6 +140,9 @@ Route::middleware(['auth'])->group(function () {
             ->middleware('can:delete users');
 
 
-        Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');
+        // Ver detalles de un usuario
+        Route::get('users/{user}/show', [Usercontroller::class, 'show'])
+            ->name('users.show')
+            ->middleware('can:list users');
     });
 });

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use RealRashid\SweetAlert\Facades\Alert;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -68,17 +69,16 @@ class UserController extends Controller
 
             Alert::success('¡Usuario Creado!', 'El usuario ha sido registrado exitosamente en el sistema.');
             return redirect()->route('users.index');
-
         } catch (\Exception $e) {
-            // LOG DE ERROR
+            // LOG DE ERROR CON LÍMITE DE CARACTERES
             \App\Models\Log::create([
                 'user_id' => auth()->id(),
-                'accion'  => 'ERROR CARGA - Falló al crear usuario: ' . $e->getMessage(),
+                'accion'  => Str::limit('ERROR ACTUALIZACIÓN - Falló al modificar usuario ' . $user->name . ': ' . $e->getMessage(), 250),
                 'modulo'  => 'USUARIOS',
             ]);
 
-            Alert::error('Error', 'Ocurrió un error al crear el usuario.');
-            return redirect()->route('users.index');
+            Alert::error('Error', 'Ocurrió un error al actualizar los datos. Verifica que la información sea correcta.');
+            return back()->withInput();
         }
     }
 
@@ -99,11 +99,15 @@ class UserController extends Controller
         $rolesPermitidos = $this->getRolesPermitidos();
 
         $validatedData = $request->validate([
-            'name'     => ['required', 'string', 'max:255'],
-            'rfc'      => ['nullable', Rule::unique('users')->ignore($user->id)],
-            'email'    => ['required', 'email', Rule::unique('users')->ignore($user->id)],
-            'role'     => ['required', Rule::in($rolesPermitidos)],
-            'password' => ['nullable', 'min:8', 'confirmed'],
+            'name'  => ['required', 'string', 'max:255'],
+            // Agregamos 'max:13' para que no pase de ahí
+            'rfc'   => ['nullable', 'string', 'max:13', Rule::unique('users')->ignore($user->id)],
+            'email' => ['required', 'email', Rule::unique('users')->ignore($user->id)],
+            'role'  => ['required', Rule::in($rolesPermitidos)],
+        ], [
+            // Mensajes personalizados para que el usuario entienda
+            'rfc.max' => 'El RFC no puede tener más de 13 caracteres.',
+            'email.unique' => 'Este correo ya está registrado por otro usuario.',
         ]);
 
         try {
@@ -125,17 +129,16 @@ class UserController extends Controller
 
             Alert::success('¡Actualización Exitosa!', 'Los datos del usuario han sido modificados correctamente.');
             return redirect()->route('users.index');
-
         } catch (\Exception $e) {
-            // LOG DE ERROR
+            // Guardamos el error técnico en el log (recortado para que no explote)
             \App\Models\Log::create([
                 'user_id' => auth()->id(),
-                'accion'  => 'ERROR ACTUALIZACIÓN - Falló al modificar usuario ' . $user->name . ': ' . $e->getMessage(),
+                'accion'  => Str::limit('ERROR - ' . $e->getMessage(), 200),
                 'modulo'  => 'USUARIOS',
             ]);
 
-            Alert::error('Error', 'Ocurrió un error al actualizar los datos.');
-            return redirect()->route('users.index');
+            Alert::error('Revisa la información', 'Parece que algunos datos son demasiado largos o tienen un formato incorrecto (ej. el RFC).');
+            return back()->withInput();
         }
     }
 
@@ -153,9 +156,9 @@ class UserController extends Controller
 
         try {
             $nombreOriginal = $user->name; // Guardamos el nombre antes de borrar
-            
+
             $user->delete();
-            
+
             // LOG DE ÉXITO
             \App\Models\Log::create([
                 'user_id' => auth()->id(),
@@ -165,17 +168,21 @@ class UserController extends Controller
 
             Alert::success('¡Acceso Revocado!', 'El usuario ha sido eliminado correctamente del sistema.');
             return redirect()->route('users.index');
-            
         } catch (\Exception $e) {
-            // LOG DE ERROR
+            // LOG DE ERROR CON LÍMITE DE CARACTERES
             \App\Models\Log::create([
                 'user_id' => auth()->id(),
-                'accion'  => 'ERROR ELIMINACION - Falló al borrar usuario ' . $user->name . ': ' . $e->getMessage(),
+                'accion'  => Str::limit('ERROR ACTUALIZACIÓN - Falló al eliminar usuario ' . $user->name . ': ' . $e->getMessage(), 250),
                 'modulo'  => 'USUARIOS',
             ]);
 
-            Alert::error('Error', 'Error al eliminar el usuario: ' . $e->getMessage());
-            return redirect()->route('users.index');
+            Alert::error('Error', 'Ocurrió un error al actualizar los datos. Verifica que la información sea correcta.');
+            return back()->withInput();
         }
+    }
+
+    public function show(User $user)
+    {
+        return view('users.show', compact('user'));
     }
 }
