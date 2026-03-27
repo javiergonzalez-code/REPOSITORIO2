@@ -44,7 +44,6 @@
                         </div>
                     </div>
 
-                    {{-- SECCIÓN: DATOS DE CONTACTO --}}
                     <h6 class="text-uppercase text-muted fw-bold mb-4 mt-5 text-center" style="font-size: 0.75rem; letter-spacing: 1px;">
                         <i class="fas fa-address-book me-2"></i>Datos de Contacto
                     </h6>
