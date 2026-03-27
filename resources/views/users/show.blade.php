@@ -27,21 +27,11 @@
                         </span>
                     </div>
 
-                    {{-- SECCIÓN: INFORMACIÓN GENERAL --}}
                     <h6 class="text-uppercase text-muted fw-bold mb-4 text-center" style="font-size: 0.75rem; letter-spacing: 1px;">
                         <i class="fas fa-id-card me-2"></i>Información General
                     </h6>
 
                     <div class="row g-4 mb-4 justify-content-center">
-                        <div class="col-md-6">
-                            <label class="form-label-custom">ID / Código de Empleado</label>
-                            <div class="input-group-modern">
-                                <i class="fas fa-hashtag icon text-muted"></i>
-                                <input type="text" class="form-input fw-semibold text-secondary" 
-                                       value="{{ $user->id }}" readonly 
-                                       style="background-color: #f8fafc; cursor: default;">
-                            </div>
-                        </div>
 
                         <div class="col-md-6">
                             <label class="form-label-custom">RFC</label>

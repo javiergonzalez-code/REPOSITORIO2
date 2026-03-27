@@ -50,16 +50,7 @@
                                     @enderror
                                 </div>
 
-                                {{-- Agregamos el ID/Código para que esté igual que en create --}}
-                                <div class="col-md-6">
-                                    <label for="id" class="form-label-custom">ID / Código de Empleado</label>
-                                    <div class="input-group-modern">
-                                        <i class="fas fa-hashtag icon"></i>
-                                        <input type="text" class="form-input @error('id') is-invalid @enderror"
-                                            id="id" name="id" value="{{ old('id', $user->id) }}"
-                                            placeholder="Ej. EMP-001" readonly style="background-color: #f1f5f9;">
-                                    </div>
-                                </div>
+
                             </div>
 
                             <h6 class="text-uppercase text-muted fw-bold mb-4 mt-5 text-center"

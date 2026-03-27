@@ -4,10 +4,8 @@ use App\Models\User;
 
 usesPagination(theme: 'bootstrap');
 
-// Restauramos el userFilter para el nombre y dejamos search para el correo
 state(['search' => '', 'userFilter' => '', 'roleFilter' => '']);
 
-// Lógica inteligente para la lista desplegable de usuarios
 $sugerencias_usuarios = computed(function () {
     if (strlen($this->userFilter) < 1) {
         return collect();
@@ -23,7 +21,6 @@ $sugerencias_usuarios = computed(function () {
     return $sugerencias;
 });
 
-// Computar la consulta principal reactiva
 $usuarios = computed(function () {
     $query = User::query();
 
@@ -62,7 +59,6 @@ $usuarios = computed(function () {
         <div class="card-body p-4">
             <div class="row g-3 align-items-end">
 
-                {{-- 1. Filtro Nombre (Con autocompletado inteligente) --}}
                 <div class="col-lg-3 col-md-6">
                     <label class="form-label-custom text-uppercase x-small fw-bold">Nombre de Usuario</label>
                     <div style="position: relative !important;">
@@ -71,7 +67,6 @@ $usuarios = computed(function () {
                         <input type="text" wire:model.live.debounce.300ms="userFilter" class="form-control ps-5"
                             placeholder="Escribir nombre..." autocomplete="off">
 
-                        {{-- LISTA DESPLEGABLE FLOTANTE CON FONDO BLANCO FORZADO --}}
                         @if (count($this->sugerencias_usuarios) > 0)
                             <div class="w-100 border rounded-3 shadow-lg"
                                 style="position: absolute !important; top: 100% !important; left: 0 !important; margin-top: 5px !important; z-index: 10000 !important; overflow: hidden; display: block !important; background-color: #ffffff !important;">

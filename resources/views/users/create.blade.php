@@ -34,18 +34,7 @@
                                     @enderror
                                 </div>
 
-                                <div class="col-md-6">
-                                    <label for="id" class="form-label-custom">ID / Código de Empleado</label>
-                                    <div class="input-group-modern">
-                                        <i class="fas fa-hashtag icon"></i>
-                                        <input type="text" class="form-input @error('id') is-invalid @enderror"
-                                            id="id" name="id" value="{{ old('id') }}"
-                                            placeholder="Ej. EMP-001" required>
-                                    </div>
-                                    @error('id')
-                                        <div class="error-msg text-danger small mt-1">{{ $message }}</div>
-                                    @enderror
-                                </div>
+
 
                                 <div class="col-md-6">
                                     <label for="rfc" class="form-label-custom">RFC</label>

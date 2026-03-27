@@ -11,7 +11,6 @@ class ErroresController extends Controller
     {
         $user = auth()->user();
         
-        // Iniciamos la consulta agrupando las condiciones OR
         $query = Log::with('user')
             ->where(function ($q) {
                 $q->where('accion', 'LIKE', '%Intento fallido%')
@@ -21,7 +20,6 @@ class ErroresController extends Controller
         $esProveedor = $user->hasRole('proveedor') || $user->role === 'proveedor';
 
         if ($esProveedor) {
-            // El proveedor solo ve sus propios errores
             $query->where('user_id', $user->id);
         }
 
