@@ -7,7 +7,7 @@ use App\Http\Controllers\ErroresController;
 use App\Http\Controllers\InputController;
 use App\Http\Controllers\OcController;
 use App\Http\Controllers\LogsController;
-use App\Http\Controllers\Usercontroller;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MantenimientoController;
 
