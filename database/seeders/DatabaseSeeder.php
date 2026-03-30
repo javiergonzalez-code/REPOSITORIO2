@@ -21,7 +21,6 @@ class DatabaseSeeder extends Seeder
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
         // 1. Crear Permisos 
-        // Agregamos 'manage roles' y 'manage permissions' para que coincida con tu controlador
         $permissions = [
             'manage roles',
             'manage permissions',
@@ -39,28 +38,28 @@ class DatabaseSeeder extends Seeder
             Permission::firstOrCreate(['name' => $permission]);
         }
 
-        // 2. Crear Roles
+        // 2. Crear Roles (¡AQUÍ AGREGAMOS EL SUPERADMIN!)
+        $roleSuperAdmin = Role::firstOrCreate(['name' => 'superadmin']);
         $roleAdmin = Role::firstOrCreate(['name' => 'admin']);
         $roleProveedor = Role::firstOrCreate(['name' => 'proveedor']);
 
         // 3. Asignar permisos
-        // El Admin tiene todo
+        // El Admin tiene todo (opcionalmente el superadmin no necesita asignar permisos si usamos un Gate global, pero lo dejamos así para el admin normal)
         $roleAdmin->syncPermissions(Permission::all());
 
         // El proveedor solo lo suyo
         $roleProveedor->syncPermissions(['list archivos', 'upload archivos']);
 
-        // 4. Tu usuario personal (Super Admin)
-        // Usamos updateOrCreate para que si ya existe, solo le asigne el rol correctamente
+        // 4. Tu usuario personal (Super Admin) - ¡AQUÍ CAMBIAMOS A SUPERADMIN!
         $myUser = User::updateOrCreate(
             ['email' => 'admin@ragon.com'],
             [
                 'name'     => 'Administrador Principal',
                 'password' => 'holamundo1234',
-                'role'     => 'admin', 
+                'role'     => 'superadmin', // <-- CAMBIO AQUÍ
             ]
         );
-        $myUser->assignRole($roleAdmin);
+        $myUser->assignRole($roleSuperAdmin); // <-- CAMBIO AQUÍ
 
         // 5. Crear 5 ADMINISTRADORES extra
         User::factory(5)->create([
