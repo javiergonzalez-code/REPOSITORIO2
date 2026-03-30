@@ -23,9 +23,8 @@ class CheckIfAdmin
 
         $user = backpack_auth()->user();
 
-        // ACTUALIZACIÓN: Permitimos el paso si el rol es 'admin' O 'superadmin'
-        // También mantenemos la validación por correo como respaldo
-        if ($user->role === 'admin' || $user->role === 'superadmin' || $user->email === 'admin@ragon.com') {
+        // Permitimos el paso validando por Spatie o por la columna 'role'
+        if ($user->hasRole('admin') || $user->hasRole('superadmin') || in_array($user->role, ['admin', 'superadmin'])) {
             return $next($request);
         }
 

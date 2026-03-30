@@ -70,7 +70,6 @@ class User extends Authenticatable
             });
     }
 
-
     public function archivos()
     {
         return $this->hasMany(Archivo::class);

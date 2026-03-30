@@ -15,7 +15,7 @@ class OcController extends Controller
         return view('oc.index');
     }
 
-public function download($id)
+    public function download($id)
     {
         $oc = Archivo::findOrFail($id);
         $user = auth()->user();
@@ -111,23 +111,17 @@ public function download($id)
 
         try {
             $nombreOriginal = $oc->nombre_original;
-            $path = storage_path('app/private/uploads/' . $oc->nombre_sistema);
-
-            if (file_exists($path)) {
-                unlink($path);
-            }
 
             $oc->delete();
 
             \App\Models\Log::create([
                 'user_id' => auth()->id(),
-                'accion'  => 'Eliminó con éxito la OC: ' . $nombreOriginal,
+                'accion'  => 'Envió a la papelera la OC: ' . $nombreOriginal, // Opcional: ajustar el texto del log
                 'modulo'  => 'OC',
             ]);
 
             Alert::success('¡Eliminado!', 'La orden de compra ha sido eliminada correctamente.');
             return redirect()->route('oc.index');
-            
         } catch (\Exception $e) {
             \App\Models\Log::create([
                 'user_id' => auth()->id(),

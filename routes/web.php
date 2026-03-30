@@ -41,8 +41,8 @@ Route::middleware(['auth'])->group(function () {
     // RUTA PARA EL SWITCH DE MANTENIMIENTO (AJAX)
     // ==========================================
     Route::post('/mantenimiento/toggle/{modulo}', function ($modulo) {
-        // Validar que solo un administrador pueda hacer esto (Ajusta los roles según tu BD)
-        if (!auth()->user()->hasRole('Super Admin') && !auth()->user()->hasRole('Administrador') && auth()->user()->email !== 'admin@ragon.com') {
+        // Validación basada 100% en roles (Spatie o columna)
+        if (!auth()->user()->hasRole('superadmin') && !auth()->user()->hasRole('admin') && !in_array(auth()->user()->role, ['superadmin', 'admin'])) {
             return response()->json(['success' => false, 'message' => 'No autorizado'], 403);
         }
 

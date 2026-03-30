@@ -15,7 +15,8 @@ class UserController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->role === 'superadmin' || $user->email === 'admin@ragon.com') {
+        // Verificamos el rol mediante Spatie o la columna 'role'
+        if ($user->hasRole('superadmin') || $user->role === 'superadmin') {
             return ['superadmin', 'admin', 'proveedor'];
         }
 

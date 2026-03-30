@@ -11,7 +11,7 @@ class PapeleraController extends Controller
     public function index(Request $request)
     {
         // Filtro: 'todos', 'usuarios', 'archivos'
-        $filtro = $request->get('tipo', 'todos'); 
+        $filtro = $request->get('tipo', 'todos');
 
         $usuarios = collect();
         $archivos = collect();
@@ -23,7 +23,7 @@ class PapeleraController extends Controller
 
         if ($filtro === 'todos' || $filtro === 'archivos') {
             // Traemos también el usuario que lo subió
-            $archivos = Archivo::onlyTrashed()->with('user')->get(); 
+            $archivos = Archivo::onlyTrashed()->with('user')->get();
         }
 
         return view('papelera.index', compact('usuarios', 'archivos', 'filtro'));
@@ -48,8 +48,18 @@ class PapeleraController extends Controller
             User::onlyTrashed()->findOrFail($id)->forceDelete();
             $mensaje = 'Usuario eliminado de forma permanente.';
         } elseif ($tipo === 'archivo') {
-            Archivo::onlyTrashed()->findOrFail($id)->forceDelete();
-            $mensaje = 'Archivo eliminado de forma permanente.';
+            $archivo = Archivo::onlyTrashed()->findOrFail($id);
+
+            // 1. Borramos el archivo físico del servidor
+    if (auth()->user() && auth()->user()->email === 'admin@ragon.com') {            $path = storage_path('app/private/uploads/' . $archivo->nombre_sistema);
+            if (file_exists($path)) {
+                unlink($path);
+            }
+
+            // 2. Lo borramos permanentemente de la base de datos
+            $archivo->forceDelete();
+
+            $mensaje = 'Archivo y registro eliminados de forma permanente.';
         }
 
         return back()->with('success', $mensaje);
