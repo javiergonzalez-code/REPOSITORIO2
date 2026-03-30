@@ -45,20 +45,6 @@ class Archivo extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function setRutaAttribute($value)
-    {
-        $attribute_name = "ruta";
-        $disk = "private";
-        $destination_path = "uploads/archivos";
-
-        if (is_string($value) && $value != null) {
-            $this->attributes[$attribute_name] = $value;
-            return;
-        }
-
-        $this->uploadFileToDisk($value, $attribute_name, $disk, $destination_path);
-    }
-
     public function getRutaUrlAttribute()
     {
         return asset('storage/' . $this->ruta);

@@ -35,7 +35,7 @@ class InputController extends Controller
 
         if ($validator->fails()) {
             $errores = implode(' | ', $validator->errors()->all());
-            
+
             Log::create([
                 'user_id' => auth()->id(),
                 'accion'  => 'Intento fallido (Validación/Seguridad): ' . $errores,
@@ -48,23 +48,23 @@ class InputController extends Controller
 
         try {
             $file = $request->file('archivo');
-            
+
             $originalName = preg_replace('/[^a-zA-Z0-9-_\.]/', '', $file->getClientOriginalName());
             if (strlen($originalName) > 200) {
-                $originalName = substr($originalName, -200); 
+                $originalName = substr($originalName, -200);
             }
-            
-            $extension = $file->getClientOriginalExtension(); 
-            
+
+            $extension = $file->getClientOriginalExtension();
+
             $allowedExtensions = ['csv', 'xlsx', 'xls', 'xml'];
             if (!in_array(strtolower($extension), $allowedExtensions)) {
                 throw new \Exception("Extensión de archivo maliciosa detectada.");
             }
 
-            $systemName = time() . '_' . uniqid() . '_' . $originalName; 
+            $systemName = time() . '_' . uniqid() . '_' . $originalName;
 
             $path = $file->storeAs('uploads', $systemName, 'local');
-            
+
             if (!$path) {
                 throw new \Exception("El servidor denegó el permiso de escritura en el disco duro.");
             }
@@ -73,9 +73,9 @@ class InputController extends Controller
                 'user_id'         => auth()->id(),
                 'nombre_original' => $originalName,
                 'nombre_sistema'  => $systemName,
-                'tipo_archivo'    => strtolower($extension), 
+                'tipo_archivo'    => strtolower($extension),
                 'ruta'            => 'uploads/' . $systemName,
-                'modulo'          => 'OC',        
+                'modulo'          => 'OC',
             ]);
 
             Log::create([
@@ -86,32 +86,43 @@ class InputController extends Controller
 
             Alert::success('¡Subida Exitosa!', 'Archivo subido y verificado correctamente.');
             return back();
-
         } catch (QueryException $e) {
             Log::create([
                 'user_id' => auth()->id(),
                 'accion'  => 'Error interno (Base de Datos): ' . $e->getMessage(),
                 'modulo'  => 'INPUTS'
             ]);
-            
+
             Alert::error('Error Crítico', 'No se pudo registrar en la base de datos.');
             return back();
-
         } catch (\Exception $e) {
             Log::create([
                 'user_id' => auth()->id(),
                 'accion'  => 'Error interno (Seguridad/Servidor): ' . $e->getMessage(),
                 'modulo'  => 'INPUTS',
             ]);
-            
+
             Alert::error('Error del Servidor', 'Error al procesar el archivo: ' . $e->getMessage());
             return back();
         }
     }
 
-public function download($id)
+    public function download($id)
     {
         $archivo = Archivo::findOrFail($id);
+
+        // Agregamos la validación de seguridad
+        $user = auth()->user();
+        $esProveedor = $user->hasRole('proveedor') || $user->role === 'proveedor';
+
+        if ($esProveedor && $archivo->user_id !== $user->id) {
+            \App\Models\Log::create([
+                'user_id' => auth()->id(),
+                'accion'  => 'Intento de descarga denegado en Input (sin permisos): ' . $archivo->nombre_original,
+                'modulo'  => 'INPUTS',
+            ]);
+            abort(403, 'No tienes permiso para descargar este archivo de otro usuario.');
+        }
 
         if (!Storage::disk('local')->exists($archivo->ruta)) {
             abort(404, 'El archivo físico no se encuentra en el servidor.');
@@ -120,7 +131,7 @@ public function download($id)
         \App\Models\Log::create([
             'user_id' => auth()->id(),
             'accion'  => 'Descargó con éxito el archivo: ' . $archivo->nombre_original,
-            'modulo'  => 'OC',
+            'modulo'  => 'INPUTS',
         ]);
 
         return Storage::disk('local')->download($archivo->ruta, $archivo->nombre_original);

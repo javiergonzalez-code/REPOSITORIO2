@@ -46,7 +46,7 @@ Route::middleware(['auth'])->group(function () {
     // ==========================================
     // MÓDULO DE PAPELERA DE RECICLAJE
     // ==========================================
-    Route::middleware(['auth'])->group(function () {
+        Route::middleware(['auth', 'can:list users'])->group(function () {
         Route::get('/papelera', [App\Http\Controllers\PapeleraController::class, 'index'])->name('papelera.index');
         Route::post('/papelera/restaurar/{tipo}/{id}', [App\Http\Controllers\PapeleraController::class, 'restaurar'])->name('papelera.restaurar');
         Route::delete('/papelera/eliminar/{tipo}/{id}', [App\Http\Controllers\PapeleraController::class, 'eliminarPermanente'])->name('papelera.eliminar');
@@ -84,36 +84,36 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['mantenimiento:users'])->group(function () {
 
         // Ver lista de usuarios
-        Route::get('users', [Usercontroller::class, 'index'])
+        Route::get('users', [UserController::class, 'index'])
             ->name('users.index')
             ->middleware('can:list users');
 
         // Crear usuarios
-        Route::get('users/create', [Usercontroller::class, 'create'])
+        Route::get('users/create', [UserController::class, 'create'])
             ->name('users.create')
             ->middleware('can:create users');
 
-        Route::post('users', [Usercontroller::class, 'store'])
+        Route::post('users', [UserController::class, 'store'])
             ->name('users.store')
             ->middleware('can:create users');
 
         // Editar usuarios
-        Route::get('users/{user}/edit', [Usercontroller::class, 'edit'])
+        Route::get('users/{user}/edit', [UserController::class, 'edit'])
             ->name('users.edit')
             ->middleware('can:edit users');
 
-        Route::put('users/{user}', [Usercontroller::class, 'update'])
+        Route::put('users/{user}', [UserController::class, 'update'])
             ->name('users.update')
             ->middleware('can:edit users');
 
         // Eliminar usuarios
-        Route::delete('users/{user}', [Usercontroller::class, 'destroy'])
+        Route::delete('users/{user}', [UserController::class, 'destroy'])
             ->name('users.destroy')
             ->middleware('can:delete users');
 
 
         // Ver detalles de un usuario
-        Route::get('users/{user}/show', [Usercontroller::class, 'show'])
+        Route::get('users/{user}/show', [UserController::class, 'show'])
             ->name('users.show')
             ->middleware('can:list users');
     });

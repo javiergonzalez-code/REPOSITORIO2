@@ -34,7 +34,6 @@ class MantenimientoModulo
             alert()->warning('Mantenimiento', 'El módulo ' . strtoupper($modulo) . ' está en mantenimiento.');
 
             // 3. Redirigimos a la vista home en lugar de mostrar el error 503
-            // Puedes cambiar redirect('/home') por redirect()->route('home') si tienes la ruta nombrada
             return redirect('/home');
         }
 
