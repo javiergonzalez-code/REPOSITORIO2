@@ -42,29 +42,29 @@ class PapeleraController extends Controller
         return back()->with('success', $mensaje);
     }
 
-public function eliminarPermanente($tipo, $id)
-{
-    $mensaje = 'No tienes permisos para realizar esta acción o la acción no es válida.';
+    public function eliminarPermanente($tipo, $id)
+    {
+        $mensaje = 'No tienes permisos para realizar esta acción o la acción no es válida.';
 
-    if ($tipo === 'usuario') {
-        User::onlyTrashed()->findOrFail($id)->forceDelete();
-        $mensaje = 'Usuario eliminado de forma permanente.';
-    } elseif ($tipo === 'archivo') {
-        $archivo = Archivo::onlyTrashed()->findOrFail($id);
+        if ($tipo === 'usuario') {
+            User::onlyTrashed()->findOrFail($id)->forceDelete();
+            $mensaje = 'Usuario eliminado de forma permanente.';
+        } elseif ($tipo === 'archivo') {
+            $archivo = Archivo::onlyTrashed()->findOrFail($id);
 
-        // Validamos por rol usando Spatie en lugar de quemar el correo
-        if (auth()->user() && auth()->user()->hasRole('superadmin')) { 
-            $path = storage_path('app/private/uploads/' . $archivo->nombre_sistema);
-            if (file_exists($path)) {
-                unlink($path);
+            // Validamos por rol usando Spatie en lugar de quemar el correo
+            if (auth()->user() && auth()->user()->hasRole('superadmin')) {
+                $path = storage_path('app/' . $oc->ruta);
+                if (file_exists($path)) {
+                    unlink($path);
+                }
+                $archivo->forceDelete();
+                $mensaje = 'Archivo y registro eliminados de forma permanente.';
+            } else {
+                return back()->with('error', 'No tienes permisos para borrar archivos del servidor.');
             }
-            $archivo->forceDelete();
-            $mensaje = 'Archivo y registro eliminados de forma permanente.';
-        } else {
-            return back()->with('error', 'No tienes permisos para borrar archivos del servidor.');
         }
-    }
 
-    return back()->with('success', $mensaje);
-}
+        return back()->with('success', $mensaje);
+    }
 }

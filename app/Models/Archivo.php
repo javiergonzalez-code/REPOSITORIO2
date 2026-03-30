@@ -26,12 +26,11 @@ class Archivo extends Model
     public function getActivitylogOptions(): \Spatie\Activitylog\LogOptions
     {
         return LogOptions::defaults()
-            // 1. AÑADIMOS 'deleted_at' para que detecte la eliminación lógica
-            ->logOnly(['name', 'email', 'codigo', 'rfc', 'telefono', 'deleted_at'])
+            // AÑADIMOS los campos correctos de la tabla archivos
+            ->logOnly(['nombre_original', 'nombre_sistema', 'tipo_archivo', 'modulo', 'ruta', 'deleted_at'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
-            ->useLogName('user')
-            // 2. Traducimos el evento para que se guarde en español
+            ->useLogName('archivo') // Cambié 'user' por 'archivo' para que no se mezcle
             ->setDescriptionForEvent(fn(string $eventName) => match ($eventName) {
                 'created' => 'Creación',
                 'updated' => 'Actualización',

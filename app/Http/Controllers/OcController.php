@@ -32,8 +32,7 @@ class OcController extends Controller
             abort(403, 'No tienes permiso para descargar este archivo.');
         }
 
-        $path = storage_path('app/private/uploads/' . $oc->nombre_sistema);
-
+        $path = storage_path('app/' . $oc->ruta);
         if (!file_exists($path)) {
             // LOG: Archivo no encontrado
             \App\Models\Log::create([
@@ -67,8 +66,7 @@ class OcController extends Controller
             abort(403, 'No tienes permiso para previsualizar este archivo.');
         }
 
-        $path = storage_path('app/private/uploads/' . $oc->nombre_sistema);
-
+        $path = storage_path('app/' . $oc->ruta);
         if (!file_exists($path)) {
             Alert::error('Extraviado', 'El archivo físico no existe en el servidor.');
             return back();

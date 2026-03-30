@@ -19,11 +19,12 @@ class MantenimientoModulo
         $setting = \DB::table('modulo_settings')->where('nombre_modulo', $modulo)->first();
 
         if ($setting && $setting->en_mantenimiento) {
-            
+
             // 1. Validar primero que haya un usuario en sesión para evitar errores si auth()->user() es null
             if (auth()->check()) {
                 // Usamos hasAnyRole de Spatie para validar múltiples opciones a la vez.
-                if (auth()->user()->hasAnyRole(['Super Admin', 'Administrador', 'super-admin', 'admin'])) {
+                // Usamos los roles exactos que tienes en tu base de datos
+                if (auth()->user()->hasAnyRole(['superadmin', 'admin']) || in_array(auth()->user()->role, ['superadmin', 'admin'])) {
                     return $next($request); // Permite pasar a los administradores
                 }
             }
@@ -34,7 +35,7 @@ class MantenimientoModulo
 
             // 3. Redirigimos a la vista home en lugar de mostrar el error 503
             // Puedes cambiar redirect('/home') por redirect()->route('home') si tienes la ruta nombrada
-            return redirect('/home'); 
+            return redirect('/home');
         }
 
         return $next($request);
