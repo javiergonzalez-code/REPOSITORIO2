@@ -9,6 +9,7 @@ use Illuminate\Validation\Rule;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log; 
 
 class UserController extends Controller
 {
@@ -70,12 +71,16 @@ class UserController extends Controller
             Alert::success('¡Usuario Creado!', 'El usuario ha sido registrado exitosamente en el sistema.');
             return redirect()->route('users.index');
         } catch (\Exception $e) {
-            // Corregimos el bug donde se llamaba a $user->name aunque hubiera fallado la creación
-            \App\Models\Log::create([
-                'user_id' => auth()->id(),
-                'accion'  => Str::limit('ERROR DE REGISTRO - Falló al crear usuario: ' . $e->getMessage(), 250),
-                'modulo'  => 'USUARIOS',
-            ]);
+            // CORRECCIÓN APLICADA AQUÍ
+            try {
+                \App\Models\Log::create([
+                    'user_id' => auth()->id(),
+                    'accion'  => Str::limit('ERROR DE REGISTRO - Falló al crear usuario: ' . $e->getMessage(), 250),
+                    'modulo'  => 'USUARIOS',
+                ]);
+            } catch (\Exception $logError) {
+                Log::error('Fallo al guardar log de creación de usuario: ' . $logError->getMessage());
+            }
 
             Alert::error('Error', 'Ocurrió un error al registrar los datos. Verifica que la información sea correcta.');
             return back()->withInput();
@@ -109,7 +114,6 @@ class UserController extends Controller
         ]);
 
         try {
-            // APLICAMOS LA TRANSACCIÓN TAMBIÉN EN LA ACTUALIZACIÓN
             DB::transaction(function () use ($request, $user, $validatedData) {
                 $user->fill($request->except('password'));
 
@@ -120,7 +124,6 @@ class UserController extends Controller
                 $user->save();
                 $user->syncRoles([$validatedData['role']]);
 
-                // LOG DE ÉXITO
                 \App\Models\Log::create([
                     'user_id' => auth()->id(),
                     'accion'  => 'ACTUALIZACIÓN - Modificó los datos del usuario: ' . $user->name,
@@ -131,11 +134,16 @@ class UserController extends Controller
             Alert::success('¡Actualización Exitosa!', 'Los datos del usuario han sido modificados correctamente.');
             return redirect()->route('users.index');
         } catch (\Exception $e) {
-            \App\Models\Log::create([
-                'user_id' => auth()->id(),
-                'accion'  => Str::limit('ERROR ACTUALIZACIÓN - ' . $e->getMessage(), 200),
-                'modulo'  => 'USUARIOS',
-            ]);
+            // CORRECCIÓN APLICADA AQUÍ
+            try {
+                \App\Models\Log::create([
+                    'user_id' => auth()->id(),
+                    'accion'  => Str::limit('ERROR ACTUALIZACIÓN - ' . $e->getMessage(), 200),
+                    'modulo'  => 'USUARIOS',
+                ]);
+            } catch (\Exception $logError) {
+                Log::error('Fallo al guardar log de actualización de usuario: ' . $logError->getMessage());
+            }
 
             Alert::error('Revisa la información', 'Parece que algunos datos son demasiado largos o tienen un formato incorrecto (ej. el RFC).');
             return back()->withInput();
@@ -168,11 +176,16 @@ class UserController extends Controller
             Alert::success('¡Acceso Revocado!', 'El usuario ha sido eliminado correctamente del sistema.');
             return redirect()->route('users.index');
         } catch (\Exception $e) {
-            \App\Models\Log::create([
-                'user_id' => auth()->id(),
-                'accion'  => Str::limit('ERROR ELIMINACIÓN - Falló al eliminar usuario ' . $user->name . ': ' . $e->getMessage(), 250),
-                'modulo'  => 'USUARIOS',
-            ]);
+            // CORRECCIÓN APLICADA AQUÍ
+            try {
+                \App\Models\Log::create([
+                    'user_id' => auth()->id(),
+                    'accion'  => Str::limit('ERROR ELIMINACIÓN - Falló al eliminar usuario ' . $user->name . ': ' . $e->getMessage(), 250),
+                    'modulo'  => 'USUARIOS',
+                ]);
+            } catch (\Exception $logError) {
+                Log::error('Fallo al guardar log de eliminación de usuario: ' . $logError->getMessage());
+            }
 
             Alert::error('Error', 'Ocurrió un error al procesar la solicitud.');
             return back()->withInput();
