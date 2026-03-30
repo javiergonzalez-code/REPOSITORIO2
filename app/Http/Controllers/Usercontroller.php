@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
@@ -15,7 +16,6 @@ class UserController extends Controller
     {
         $user = auth()->user();
 
-        // Verificamos el rol mediante Spatie o la columna 'role'
         if ($user->hasRole('superadmin') || $user->role === 'superadmin') {
             return ['superadmin', 'admin', 'proveedor'];
         }
@@ -48,33 +48,36 @@ class UserController extends Controller
         ]);
 
         try {
-            $user = User::create([
-                'name'     => $validatedData['name'],
-                'rfc'      => $validatedData['rfc'],
-                'email'    => $validatedData['email'],
-                'telefono' => $validatedData['telefono'],
-                'password' => Hash::make($validatedData['password']),
-                'role'     => $validatedData['role'],
-            ]);
+            DB::transaction(function () use ($validatedData) {
+                $user = User::create([
+                    'name'     => $validatedData['name'],
+                    'rfc'      => $validatedData['rfc'],
+                    'email'    => $validatedData['email'],
+                    'telefono' => $validatedData['telefono'],
+                    'password' => Hash::make($validatedData['password']),
+                    'role'     => $validatedData['role'],
+                ]);
 
-            $user->assignRole($validatedData['role']);
+                $user->assignRole($validatedData['role']);
 
-            \App\Models\Log::create([
-                'user_id' => auth()->id(),
-                'accion'  => 'CARGA - Registró con éxito al usuario: ' . $user->name,
-                'modulo'  => 'USUARIOS',
-            ]);
+                \App\Models\Log::create([
+                    'user_id' => auth()->id(),
+                    'accion'  => 'CARGA - Registró con éxito al usuario: ' . $user->name,
+                    'modulo'  => 'USUARIOS',
+                ]);
+            });
 
             Alert::success('¡Usuario Creado!', 'El usuario ha sido registrado exitosamente en el sistema.');
             return redirect()->route('users.index');
         } catch (\Exception $e) {
+            // Corregimos el bug donde se llamaba a $user->name aunque hubiera fallado la creación
             \App\Models\Log::create([
                 'user_id' => auth()->id(),
-                'accion'  => Str::limit('ERROR ACTUALIZACIÓN - Falló al modificar usuario ' . $user->name . ': ' . $e->getMessage(), 250),
+                'accion'  => Str::limit('ERROR DE REGISTRO - Falló al crear usuario: ' . $e->getMessage(), 250),
                 'modulo'  => 'USUARIOS',
             ]);
 
-            Alert::error('Error', 'Ocurrió un error al actualizar los datos. Verifica que la información sea correcta.');
+            Alert::error('Error', 'Ocurrió un error al registrar los datos. Verifica que la información sea correcta.');
             return back()->withInput();
         }
     }
@@ -106,28 +109,31 @@ class UserController extends Controller
         ]);
 
         try {
-            $user->fill($request->except('password'));
+            // APLICAMOS LA TRANSACCIÓN TAMBIÉN EN LA ACTUALIZACIÓN
+            DB::transaction(function () use ($request, $user, $validatedData) {
+                $user->fill($request->except('password'));
 
-            if ($request->filled('password')) {
-                $user->password = Hash::make($request->password);
-            }
+                if ($request->filled('password')) {
+                    $user->password = Hash::make($request->password);
+                }
 
-            $user->save();
-            $user->syncRoles([$validatedData['role']]);
+                $user->save();
+                $user->syncRoles([$validatedData['role']]);
 
-            // LOG DE ÉXITO
-            \App\Models\Log::create([
-                'user_id' => auth()->id(),
-                'accion'  => 'ACTUALIZACIÓN - Modificó los datos del usuario: ' . $user->name,
-                'modulo'  => 'USUARIOS',
-            ]);
+                // LOG DE ÉXITO
+                \App\Models\Log::create([
+                    'user_id' => auth()->id(),
+                    'accion'  => 'ACTUALIZACIÓN - Modificó los datos del usuario: ' . $user->name,
+                    'modulo'  => 'USUARIOS',
+                ]);
+            });
 
             Alert::success('¡Actualización Exitosa!', 'Los datos del usuario han sido modificados correctamente.');
             return redirect()->route('users.index');
         } catch (\Exception $e) {
             \App\Models\Log::create([
                 'user_id' => auth()->id(),
-                'accion'  => Str::limit('ERROR - ' . $e->getMessage(), 200),
+                'accion'  => Str::limit('ERROR ACTUALIZACIÓN - ' . $e->getMessage(), 200),
                 'modulo'  => 'USUARIOS',
             ]);
 
@@ -164,11 +170,11 @@ class UserController extends Controller
         } catch (\Exception $e) {
             \App\Models\Log::create([
                 'user_id' => auth()->id(),
-                'accion'  => Str::limit('ERROR ACTUALIZACIÓN - Falló al eliminar usuario ' . $user->name . ': ' . $e->getMessage(), 250),
+                'accion'  => Str::limit('ERROR ELIMINACIÓN - Falló al eliminar usuario ' . $user->name . ': ' . $e->getMessage(), 250),
                 'modulo'  => 'USUARIOS',
             ]);
 
-            Alert::error('Error', 'Ocurrió un error al actualizar los datos. Verifica que la información sea correcta.');
+            Alert::error('Error', 'Ocurrió un error al procesar la solicitud.');
             return back()->withInput();
         }
     }
