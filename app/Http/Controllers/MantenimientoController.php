@@ -9,8 +9,8 @@ class MantenimientoController extends Controller
 {
     public function toggle($modulo)
     {
-        // Validación basada 100% en roles (Spatie o columna)
-        if (!auth()->user()->hasRole('superadmin') && !auth()->user()->hasRole('admin') && !in_array(auth()->user()->role, ['superadmin', 'admin'])) {
+        // Validación limpia y segura
+        if (!in_array(auth()->user()->role, ['superadmin', 'admin'])) {
             return response()->json(['success' => false, 'message' => 'No autorizado'], 403);
         }
 

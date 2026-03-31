@@ -23,7 +23,7 @@ class InputController extends Controller
             'archivo' => [
                 'required',
                 'file',
-                'mimes:csv,xlsx,xls,xml',
+                'mimes:csv,txt,xlsx,xls,xml',
                 'extensions:csv,xlsx,xls,xml',
                 'max:5120',
             ]

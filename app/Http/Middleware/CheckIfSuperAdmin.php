@@ -3,18 +3,18 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Support\Facades\Auth;
 
 class CheckIfSuperAdmin
 {
     public function handle($request, Closure $next)
     {
-        if (backpack_auth()->guest()) {
-            return redirect()->guest(backpack_url('login'));
+        if (!Auth::check()) {
+            return redirect()->route('login');
         }
 
-        $user = backpack_auth()->user();
+        $user = Auth::user();
 
-        // Validación exclusiva para el Súper Usuario
         if ($user->hasRole('superadmin') || $user->role === 'superadmin') {
             return $next($request);
         }
