@@ -9,16 +9,13 @@ class MantenimientoController extends Controller
 {
     public function toggle($modulo)
     {
-        // Validación limpia y segura
         if (!in_array(auth()->user()->role, ['superadmin', 'admin'])) {
             return response()->json(['success' => false, 'message' => 'No autorizado'], 403);
         }
 
-        // Buscamos si ya existe el registro en la BD
         $setting = DB::table('modulo_settings')->where('nombre_modulo', $modulo)->first();
 
         if ($setting) {
-            // Invertimos el valor actual
             DB::table('modulo_settings')->where('nombre_modulo', $modulo)->update([
                 'en_mantenimiento' => !$setting->en_mantenimiento,
                 'updated_at' => now()

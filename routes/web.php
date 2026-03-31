@@ -46,7 +46,6 @@ Route::middleware(['auth'])->group(function () {
     // ==========================================
     // MÓDULO DE PAPELERA DE RECICLAJE
     // ==========================================
-    Route::middleware(['auth'])->group(function () {
         Route::get('/papelera', [App\Http\Controllers\PapeleraController::class, 'index'])->name('papelera.index');
         Route::post('/papelera/restaurar/{tipo}/{id}', [App\Http\Controllers\PapeleraController::class, 'restaurar'])->name('papelera.restaurar');
         Route::delete('/papelera/eliminar/{tipo}/{id}', [App\Http\Controllers\PapeleraController::class, 'eliminarPermanente'])->name('papelera.eliminar');

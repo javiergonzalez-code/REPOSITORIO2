@@ -11,16 +11,24 @@ class PapeleraController extends Controller
     public function index(Request $request)
     {
         $filtro = $request->get('tipo', 'todos');
+        $user = auth()->user();
+        $esProveedor = $user->hasRole('proveedor') || $user->role === 'proveedor';
 
         $usuarios = collect();
         $archivos = collect();
 
-        if ($filtro === 'todos' || $filtro === 'usuarios') {
-            $usuarios = User::onlyTrashed()->get();
-        }
-
-        if ($filtro === 'todos' || $filtro === 'archivos') {
-            $archivos = Archivo::onlyTrashed()->with('user')->get();
+        if ($esProveedor) {
+            // Proveedor SOLO ve sus propios archivos
+            $filtro = 'archivos';
+            $archivos = Archivo::onlyTrashed()->with('user')->where('user_id', $user->id)->get();
+        } else {
+            // Admins ven todo
+            if ($filtro === 'todos' || $filtro === 'usuarios') {
+                $usuarios = User::onlyTrashed()->get();
+            }
+            if ($filtro === 'todos' || $filtro === 'archivos') {
+                $archivos = Archivo::onlyTrashed()->with('user')->get();
+            }
         }
 
         return view('papelera.index', compact('usuarios', 'archivos', 'filtro'));
@@ -28,13 +36,20 @@ class PapeleraController extends Controller
 
     public function restaurar($tipo, $id)
     {
+        $user = auth()->user();
+        $esProveedor = $user->hasRole('proveedor') || $user->role === 'proveedor';
         $mensaje = 'Acción no válida o tipo desconocido.';
 
         if ($tipo === 'usuario') {
+            if ($esProveedor) abort(403, 'No tienes permiso para restaurar usuarios.');
             User::onlyTrashed()->findOrFail($id)->restore();
             $mensaje = 'Usuario restaurado correctamente.';
         } elseif ($tipo === 'archivo') {
-            Archivo::onlyTrashed()->findOrFail($id)->restore();
+            $archivo = Archivo::onlyTrashed()->findOrFail($id);
+            if ($esProveedor && $archivo->user_id !== $user->id) {
+                abort(403, 'No puedes restaurar archivos ajenos.');
+            }
+            $archivo->restore();
             $mensaje = 'Archivo restaurado correctamente.';
         }
 

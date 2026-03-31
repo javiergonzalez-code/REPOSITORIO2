@@ -81,7 +81,14 @@ class OcController extends Controller
                 $sheets = Excel::toArray(new class {}, $path);
                 $data = $sheets[0] ?? [];
             } elseif ($extension === 'xml') {
+                libxml_use_internal_errors(true);
                 $xmlContent = simplexml_load_file($path);
+
+                if ($xmlContent === false) {
+                    Alert::error('XML Corrupto', 'El archivo no tiene un formato XML válido.');
+                    return back();
+                }
+
                 $data = json_decode(json_encode($xmlContent), true);
             } elseif ($extension === 'json') {
                 $jsonContent = file_get_contents($path);
