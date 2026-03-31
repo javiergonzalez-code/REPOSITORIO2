@@ -30,7 +30,7 @@ Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::middleware(['auth'])->group(function () {
 
     // Dashboard o página de inicio (Apunta a HomeController ahora)
-    Route::get('/home', [AuthController::class, 'home'])->name('home');
+    Route::get('/home', [HomeController::class, 'home'])->name('home');
 
     // Cierre de sesión
     Route::post('/logout', [LogoutController::class, 'destroy'])->name('logout');

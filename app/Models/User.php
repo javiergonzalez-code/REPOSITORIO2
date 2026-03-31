@@ -33,12 +33,7 @@ class User extends Authenticatable
         ];
     }
 
-    /**
-     * LÓGICA MANUAL PARA SOFT DELETES
-     */
-/**
-     * LÓGICA MANUAL PARA SOFT DELETES
-     */
+
     protected static function booted()
     {
 
@@ -53,9 +48,7 @@ class User extends Authenticatable
             }
         });
     }
-    /**
-     * Configuración del Log automático (Solo para Cargas y Actualizaciones)
-     */
+
     public function getActivitylogOptions(): \Spatie\Activitylog\LogOptions
     {
         return LogOptions::defaults()

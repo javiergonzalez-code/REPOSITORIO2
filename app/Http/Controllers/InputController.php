@@ -75,7 +75,7 @@ class InputController extends Controller
                 'nombre_sistema'  => $systemName,
                 'tipo_archivo'    => strtolower($extension),
                 'ruta'            => 'uploads/' . $systemName,
-                'modulo'          => 'OC',
+                'modulo'          => 'INPUTS',
             ]);
 
             Log::create([
@@ -110,29 +110,31 @@ class InputController extends Controller
     public function download($id)
     {
         $archivo = Archivo::findOrFail($id);
-
         $user = auth()->user();
-        $esProveedor = $user->hasRole('proveedor') || $user->role === 'proveedor';
 
-        if ($esProveedor && $archivo->user_id !== $user->id) {
+        // Validación de seguridad: Proveedores solo descargan lo suyo
+        if (($user->hasRole('proveedor') || $user->role === 'proveedor') && $archivo->user_id !== $user->id) {
             \App\Models\Log::create([
-                'user_id' => auth()->id(),
-                'accion'  => 'Intento de descarga denegado en Input (sin permisos): ' . $archivo->nombre_original,
+                'user_id' => $user->id,
+                'accion'  => 'Intento de descarga de INPUT denegado (sin permisos): ' . $archivo->nombre_original,
                 'modulo'  => 'INPUTS',
             ]);
-            abort(403, 'No tienes permiso para descargar este archivo de otro usuario.');
+            abort(403, 'No tienes permiso para descargar este archivo.');
         }
 
-        if (!Storage::disk('local')->exists($archivo->ruta)) {
+        // Ruta real (la misma corrección que hicimos en OC)
+        $path = storage_path('app/' . $archivo->ruta);
+
+        if (!file_exists($path)) {
             abort(404, 'El archivo físico no se encuentra en el servidor.');
         }
 
         \App\Models\Log::create([
-            'user_id' => auth()->id(),
+            'user_id' => $user->id,
             'accion'  => 'Descargó con éxito el archivo: ' . $archivo->nombre_original,
-            'modulo'  => 'INPUTS',
+            'modulo'  => 'INPUTS', // Corregido de 'OC' a 'INPUTS'
         ]);
 
-        return Storage::disk('local')->download($archivo->ruta, $archivo->nombre_original);
+        return response()->download($path, $archivo->nombre_original);
     }
 }

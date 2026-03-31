@@ -52,10 +52,13 @@ class PapeleraController extends Controller
             $archivo = Archivo::onlyTrashed()->findOrFail($id);
 
             if (auth()->user() && auth()->user()->hasRole('superadmin')) {
-                $path = storage_path('app/' . $oc->ruta);
+                // CORRECCIÓN AQUÍ: Cambiamos $oc->ruta por $archivo->ruta
+                $path = storage_path('app/' . $archivo->ruta); 
+                
                 if (file_exists($path)) {
                     unlink($path);
                 }
+                
                 $archivo->forceDelete();
                 $mensaje = 'Archivo y registro eliminados de forma permanente.';
             } else {

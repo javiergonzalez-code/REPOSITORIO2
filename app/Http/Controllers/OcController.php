@@ -72,7 +72,7 @@ class OcController extends Controller
 
         try {
             if (in_array($extension, ['xlsx', 'xls', 'csv'])) {
-                $sheets = Excel::toArray(new \stdClass, $path);
+                $sheets = Excel::toArray(new class {}, $path);
                 $data = $sheets[0] ?? [];
             } elseif ($extension === 'xml') {
                 $xmlContent = simplexml_load_file($path);
