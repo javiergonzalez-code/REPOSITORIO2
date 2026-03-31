@@ -9,7 +9,7 @@ use Illuminate\Validation\Rule;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log; 
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
@@ -104,10 +104,11 @@ class UserController extends Controller
         $rolesPermitidos = $this->getRolesPermitidos();
 
         $validatedData = $request->validate([
-            'name'  => ['required', 'string', 'max:255'],
-            'rfc'   => ['nullable', 'string', 'max:13', Rule::unique('users')->ignore($user->id)],
-            'email' => ['required', 'email', Rule::unique('users')->ignore($user->id)],
-            'role'  => ['required', Rule::in($rolesPermitidos)],
+            'name'     => ['required', 'string', 'max:255'],
+            'rfc'      => ['nullable', 'string', 'max:13', Rule::unique('users')->ignore($user->id)],
+            'email'    => ['required', 'email', Rule::unique('users')->ignore($user->id)],
+            'role'     => ['required', Rule::in($rolesPermitidos)],
+            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
         ], [
             'rfc.max' => 'El RFC no puede tener más de 13 caracteres.',
             'email.unique' => 'Este correo ya está registrado por otro usuario.',

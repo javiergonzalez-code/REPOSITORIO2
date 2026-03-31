@@ -29,7 +29,7 @@ class AuthController extends Controller
 
         if ($validator->fails()) {
             Alert::error('Datos incompletos', 'Por favor verifica que tu correo y contraseña cumplan con el formato.');
-            return back()->withInput();
+            return back()->withErrors($validator)->withInput($request->except('password'));
         }
 
         $credentials = $validator->validated();
@@ -51,7 +51,7 @@ class AuthController extends Controller
         return back();
     }
 
-public function home()
+    public function home()
     {
         // 1. Consultamos la tabla de configuraciones
         $settings = \Illuminate\Support\Facades\DB::table('modulo_settings')->pluck('en_mantenimiento', 'nombre_modulo');
@@ -61,16 +61,16 @@ public function home()
         $mantenimientoInputs = $settings->get('inputs', false);
         $mantenimientoUsers = $settings->get('users', false);
         $mantenimientoLogs = $settings->get('logs', false);
-        
+
         // NUEVOS:
         $mantenimientoErrores = $settings->get('errores', false);
         $mantenimientoSuperusuario = $settings->get('superuser', false);
 
         // 3. Retornamos la vista enviando TODAS las variables
         return view('home', compact(
-            'mantenimientoOC', 
-            'mantenimientoInputs', 
-            'mantenimientoUsers', 
+            'mantenimientoOC',
+            'mantenimientoInputs',
+            'mantenimientoUsers',
             'mantenimientoLogs',
             'mantenimientoErrores',
             'mantenimientoSuperusuario'

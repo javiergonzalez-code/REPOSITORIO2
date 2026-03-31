@@ -70,6 +70,12 @@ class OcController extends Controller
         $extension = strtolower(pathinfo($oc->nombre_original, PATHINFO_EXTENSION));
         $data = [];
 
+        $tamanoArchivo = filesize($path);
+        if ($tamanoArchivo > 5242880) {
+            Alert::warning('Archivo muy grande', 'El archivo es demasiado grande para previsualizarlo. Por favor, descárgalo.');
+            return back();
+        }
+
         try {
             if (in_array($extension, ['xlsx', 'xls', 'csv'])) {
                 $sheets = Excel::toArray(new class {}, $path);

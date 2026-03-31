@@ -43,27 +43,24 @@ class PapeleraController extends Controller
 
     public function eliminarPermanente($tipo, $id)
     {
-        $mensaje = 'No tienes permisos para realizar esta acción o la acción no es válida.';
+        if (!auth()->user() || !auth()->user()->hasRole('superadmin')) {
+            return back()->with('error', 'No tienes permisos de superusuario para borrar permanentemente.');
+        }
+
+        $mensaje = 'Acción no válida.';
 
         if ($tipo === 'usuario') {
             User::onlyTrashed()->findOrFail($id)->forceDelete();
             $mensaje = 'Usuario eliminado de forma permanente.';
         } elseif ($tipo === 'archivo') {
             $archivo = Archivo::onlyTrashed()->findOrFail($id);
+            $path = storage_path('app/' . $archivo->ruta);
 
-            if (auth()->user() && auth()->user()->hasRole('superadmin')) {
-                // CORRECCIÓN AQUÍ: Cambiamos $oc->ruta por $archivo->ruta
-                $path = storage_path('app/' . $archivo->ruta); 
-                
-                if (file_exists($path)) {
-                    unlink($path);
-                }
-                
-                $archivo->forceDelete();
-                $mensaje = 'Archivo y registro eliminados de forma permanente.';
-            } else {
-                return back()->with('error', 'No tienes permisos para borrar archivos del servidor.');
+            if (file_exists($path)) {
+                unlink($path);
             }
+            $archivo->forceDelete();
+            $mensaje = 'Archivo y registro eliminados de forma permanente.';
         }
 
         return back()->with('success', $mensaje);
