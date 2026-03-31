@@ -10,19 +10,16 @@ class PapeleraController extends Controller
 {
     public function index(Request $request)
     {
-        // Filtro: 'todos', 'usuarios', 'archivos'
         $filtro = $request->get('tipo', 'todos');
 
         $usuarios = collect();
         $archivos = collect();
 
-        // Solo consultamos si el filtro lo requiere
         if ($filtro === 'todos' || $filtro === 'usuarios') {
             $usuarios = User::onlyTrashed()->get();
         }
 
         if ($filtro === 'todos' || $filtro === 'archivos') {
-            // Traemos también el usuario que lo subió
             $archivos = Archivo::onlyTrashed()->with('user')->get();
         }
 
@@ -31,6 +28,8 @@ class PapeleraController extends Controller
 
     public function restaurar($tipo, $id)
     {
+        $mensaje = 'Acción no válida o tipo desconocido.';
+
         if ($tipo === 'usuario') {
             User::onlyTrashed()->findOrFail($id)->restore();
             $mensaje = 'Usuario restaurado correctamente.';
@@ -52,7 +51,6 @@ class PapeleraController extends Controller
         } elseif ($tipo === 'archivo') {
             $archivo = Archivo::onlyTrashed()->findOrFail($id);
 
-            // Validamos por rol usando Spatie en lugar de quemar el correo
             if (auth()->user() && auth()->user()->hasRole('superadmin')) {
                 $path = storage_path('app/' . $oc->ruta);
                 if (file_exists($path)) {

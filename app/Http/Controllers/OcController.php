@@ -11,7 +11,6 @@ class OcController extends Controller
 {
     public function index()
     {
-        // La consulta a la BD y filtros se movieron a Livewire
         return view('oc.index');
     }
 
@@ -22,7 +21,6 @@ class OcController extends Controller
         $esProveedor = $user->hasRole('proveedor') || $user->role === 'proveedor';
 
         if ($esProveedor && $oc->user_id !== $user->id) {
-            // LOG: Intento no autorizado
             \App\Models\Log::create([
                 'user_id' => auth()->id(),
                 'accion'  => 'Intento de descarga denegado (sin permisos): ' . $oc->nombre_original,
@@ -34,7 +32,6 @@ class OcController extends Controller
 
         $path = storage_path('app/' . $oc->ruta);
         if (!file_exists($path)) {
-            // LOG: Archivo no encontrado
             \App\Models\Log::create([
                 'user_id' => auth()->id(),
                 'accion'  => 'Intento de descarga fallido (archivo físico extraviado): ' . $oc->nombre_original,
@@ -45,8 +42,6 @@ class OcController extends Controller
             return back();
         }
 
-        // LOG: DESCARGA EXITOSA (Agregado aquí)
-        // Utilizamos la palabra "Descargó" para que coincida con tu filtro Livewire
         \App\Models\Log::create([
             'user_id' => auth()->id(),
             'accion'  => 'Descargó con éxito el archivo: ' . $oc->nombre_original,

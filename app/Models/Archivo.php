@@ -4,13 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes; // 1. Importar SoftDeletes
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
 class Archivo extends Model
 {
-    // 2. Agregar SoftDeletes a la clase
     use HasFactory, SoftDeletes;
     use LogsActivity;
 
@@ -30,7 +29,7 @@ class Archivo extends Model
             ->logOnly(['nombre_original', 'nombre_sistema', 'tipo_archivo', 'modulo', 'ruta', 'deleted_at'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
-            ->useLogName('archivo') // Cambié 'user' por 'archivo' para que no se mezcle
+            ->useLogName('archivo')
             ->setDescriptionForEvent(fn(string $eventName) => match ($eventName) {
                 'created' => 'Creación',
                 'updated' => 'Actualización',

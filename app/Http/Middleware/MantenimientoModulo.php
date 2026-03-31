@@ -23,17 +23,13 @@ class MantenimientoModulo
             // 1. Validar primero que haya un usuario en sesión para evitar errores si auth()->user() es null
             if (auth()->check()) {
                 // Usamos hasAnyRole de Spatie para validar múltiples opciones a la vez.
-                // Usamos los roles exactos que tienes en tu base de datos
                 if (auth()->user()->hasAnyRole(['superadmin', 'admin']) || in_array(auth()->user()->role, ['superadmin', 'admin'])) {
                     return $next($request); // Permite pasar a los administradores
                 }
             }
 
-            // 2. Si el usuario no es admin o no está logueado, lanzamos SweetAlert
-            // Asumiendo que usas el helper global alert() del paquete realrashid/sweet-alert
             alert()->warning('Mantenimiento', 'El módulo ' . strtoupper($modulo) . ' está en mantenimiento.');
 
-            // 3. Redirigimos a la vista home en lugar de mostrar el error 503
             return redirect('/home');
         }
 

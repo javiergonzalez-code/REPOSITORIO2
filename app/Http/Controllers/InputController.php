@@ -111,7 +111,6 @@ class InputController extends Controller
     {
         $archivo = Archivo::findOrFail($id);
 
-        // Agregamos la validación de seguridad
         $user = auth()->user();
         $esProveedor = $user->hasRole('proveedor') || $user->role === 'proveedor';
 
