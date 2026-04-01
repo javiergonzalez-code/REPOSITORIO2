@@ -74,7 +74,7 @@ class InputController extends Controller
                 'nombre_original' => $originalName,
                 'nombre_sistema'  => $systemName,
                 'tipo_archivo'    => strtolower($extension),
-                'ruta'            => 'private/uploads/' . $systemName,
+                'ruta'            => 'uploads/' . $systemName,
                 'modulo'          => 'INPUTS',
             ]);
 
@@ -107,32 +107,23 @@ class InputController extends Controller
         }
     }
 
+    // EN EL MÉTODO download() de InputController
     public function download($id)
     {
         $archivo = Archivo::findOrFail($id);
         $user = auth()->user();
 
-        // Validación de seguridad: Proveedores solo descargan lo suyo
         if (($user->hasRole('proveedor') || $user->role === 'proveedor') && $archivo->user_id !== $user->id) {
-            \App\Models\Log::create([
-                'user_id' => $user->id,
-                'accion'  => 'Intento de descarga de INPUT denegado (sin permisos): ' . $archivo->nombre_original,
-                'modulo'  => 'INPUTS',
-            ]);
             abort(403, 'No tienes permiso para descargar este archivo.');
         }
 
-        // Ruta real (la misma corrección que hicimos en OC)
-        $path = storage_path('app/private/' . $archivo->ruta);
+        // SOLUCIÓN DEFINITIVA: Limpiamos por si en la BD se guardó "private/uploads" o solo "uploads"
+        $rutaLimpia = str_replace('private/', '', $archivo->ruta);
+        $path = storage_path('app/private/' . $rutaLimpia);
+
         if (!file_exists($path)) {
             abort(404, 'El archivo físico no se encuentra en el servidor.');
         }
-
-        \App\Models\Log::create([
-            'user_id' => $user->id,
-            'accion'  => 'Descargó con éxito el archivo: ' . $archivo->nombre_original,
-            'modulo'  => 'INPUTS', // Corregido de 'OC' a 'INPUTS'
-        ]);
 
         return response()->download($path, $archivo->nombre_original);
     }

@@ -26,12 +26,12 @@ class OcController extends Controller
                 'accion'  => 'Intento de descarga denegado (sin permisos): ' . $oc->nombre_original,
                 'modulo'  => 'OC',
             ]);
-
             abort(403, 'No tienes permiso para descargar este archivo.');
         }
 
-        // CORRECCIÓN: Se quitó 'uploads/' porque $oc->ruta ya lo trae.
-        $path = storage_path('app/private/' . $oc->ruta);
+        // SOLUCIÓN DEFINITIVA APLICADA
+        $rutaLimpia = str_replace('private/', '', $oc->ruta);
+        $path = storage_path('app/private/' . $rutaLimpia);
         
         if (!file_exists($path)) {
             \App\Models\Log::create([
@@ -39,7 +39,6 @@ class OcController extends Controller
                 'accion'  => 'Intento de descarga fallido (archivo físico extraviado): ' . $oc->nombre_original,
                 'modulo'  => 'OC',
             ]);
-
             Alert::error('Extraviado', 'El archivo físico no existe.');
             return back();
         }
@@ -63,8 +62,9 @@ class OcController extends Controller
             abort(403, 'No tienes permiso para previsualizar este archivo.');
         }
 
-        // CORRECCIÓN: Se quitó 'uploads/' porque $oc->ruta ya lo trae.
-        $path = storage_path('app/private/' . $oc->ruta);
+        // SOLUCIÓN DEFINITIVA APLICADA AQUÍ TAMBIÉN
+        $rutaLimpia = str_replace('private/', '', $oc->ruta);
+        $path = storage_path('app/private/' . $rutaLimpia);
         
         if (!file_exists($path)) {
             Alert::error('Extraviado', 'El archivo físico no existe en el servidor.');

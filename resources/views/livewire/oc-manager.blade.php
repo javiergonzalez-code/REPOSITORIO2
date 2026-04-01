@@ -193,8 +193,9 @@ $ordenes = computed(function () {
                                     hrs</span>
                             </td>
                             <td class="text-end pe-4">
+                                {{-- AQUÍ ESTÁ LA MAGIA, RUTA CORREGIDA A oc.download --}}
                                 <x-table-actions viewRoute="{{ route('oc.preview', $oc->id) }}"
-                                    downloadRoute="{{ route('archivos.download', $oc->id) }}"
+                                    downloadRoute="{{ route('oc.download', $oc->id) }}"
                                     deleteRoute="{{ route('oc.destroy', $oc->id) }}" />
                             </td>
                         </tr>
