@@ -30,7 +30,9 @@ class OcController extends Controller
             abort(403, 'No tienes permiso para descargar este archivo.');
         }
 
-        $path = storage_path('app/' . $oc->ruta);
+        // CORRECCIÓN: Se quitó 'uploads/' porque $oc->ruta ya lo trae.
+        $path = storage_path('app/private/' . $oc->ruta);
+        
         if (!file_exists($path)) {
             \App\Models\Log::create([
                 'user_id' => auth()->id(),
@@ -61,7 +63,9 @@ class OcController extends Controller
             abort(403, 'No tienes permiso para previsualizar este archivo.');
         }
 
-        $path = storage_path('app/' . $oc->ruta);
+        // CORRECCIÓN: Se quitó 'uploads/' porque $oc->ruta ya lo trae.
+        $path = storage_path('app/private/' . $oc->ruta);
+        
         if (!file_exists($path)) {
             Alert::error('Extraviado', 'El archivo físico no existe en el servidor.');
             return back();
@@ -122,7 +126,7 @@ class OcController extends Controller
 
             \App\Models\Log::create([
                 'user_id' => auth()->id(),
-                'accion'  => 'Envió a la papelera la OC: ' . $nombreOriginal, // Opcional: ajustar el texto del log
+                'accion'  => 'Envió a la papelera la OC: ' . $nombreOriginal, 
                 'modulo'  => 'OC',
             ]);
 

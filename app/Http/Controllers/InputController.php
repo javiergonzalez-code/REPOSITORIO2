@@ -123,8 +123,7 @@ class InputController extends Controller
         }
 
         // Ruta real (la misma corrección que hicimos en OC)
-        $path = storage_path('app/' . $archivo->ruta);
-
+        $path = storage_path('app/private/' . $archivo->ruta);
         if (!file_exists($path)) {
             abort(404, 'El archivo físico no se encuentra en el servidor.');
         }
