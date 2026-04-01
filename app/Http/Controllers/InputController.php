@@ -74,7 +74,7 @@ class InputController extends Controller
                 'nombre_original' => $originalName,
                 'nombre_sistema'  => $systemName,
                 'tipo_archivo'    => strtolower($extension),
-                'ruta'            => 'uploads/' . $systemName,
+                'ruta'            => 'private/uploads/' . $systemName,
                 'modulo'          => 'INPUTS',
             ]);
 

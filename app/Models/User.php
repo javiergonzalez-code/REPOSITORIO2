@@ -34,21 +34,6 @@ class User extends Authenticatable
     }
 
 
-    protected static function booted()
-    {
-
-        // Cuando se CREA un usuario (CARGA)
-        static::created(function ($user) {
-            if (auth()->check()) {
-                \App\Models\Log::create([
-                    'user_id' => auth()->id(), // El admin que lo creó
-                    'accion'  => 'CARGA',
-                    'modulo'  => 'USUARIOS'
-                ]);
-            }
-        });
-    }
-
     public function getActivitylogOptions(): \Spatie\Activitylog\LogOptions
     {
         return LogOptions::defaults()

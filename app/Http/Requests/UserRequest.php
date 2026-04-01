@@ -21,18 +21,18 @@ class UserRequest extends FormRequest
     public function rules()
     {
         // Obtiene el ID del usuario desde la ruta para la excepción de email único
-        $userId = request()->route('id') ?? request()->route('user');
-
+        $userRoute = request()->route('user');
+        $userId = $userRoute ? (is_object($userRoute) ? $userRoute->id : $userRoute) : request()->route('id');
         return [
             'name'     => 'required|min:5|max:255',
             'email'    => 'required|email|unique:users,email,' . $userId,
             'password' => $userId ? 'nullable|min:6' : 'required|min:6',
-            
+
             // Reglas para los nuevos campos detectados en UserCrudController:
-            'codigo'   => 'nullable|string|max:50', 
+            'codigo'   => 'nullable|string|max:50',
             // Implementamos la regla ValidRFC aquí pasándola en un array
-            'rfc'      => ['nullable', 'string', 'min:12', 'max:13', new ValidRFC()], 
-            'telefono' => 'nullable|string|max:20', 
+            'rfc'      => ['nullable', 'string', 'min:12', 'max:13', new ValidRFC()],
+            'telefono' => 'nullable|string|max:20',
         ];
     }
 

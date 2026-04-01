@@ -116,4 +116,3 @@ Route::middleware(['auth'])->group(function () {
             ->name('users.show')
             ->middleware('can:list users');
     });
-});

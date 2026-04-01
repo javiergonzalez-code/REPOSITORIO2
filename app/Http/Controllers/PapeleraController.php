@@ -18,11 +18,9 @@ class PapeleraController extends Controller
         $archivos = collect();
 
         if ($esProveedor) {
-            // Proveedor SOLO ve sus propios archivos
             $filtro = 'archivos';
             $archivos = Archivo::onlyTrashed()->with('user')->where('user_id', $user->id)->get();
         } else {
-            // Admins ven todo
             if ($filtro === 'todos' || $filtro === 'usuarios') {
                 $usuarios = User::onlyTrashed()->get();
             }
@@ -58,8 +56,9 @@ class PapeleraController extends Controller
 
     public function eliminarPermanente($tipo, $id)
     {
-        if (!auth()->user() || !auth()->user()->hasRole('superadmin')) {
-            return back()->with('error', 'No tienes permisos de superusuario para borrar permanentemente.');
+        $user = auth()->user();
+        if (!$user || (!$user->hasRole('superadmin') && $user->role !== 'superadmin')) {
+            return back()->with('error', 'No tienes permisos para borrar permanentemente.');
         }
 
         $mensaje = 'Acción no válida.';
