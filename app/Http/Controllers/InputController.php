@@ -99,7 +99,7 @@ class InputController extends Controller
             Log::create([
                 'user_id' => auth()->id(),
                 'accion'  => 'Error interno (Seguridad/Servidor): ' . $e->getMessage(),
-                'modulo'  => 'INPUTS',
+                'modulo'  => 'OC',
             ]);
 
             Alert::error('Error del Servidor', 'Error al procesar el archivo: ' . $e->getMessage());

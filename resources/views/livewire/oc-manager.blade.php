@@ -36,8 +36,7 @@ $sugerencias_usuarios = computed(function () {
 // Computar la consulta principal reactiva
 $ordenes = computed(function () {
     $user = auth()->user();
-    $query = Archivo::with('user')->where('modulo', 'OC');
-
+    $query = Archivo::with('user')->whereIn('modulo', ['OC', 'INPUTS']);
     if ($this->esProveedor) {
         $query->where('user_id', $user->id);
     }
