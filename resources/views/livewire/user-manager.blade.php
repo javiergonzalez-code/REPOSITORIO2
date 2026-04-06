@@ -95,15 +95,6 @@ $usuarios = computed(function () {
                     </div>
                 </div>
 
-                {{-- 2. Búsqueda por Email --}}
-                <div class="col-lg-3 col-md-6">
-                    <label class="form-label-custom text-uppercase x-small fw-bold">Correo Electrónico</label>
-                    <div class="position-relative">
-                        <i class="fas fa-at text-muted position-absolute top-50 start-0 translate-middle-y ms-3"></i>
-                        <input type="text" wire:model.live.debounce.300ms="search" class="form-control ps-5"
-                            placeholder="Ej: admin@ragon.com...">
-                    </div>
-                </div>
 
                 {{-- 3. Filtro de Rol --}}
                 <div class="col-lg-4 col-md-6">
