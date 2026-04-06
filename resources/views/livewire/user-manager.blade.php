@@ -7,17 +7,21 @@ usesPagination(theme: 'bootstrap');
 state(['search' => '', 'userFilter' => '', 'roleFilter' => '']);
 
 $sugerencias_usuarios = computed(function () {
-    if (strlen($this->userFilter) < 1) {
+    $query = User::select('name');
+
+    // Filtrar solo si hay texto en el input
+    if (strlen($this->userFilter) > 0) {
+        $query->where('name', 'like', "%{$this->userFilter}%");
+    }
+
+    // Aumentamos el límite para tener scroll
+    $sugerencias = $query->orderBy('name', 'asc')->take(50)->get();
+
+    // Ocultar la lista si hay una coincidencia exacta
+    if (strlen($this->userFilter) > 0 && $sugerencias->count() === 1 && strtolower($sugerencias->first()->name) === strtolower($this->userFilter)) {
         return collect();
     }
-    $sugerencias = User::select('name')
-        ->where('name', 'like', "%{$this->userFilter}%")
-        ->orderBy('name', 'asc')
-        ->take(6)
-        ->get();
-    if ($sugerencias->count() === 1 && strtolower($sugerencias->first()->name) === strtolower($this->userFilter)) {
-        return collect();
-    }
+
     return $sugerencias;
 });
 
@@ -59,23 +63,25 @@ $usuarios = computed(function () {
         <div class="card-body p-4">
             <div class="row g-3 align-items-end">
 
-                <div class="col-lg-3 col-md-6">
+                <div class="col-lg-3 col-md-6" x-data="{ showDropdown: false }" @click.outside="showDropdown = false">
                     <label class="form-label-custom text-uppercase x-small fw-bold">Nombre de Usuario</label>
                     <div style="position: relative !important;">
                         <i class="fas fa-user text-muted position-absolute top-50 start-0 translate-middle-y ms-3"
                             style="z-index: 10;"></i>
                         <input type="text" wire:model.live.debounce.300ms="userFilter" class="form-control ps-5"
-                            placeholder="Escribir nombre..." autocomplete="off">
+                            placeholder="Seleccionar usuario..." autocomplete="off" @focus="showDropdown = true"
+                            @input="showDropdown = true">
 
                         @if (count($this->sugerencias_usuarios) > 0)
-                            <div class="w-100 border rounded-3 shadow-lg"
-                                style="position: absolute !important; top: 100% !important; left: 0 !important; margin-top: 5px !important; z-index: 10000 !important; overflow: hidden; display: block !important; background-color: #ffffff !important;">
+                            <div class="w-100 border rounded-3 shadow-lg" x-show="showDropdown" x-transition.opacity
+                                style="display: none; position: absolute !important; top: 100% !important; left: 0 !important; margin-top: 5px !important; z-index: 10000 !important; overflow-y: auto; max-height: 250px; background-color: #ffffff !important;">
                                 <ul class="list-unstyled mb-0">
                                     @foreach ($this->sugerencias_usuarios as $sugerencia)
                                         <li>
                                             <button type="button" class="w-100 border-0 text-start px-3 py-2"
                                                 style="font-size: 0.9rem; background-color: transparent; color: #1e293b; transition: all 0.2s;"
                                                 wire:click="$set('userFilter', '{{ $sugerencia->name }}')"
+                                                @click="showDropdown = false"
                                                 onmouseover="this.style.backgroundColor='#f1f5f9'"
                                                 onmouseout="this.style.backgroundColor='transparent'">
                                                 <i class="fas fa-user-circle text-primary me-2"></i>

@@ -107,7 +107,6 @@ class InputController extends Controller
         }
     }
 
-    // EN EL MÉTODO download() de InputController
     public function download($id)
     {
         $archivo = Archivo::findOrFail($id);
@@ -117,7 +116,6 @@ class InputController extends Controller
             abort(403, 'No tienes permiso para descargar este archivo.');
         }
 
-        // SOLUCIÓN DEFINITIVA: Limpiamos por si en la BD se guardó "private/uploads" o solo "uploads"
         $rutaLimpia = str_replace('private/', '', $archivo->ruta);
         $path = storage_path('app/private/' . $rutaLimpia);
 

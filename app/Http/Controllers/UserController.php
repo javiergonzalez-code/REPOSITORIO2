@@ -41,20 +41,23 @@ class UserController extends Controller
 
         $validatedData = $request->validate([
             'name'     => ['required', 'string', 'max:255'],
-            'rfc'      => ['nullable', 'string', 'max:13', 'unique:users'],
-            'email'    => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'rfc'      => ['nullable', 'string', 'max:13', Rule::unique('users')],
+            'email'    => ['required', 'email', Rule::unique('users')],
             'telefono' => ['nullable', 'string', 'max:20'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
             'role'     => ['required', Rule::in($rolesPermitidos)],
+            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+        ], [
+            'rfc.max' => 'El RFC no puede tener más de 13 caracteres.',
+            'email.unique' => 'Este correo ya está registrado por otro usuario.',
         ]);
 
         try {
             DB::transaction(function () use ($validatedData) {
                 $user = User::create([
                     'name'     => $validatedData['name'],
-                    'rfc'      => $validatedData['rfc'],
+                    'rfc'      => $validatedData['rfc'] ?? null,
                     'email'    => $validatedData['email'],
-                    'telefono' => $validatedData['telefono'],
+                    'telefono' => $validatedData['telefono'] ?? null,
                     'password' => Hash::make($validatedData['password']),
                     'role'     => $validatedData['role'],
                 ]);
@@ -71,7 +74,6 @@ class UserController extends Controller
             Alert::success('¡Usuario Creado!', 'El usuario ha sido registrado exitosamente en el sistema.');
             return redirect()->route('users.index');
         } catch (\Exception $e) {
-            // CORRECCIÓN APLICADA AQUÍ
             try {
                 \App\Models\Log::create([
                     'user_id' => auth()->id(),
@@ -177,7 +179,6 @@ class UserController extends Controller
             Alert::success('¡Acceso Revocado!', 'El usuario ha sido eliminado correctamente del sistema.');
             return redirect()->route('users.index');
         } catch (\Exception $e) {
-            // CORRECCIÓN APLICADA AQUÍ
             try {
                 \App\Models\Log::create([
                     'user_id' => auth()->id(),

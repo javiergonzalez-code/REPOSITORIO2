@@ -13,17 +13,25 @@ $esProveedor = computed(function () {
 });
 
 $sugerencias_usuarios = computed(function () {
-    if ($this->esProveedor || strlen($this->userFilter) < 1) {
+    if ($this->esProveedor) {
         return collect();
     }
-    $sugerencias = User::select('name')
-        ->where('name', 'like', "%{$this->userFilter}%")
-        ->orderBy('name', 'asc')
-        ->take(6)
-        ->get();
-    if ($sugerencias->count() === 1 && strtolower($sugerencias->first()->name) === strtolower($this->userFilter)) {
+
+    $query = User::select('name');
+
+    // Filtrar solo si hay algo escrito
+    if (strlen($this->userFilter) > 0) {
+        $query->where('name', 'like', "%{$this->userFilter}%");
+    }
+
+    // AUMENTAMOS EL LÍMITE (ej. 50) PARA QUE TENGAS SUFICIENTES DATOS PARA HACER SCROLL
+    $sugerencias = $query->orderBy('name', 'asc')->take(50)->get();
+
+    // Ocultar si hay coincidencia exacta
+    if (strlen($this->userFilter) > 0 && $sugerencias->count() === 1 && strtolower($sugerencias->first()->name) === strtolower($this->userFilter)) {
         return collect();
     }
+
     return $sugerencias;
 });
 
@@ -34,49 +42,43 @@ $logs = computed(function () {
     if ($this->esProveedor) {
         $query->where('user_id', $user->id);
     }
-    
-    // CORRECCIÓN: Buscar en 'accion' o 'modulo' ya que 'descripcion' no existe en tu tabla
+
     if ($this->search) {
-        $query->where(function($q) {
-            $q->where('accion', 'like', "%{$this->search}%")
-              ->orWhere('modulo', 'like', "%{$this->search}%");
+        $query->where(function ($q) {
+            $q->where('accion', 'like', "%{$this->search}%")->orWhere('modulo', 'like', "%{$this->search}%");
         });
     }
-    
+
     if ($this->userFilter && !$this->esProveedor) {
         $query->whereHas('user', fn($q) => $q->where('name', 'like', "%{$this->userFilter}%"));
     }
-    
-if ($this->accion) {
-        $query->where(function($q) {
+
+    if ($this->accion) {
+        $query->where(function ($q) {
             switch (strtoupper($this->accion)) {
                 case 'CARGA':
                     $q->whereRaw('LOWER(accion) LIKE ?', ['%subió%'])
-                      ->orWhereRaw('LOWER(accion) LIKE ?', ['%subio%']) // Sin acento por si acaso
-                      ->orWhereRaw('LOWER(accion) LIKE ?', ['%carga%']);
+                        ->orWhereRaw('LOWER(accion) LIKE ?', ['%subio%'])
+                        ->orWhereRaw('LOWER(accion) LIKE ?', ['%carga%']);
                     break;
                 case 'DESCARGA':
-                    $q->whereRaw('LOWER(accion) LIKE ?', ['%descarg%'])
-                      ->orWhereRaw('LOWER(accion) LIKE ?', ['%download%']);
+                    $q->whereRaw('LOWER(accion) LIKE ?', ['%descarg%'])->orWhereRaw('LOWER(accion) LIKE ?', ['%download%']);
                     break;
                 case 'ELIMINACION':
-                    $q->whereRaw('LOWER(accion) LIKE ?', ['%elimin%'])
-                      ->orWhereRaw('LOWER(accion) LIKE ?', ['%borrad%']);
+                    $q->whereRaw('LOWER(accion) LIKE ?', ['%elimin%'])->orWhereRaw('LOWER(accion) LIKE ?', ['%borrad%']);
                     break;
                 case 'LOGIN':
-                    $q->whereRaw('LOWER(accion) LIKE ?', ['%inicio%'])
-                      ->orWhereRaw('LOWER(accion) LIKE ?', ['%login%']);
+                    $q->whereRaw('LOWER(accion) LIKE ?', ['%inicio%'])->orWhereRaw('LOWER(accion) LIKE ?', ['%login%']);
                     break;
                 case 'LOGOUT':
-                    $q->whereRaw('LOWER(accion) LIKE ?', ['%cierre%'])
-                      ->orWhereRaw('LOWER(accion) LIKE ?', ['%logout%']);
+                    $q->whereRaw('LOWER(accion) LIKE ?', ['%cierre%'])->orWhereRaw('LOWER(accion) LIKE ?', ['%logout%']);
                     break;
                 default:
                     $q->whereRaw('LOWER(accion) LIKE ?', ['%' . strtolower($this->accion) . '%']);
             }
         });
     }
-    
+
     if ($this->fecha) {
         $query->whereDate('created_at', $this->fecha);
     }
@@ -85,7 +87,6 @@ if ($this->accion) {
 });
 ?>
 
-{{-- REGLA DE ORO DE LIVEWIRE: UN SOLO DIV PADRE QUE ENVUELVE TODO --}}
 <div>
 
     <div class="mb-3 text-end" style="font-size: 0.8rem; color: #64748b; font-weight: 700;">
@@ -115,24 +116,28 @@ if ($this->accion) {
 
                 {{-- Filtro de Usuario con Dropdown Arreglado --}}
                 @if (!$this->esProveedor)
-                    <div class="col-lg-3 col-md-6">
+                    <div class="col-lg-3 col-md-6" x-data="{ showDropdown: false }" @click.outside="showDropdown = false">
                         <label class="form-label-custom text-uppercase x-small fw-bold">Usuario</label>
                         <div style="position: relative !important;">
                             <i class="fas fa-user text-muted position-absolute top-50 start-0 translate-middle-y ms-3"
                                 style="z-index: 10;"></i>
                             <input type="text" wire:model.live.debounce.300ms="userFilter" class="form-control ps-5"
-                                placeholder="Escribir usuario..." autocomplete="off">
+                                placeholder="Seleccionar usuario..." autocomplete="off" @focus="showDropdown = true"
+                                @input="showDropdown = true">
 
-                            {{-- LISTA DESPLEGABLE FLOTANTE CON FONDO BLANCO FORZADO --}}
+                            {{-- LISTA DESPLEGABLE FLOTANTE CON FONDO BLANCO FORZADO Y SCROLL --}}
                             @if (count($this->sugerencias_usuarios) > 0)
                                 <div class="w-100 border rounded-3 shadow-lg"
-                                    style="position: absolute !important; top: 100% !important; left: 0 !important; margin-top: 5px !important; z-index: 10000 !important; overflow: hidden; display: block !important; background-color: #ffffff !important;">
+                                    x-show="showDropdown"
+                                    x-transition.opacity
+                                    style="display: none; position: absolute !important; top: 100% !important; left: 0 !important; margin-top: 5px !important; z-index: 10000 !important; overflow-y: auto; max-height: 250px; background-color: #ffffff !important;">
                                     <ul class="list-unstyled mb-0">
                                         @foreach ($this->sugerencias_usuarios as $sugerencia)
                                             <li>
                                                 <button type="button" class="w-100 border-0 text-start px-3 py-2"
                                                     style="font-size: 0.9rem; background-color: transparent; color: #1e293b; transition: all 0.2s;"
                                                     wire:click="$set('userFilter', '{{ $sugerencia->name }}')"
+                                                    @click="showDropdown = false"
                                                     onmouseover="this.style.backgroundColor='#f1f5f9'"
                                                     onmouseout="this.style.backgroundColor='transparent'">
                                                     <i class="fas fa-user-circle text-primary me-2"></i>
