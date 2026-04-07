@@ -63,7 +63,8 @@ class InputController extends Controller
 
             $systemName = time() . '_' . uniqid() . '_' . $originalName;
 
-            $path = $file->storeAs('uploads', $systemName, 'local');
+            // CORRECCIÓN 1: Guardar físicamente en la carpeta privada
+            $path = $file->storeAs('private/uploads', $systemName, 'local');
 
             if (!$path) {
                 throw new \Exception("El servidor denegó el permiso de escritura en el disco duro.");
@@ -74,7 +75,8 @@ class InputController extends Controller
                 'nombre_original' => $originalName,
                 'nombre_sistema'  => $systemName,
                 'tipo_archivo'    => strtolower($extension),
-                'ruta'            => 'uploads/' . $systemName,
+                // CORRECCIÓN 2: Guardar la ruta correcta en la base de datos
+                'ruta'            => 'private/uploads/' . $systemName,
                 'modulo'          => 'INPUTS',
             ]);
 
@@ -99,7 +101,8 @@ class InputController extends Controller
             Log::create([
                 'user_id' => auth()->id(),
                 'accion'  => 'Error interno (Seguridad/Servidor): ' . $e->getMessage(),
-                'modulo'  => 'OC',
+                // CORRECCIÓN 3: El módulo correcto para que no diga OC
+                'modulo'  => 'INPUTS',
             ]);
 
             Alert::error('Error del Servidor', 'Error al procesar el archivo: ' . $e->getMessage());

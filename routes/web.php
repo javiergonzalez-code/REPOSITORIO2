@@ -23,12 +23,14 @@ Route::get('/', function () {
  */
 Route::get('/login', [AuthController::class, 'index'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post')->middleware('throttle:5,1');
+
 /**
  * RUTAS PROTEGIDAS (MIDDLEWARE AUTH)
+ * ¡Todo el sistema debe estar dentro de este grupo!
  */
 Route::middleware(['auth'])->group(function () {
 
-    // Dashboard o página de inicio (Apunta a HomeController ahora)
+    // Dashboard o página de inicio
     Route::get('/home', [HomeController::class, 'home'])->name('home');
 
     // Cierre de sesión
@@ -45,10 +47,12 @@ Route::middleware(['auth'])->group(function () {
     // ==========================================
     // MÓDULO DE PAPELERA DE RECICLAJE
     // ==========================================
-        Route::get('/papelera', [App\Http\Controllers\PapeleraController::class, 'index'])->name('papelera.index');
-        Route::post('/papelera/restaurar/{tipo}/{id}', [App\Http\Controllers\PapeleraController::class, 'restaurar'])->name('papelera.restaurar');
-        Route::delete('/papelera/eliminar/{tipo}/{id}', [App\Http\Controllers\PapeleraController::class, 'eliminarPermanente'])->name('papelera.eliminar');
-    });
+    Route::get('/papelera', [App\Http\Controllers\PapeleraController::class, 'index'])->name('papelera.index');
+    Route::post('/papelera/restaurar/{tipo}/{id}', [App\Http\Controllers\PapeleraController::class, 'restaurar'])->name('papelera.restaurar');
+    Route::delete('/papelera/eliminar/{tipo}/{id}', [App\Http\Controllers\PapeleraController::class, 'eliminarPermanente'])->name('papelera.eliminar');
+    
+    // EL `});` SE ELIMINÓ DE AQUÍ PARA NO ROMPER LA SEGURIDAD
+
     // ==========================================
     // MÓDULO DE CARGA DE ARCHIVOS (INPUTS) - PROTEGIDO
     // ==========================================
@@ -109,9 +113,10 @@ Route::middleware(['auth'])->group(function () {
             ->name('users.destroy')
             ->middleware('can:delete users');
 
-
         // Ver detalles de un usuario
         Route::get('users/{user}/show', [UserController::class, 'show'])
             ->name('users.show')
             ->middleware('can:list users');
     });
+
+});

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Archivo;
+use Illuminate\Support\Facades\Storage; // <-- CORRECCIÓN: Importamos Storage
 
 class PapeleraController extends Controller
 {
@@ -68,11 +69,12 @@ class PapeleraController extends Controller
             $mensaje = 'Usuario eliminado de forma permanente.';
         } elseif ($tipo === 'archivo') {
             $archivo = Archivo::onlyTrashed()->findOrFail($id);
-            $path = storage_path('app/' . $archivo->ruta);
-
-            if (file_exists($path)) {
-                unlink($path);
+            
+            // <-- CORRECCIÓN: Borrado seguro del archivo físico usando Storage de Laravel
+            if (Storage::disk('local')->exists($archivo->ruta)) {
+                Storage::disk('local')->delete($archivo->ruta);
             }
+            
             $archivo->forceDelete();
             $mensaje = 'Archivo y registro eliminados de forma permanente.';
         }
