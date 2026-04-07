@@ -9,21 +9,20 @@ class CheckIfAdmin
     private function respondToUnauthorizedRequest($request)
     {
         if ($request->ajax() || $request->wantsJson()) {
-            return response(trans('backpack::base.unauthorized'), 401);
+            return response(trans('auth.failed'), 401);
         } else {
-            return redirect()->guest(backpack_url('login'));
+            return redirect()->guest(route('login')); // Usar route() nativo
         }
     }
 
     public function handle($request, Closure $next)
     {
-        if (backpack_auth()->guest()) {
+        if (auth()->guest()) { // Usar auth() nativo
             return $this->respondToUnauthorizedRequest($request);
         }
 
-        $user = backpack_auth()->user();
+        $user = auth()->user(); // Usar auth() nativo
 
-        // Permitimos el paso validando por Spatie o por la columna 'role'
         if ($user->hasRole('admin') || $user->hasRole('superadmin') || in_array($user->role, ['admin', 'superadmin'])) {
             return $next($request);
         }

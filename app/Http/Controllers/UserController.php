@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
+
 class UserController extends Controller
 {
     private function getRolesPermitidos()
@@ -42,7 +43,7 @@ class UserController extends Controller
         $validatedData = $request->validate([
             'name'     => ['required', 'string', 'max:255'],
             'rfc'      => ['nullable', 'string', 'max:13', Rule::unique('users')],
-            'email'    => ['required', 'email', Rule::unique('users')],
+            'email' => ['required', 'email', Rule::unique('users')->whereNull('deleted_at')],
             'telefono' => ['nullable', 'string', 'max:20'],
             'role'     => ['required', Rule::in($rolesPermitidos)],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
@@ -105,10 +106,17 @@ class UserController extends Controller
     {
         $rolesPermitidos = $this->getRolesPermitidos();
 
+        // 🚨 1. CORRECCIÓN DE SEGURIDAD: Evitar que editen al superadmin si no tienen el rol
+        if ($user->role === 'superadmin' && !in_array('superadmin', $rolesPermitidos)) {
+            Alert::error('Acceso Denegado', 'No tienes permisos para modificar a un Superusuario.');
+            return redirect()->route('users.index');
+        }
+
+        // ⚠️ 2. CORRECCIÓN DE PAPELERA: Agregar ->whereNull('deleted_at') al email y rfc
         $validatedData = $request->validate([
             'name'     => ['required', 'string', 'max:255'],
-            'rfc'      => ['nullable', 'string', 'max:13', Rule::unique('users')->ignore($user->id)],
-            'email'    => ['required', 'email', Rule::unique('users')->ignore($user->id)],
+            'rfc'      => ['nullable', 'string', 'max:13', Rule::unique('users')->ignore($user->id)->whereNull('deleted_at')],
+            'email'    => ['required', 'email', Rule::unique('users')->ignore($user->id)->whereNull('deleted_at')],
             'role'     => ['required', Rule::in($rolesPermitidos)],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
         ], [
@@ -137,7 +145,6 @@ class UserController extends Controller
             Alert::success('¡Actualización Exitosa!', 'Los datos del usuario han sido modificados correctamente.');
             return redirect()->route('users.index');
         } catch (\Exception $e) {
-            // CORRECCIÓN APLICADA AQUÍ
             try {
                 \App\Models\Log::create([
                     'user_id' => auth()->id(),
