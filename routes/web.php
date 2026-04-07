@@ -22,8 +22,7 @@ Route::get('/', function () {
  * RUTAS PÚBLICAS (AUTENTICACIÓN)
  */
 Route::get('/login', [AuthController::class, 'index'])->name('login');
-Route::post('/login', [AuthController::class, 'login'])->name('login.post');
-
+Route::post('/login', [AuthController::class, 'login'])->name('login.post')->middleware('throttle:5,1');
 /**
  * RUTAS PROTEGIDAS (MIDDLEWARE AUTH)
  */

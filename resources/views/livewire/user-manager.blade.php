@@ -63,6 +63,7 @@ $usuarios = computed(function () {
         <div class="card-body p-4">
             <div class="row g-3 align-items-end">
 
+                {{-- 1. Búsqueda por Nombre de Usuario --}}
                 <div class="col-lg-3 col-md-6" x-data="{ showDropdown: false }" @click.outside="showDropdown = false">
                     <label class="form-label-custom text-uppercase x-small fw-bold">Nombre de Usuario</label>
                     <div style="position: relative !important;">
@@ -95,6 +96,15 @@ $usuarios = computed(function () {
                     </div>
                 </div>
 
+                {{-- 2. Búsqueda por Email (Restaurado) --}}
+                <div class="col-lg-3 col-md-6">
+                    <label class="form-label-custom text-uppercase x-small fw-bold">Correo Electrónico</label>
+                    <div class="position-relative">
+                        <i class="fas fa-at text-muted position-absolute top-50 start-0 translate-middle-y ms-3"></i>
+                        <input type="text" wire:model.live.debounce.300ms="search" class="form-control ps-5"
+                            placeholder="Ej: admin@ragon.com...">
+                    </div>
+                </div>
 
                 {{-- 3. Filtro de Rol --}}
                 <div class="col-lg-4 col-md-6">
@@ -107,11 +117,17 @@ $usuarios = computed(function () {
                     </select>
                 </div>
 
-                {{-- 4. Botón Limpiar --}}
+                {{-- 4. Botón Limpiar (Con protección anti-doble clic) --}}
                 <div class="col-lg-2 col-md-12">
                     <button wire:click="$set('search', ''); $set('userFilter', ''); $set('roleFilter', '')"
+                        wire:loading.attr="disabled"
                         class="btn btn-outline-secondary rounded-pill w-100 fw-bold">
-                        <i class="fas fa-eraser me-1"></i> Limpiar
+                        <span wire:loading.remove wire:target="$set">
+                            <i class="fas fa-eraser me-1"></i> Limpiar
+                        </span>
+                        <span wire:loading wire:target="$set">
+                            <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>...
+                        </span>
                     </button>
                 </div>
             </div>

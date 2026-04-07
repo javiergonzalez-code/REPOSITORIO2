@@ -171,12 +171,21 @@ $logs = computed(function () {
                     <input type="date" wire:model.live="fecha" class="form-control">
                 </div>
 
-                {{-- Botón Limpiar --}}
+                {{-- Botón Limpiar con Protección Livewire --}}
                 <div class="{{ $this->esProveedor ? 'col-lg-5' : 'col-lg-2' }} col-md-12">
                     <button
                         wire:click="$set('search', ''); $set('userFilter', ''); $set('accion', ''); $set('fecha', '')"
+                        wire:loading.attr="disabled"
                         class="btn btn-outline-secondary rounded-pill w-100 fw-bold">
-                        <i class="fas fa-eraser me-1"></i> Limpiar
+                        
+                        <span wire:loading.remove wire:target="$set">
+                            <i class="fas fa-eraser me-1"></i> Limpiar
+                        </span>
+                        
+                        <span wire:loading wire:target="$set">
+                            <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>...
+                        </span>
+                        
                     </button>
                 </div>
             </div>

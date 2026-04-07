@@ -33,7 +33,6 @@ $sugerencias_usuarios = computed(function () {
     return $sugerencias;
 });
 
-// Computar la consulta principal reactiva
 $ordenes = computed(function () {
     $user = auth()->user();
     $query = Archivo::with('user')->whereIn('modulo', ['OC', 'INPUTS']);
@@ -69,7 +68,6 @@ $ordenes = computed(function () {
         {{ $this->ordenes->total() }} DOCUMENTOS ENCONTRADOS
     </div>
 
-    {{-- RECUADRO 2: FILTROS --}}
     <div class="card border-0 shadow-sm rounded-4 mb-4 bg-white custom-card"
         style="overflow: visible; position: relative; z-index: 1050;">
         <div class="card-header bg-transparent border-0 pt-4 px-4">
@@ -80,7 +78,6 @@ $ordenes = computed(function () {
         <div class="card-body p-4">
             <div class="row g-3 align-items-end">
 
-                {{-- Búsqueda Libre --}}
                 <div class="col-lg-3 col-md-6">
                     <label class="form-label-custom text-uppercase x-small fw-bold">Búsqueda General</label>
                     <div class="position-relative">
@@ -91,7 +88,6 @@ $ordenes = computed(function () {
                     </div>
                 </div>
 
-                {{-- Filtro de Usuario con Dropdown (CORREGIDO: Sin inputs duplicados) --}}
                 @if (!$this->esProveedor)
                     <div class="col-lg-3 col-md-6">
                         <label class="form-label-custom text-uppercase x-small fw-bold">Cargado por</label>
@@ -141,7 +137,6 @@ $ordenes = computed(function () {
                     <input type="date" wire:model.live="fecha" class="form-control">
                 </div>
 
-                {{-- Botón Limpiar --}}
                 <div class="{{ $this->esProveedor ? 'col-lg-5' : 'col-lg-2' }} col-md-12">
                     <button
                         wire:click="$set('search', ''); $set('userFilter', ''); $set('extension', ''); $set('fecha', '')"
@@ -153,7 +148,6 @@ $ordenes = computed(function () {
         </div>
     </div>
 
-    {{-- RECUADRO 3: TABLA --}}
     <div class="card border-0 shadow-sm rounded-4 mb-4 bg-white custom-card">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">

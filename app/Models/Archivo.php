@@ -48,4 +48,10 @@ class Archivo extends Model
     {
         return asset('storage/' . $this->ruta);
     }
+    protected static function booted()
+    {
+        static::forceDeleted(function ($archivo) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($archivo->ruta);
+        });
+    }
 }
