@@ -35,7 +35,7 @@ class UserController extends Controller
         $roles = $this->getRolesPermitidos();
         return view('users.create', compact('roles'));
     }
-
+    
     public function store(Request $request)
     {
         $rolesPermitidos = $this->getRolesPermitidos();
