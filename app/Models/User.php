@@ -13,17 +13,23 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class User extends Authenticatable
 {
     use HasFactory, Notifiable, HasRoles, LogsActivity, SoftDeletes;
-    
+
     protected $guard_name = 'web';
 
     protected static $recordEvents = ['created', 'updated'];
 
     protected $fillable = [
-        'name', 'email', 'password', 'codigo', 'rfc', 'telefono', 'role', 'roles', 'permissions',
+        'name',
+        'email',
+        'password',
+        'codigo',
+        'rfc',
+        'telefono',
     ];
 
     protected $hidden = [
-        'password', 'remember_token',
+        'password',
+        'remember_token',
     ];
 
     protected function casts(): array
@@ -41,7 +47,7 @@ class User extends Authenticatable
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->useLogName('user')
-            ->setDescriptionForEvent(fn(string $eventName) => match($eventName) {
+            ->setDescriptionForEvent(fn(string $eventName) => match ($eventName) {
                 'created' => 'Creación',
                 'updated' => 'Actualización',
                 default => $eventName,

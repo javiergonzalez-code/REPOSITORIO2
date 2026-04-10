@@ -29,11 +29,7 @@ class OcController extends Controller
             abort(403, 'No tienes permiso para descargar este archivo.');
         }
 
-        // SOLUCIÓN DEFINITIVA APLICADA
-        $rutaLimpia = str_replace('private/', '', $oc->ruta);
-        $path = storage_path('app/private/' . $rutaLimpia);
-        
-        if (!file_exists($path)) {
+        if (!\Illuminate\Support\Facades\Storage::disk('local')->exists($oc->ruta)) {
             \App\Models\Log::create([
                 'user_id' => auth()->id(),
                 'accion'  => 'Intento de descarga fallido (archivo físico extraviado): ' . $oc->nombre_original,
@@ -49,7 +45,7 @@ class OcController extends Controller
             'modulo'  => 'OC',
         ]);
 
-        return response()->download($path, $oc->nombre_original);
+        return \Illuminate\Support\Facades\Storage::disk('local')->download($oc->ruta, $oc->nombre_original);
     }
 
     public function preview($id)
@@ -62,17 +58,20 @@ class OcController extends Controller
             abort(403, 'No tienes permiso para previsualizar este archivo.');
         }
 
-        // SOLUCIÓN DEFINITIVA APLICADA AQUÍ TAMBIÉN
-        $rutaLimpia = str_replace('private/', '', $oc->ruta);
-        $path = storage_path('app/private/' . $rutaLimpia);
-        
-        if (!file_exists($path)) {
+        // AGREGANDO RASTREO DE AUDITORÍA FALTANTE
+        \App\Models\Log::create([
+            'user_id' => auth()->id(),
+            'accion'  => 'Previsualizó el archivo: ' . $oc->nombre_original,
+            'modulo'  => 'OC',
+        ]);
+
+        if (!\Illuminate\Support\Facades\Storage::disk('local')->exists($oc->ruta)) {
             Alert::error('Extraviado', 'El archivo físico no existe en el servidor.');
             return back();
         }
 
-        $extension = strtolower(pathinfo($oc->nombre_original, PATHINFO_EXTENSION));
-        $data = [];
+        // Extraer ruta real para procesos internos como libxml_load
+        $path = storage_path('app/' . $oc->ruta);
 
         $tamanoArchivo = filesize($path);
         if ($tamanoArchivo > 5242880) {
@@ -126,7 +125,7 @@ class OcController extends Controller
 
             \App\Models\Log::create([
                 'user_id' => auth()->id(),
-                'accion'  => 'Envió a la papelera la OC: ' . $nombreOriginal, 
+                'accion'  => 'Envió a la papelera la OC: ' . $nombreOriginal,
                 'modulo'  => 'OC',
             ]);
 

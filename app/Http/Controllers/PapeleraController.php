@@ -37,22 +37,22 @@ class PapeleraController extends Controller
     {
         $user = auth()->user();
         $esProveedor = $user->hasRole('proveedor') || $user->role === 'proveedor';
-        $mensaje = 'Acción no válida o tipo desconocido.';
 
         if ($tipo === 'usuario') {
             if ($esProveedor) abort(403, 'No tienes permiso para restaurar usuarios.');
             User::onlyTrashed()->findOrFail($id)->restore();
-            $mensaje = 'Usuario restaurado correctamente.';
+            return back()->with('success', 'Usuario restaurado correctamente.');
         } elseif ($tipo === 'archivo') {
             $archivo = Archivo::onlyTrashed()->findOrFail($id);
             if ($esProveedor && $archivo->user_id !== $user->id) {
                 abort(403, 'No puedes restaurar archivos ajenos.');
             }
             $archivo->restore();
-            $mensaje = 'Archivo restaurado correctamente.';
+            return back()->with('success', 'Archivo restaurado correctamente.');
         }
 
-        return back()->with('success', $mensaje);
+        // Si llega aquí, es porque alteraron la URL
+        return back()->with('error', 'Acción no válida o tipo desconocido.');
     }
 
     public function eliminarPermanente($tipo, $id)
@@ -62,23 +62,20 @@ class PapeleraController extends Controller
             return back()->with('error', 'No tienes permisos para borrar permanentemente.');
         }
 
-        $mensaje = 'Acción no válida.';
-
         if ($tipo === 'usuario') {
             User::onlyTrashed()->findOrFail($id)->forceDelete();
-            $mensaje = 'Usuario eliminado de forma permanente.';
+            return back()->with('success', 'Usuario eliminado de forma permanente.');
         } elseif ($tipo === 'archivo') {
             $archivo = Archivo::onlyTrashed()->findOrFail($id);
-            
-            // <-- CORRECCIÓN: Borrado seguro del archivo físico usando Storage de Laravel
+
             if (Storage::disk('local')->exists($archivo->ruta)) {
                 Storage::disk('local')->delete($archivo->ruta);
             }
-            
+
             $archivo->forceDelete();
-            $mensaje = 'Archivo y registro eliminados de forma permanente.';
+            return back()->with('success', 'Archivo y registro eliminados de forma permanente.');
         }
 
-        return back()->with('success', $mensaje);
+        return back()->with('error', 'Acción no válida.');
     }
 }
