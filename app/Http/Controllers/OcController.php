@@ -78,7 +78,8 @@ class OcController extends Controller
             Alert::warning('Archivo muy grande', 'El archivo es demasiado grande para previsualizarlo. Por favor, descárgalo.');
             return back();
         }
-
+        $extension = strtolower($oc->tipo_archivo);
+        
         try {
             if (in_array($extension, ['xlsx', 'xls', 'csv'])) {
                 $sheets = Excel::toArray(new class {}, $path);

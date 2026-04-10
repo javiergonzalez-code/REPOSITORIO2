@@ -20,7 +20,6 @@ class PapeleraController extends Controller
         $usuarios = collect();
         $archivos = collect();
 
-        // SEGURIDAD DE MEMORIA: Se cambió get() por paginate()
         if ($esProveedor) {
             $filtro = 'archivos';
             $archivos = Archivo::onlyTrashed()->with('user')->where('user_id', $user->id)->paginate(50);

@@ -39,11 +39,13 @@ Route::middleware(['auth'])->group(function () {
     // Gestión de Errores
     Route::get('/errores', [ErroresController::class, 'index'])->name('errores.index');
 
-    // ==========================================
+// ==========================================
     // RUTA PARA EL SWITCH DE MANTENIMIENTO (AJAX)
     // ==========================================
-    Route::post('/mantenimiento/toggle/{modulo}', [MantenimientoController::class, 'toggle'])->name('mantenimiento.toggle');
-
+    // 👇 SOLUCIÓN: Se agregó el middleware de permisos para que los proveedores no puedan apagar el sistema 👇
+    Route::post('/mantenimiento/toggle/{modulo}', [MantenimientoController::class, 'toggle'])
+        ->name('mantenimiento.toggle')
+        ->middleware('can:list users');
 
     // ==========================================
     // MÓDULO DE PAPELERA DE RECICLAJE - PROTEGIDO
