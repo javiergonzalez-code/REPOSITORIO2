@@ -1,7 +1,6 @@
 use Ragon_Pruebas;
 select * from OCRD where CardCode like 'p%'
 
-select cardcode, cardname, LicTradNum, Cellular, E_mail from OCRD where CardCode like 'p%'
 
 SELECT 
     COLUMN_NAME AS [Columna], 
@@ -16,6 +15,7 @@ WHERE
 ORDER BY 
     ORDINAL_POSITION;
 
+select cardcode, cardname, LicTradNum, Cellular, E_mail from OCRD where CardCode like 'p%'
 
 CardCode	nvarchar	15	NO
 CardName	nvarchar	100	YES

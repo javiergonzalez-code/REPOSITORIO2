@@ -42,7 +42,6 @@ Route::middleware(['auth'])->group(function () {
 // ==========================================
     // RUTA PARA EL SWITCH DE MANTENIMIENTO (AJAX)
     // ==========================================
-    // 👇 SOLUCIÓN: Se agregó el middleware de permisos para que los proveedores no puedan apagar el sistema 👇
     Route::post('/mantenimiento/toggle/{modulo}', [MantenimientoController::class, 'toggle'])
         ->name('mantenimiento.toggle')
         ->middleware('can:list users');

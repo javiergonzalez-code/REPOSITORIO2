@@ -3,8 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use App\Models\Archivo;
-use App\Models\Log;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
@@ -17,10 +15,10 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
-        // 0. Limpiar caché
+        // 0. Limpiar caché (Spatie)
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // 1. Crear Permisos 
+        // 1. Crear Permisos (Oficiales del sistema)
         $permissions = [
             'manage roles',
             'manage permissions',
@@ -38,56 +36,26 @@ class DatabaseSeeder extends Seeder
             Permission::firstOrCreate(['name' => $permission]);
         }
 
-        // 2. Crear Roles (¡AQUÍ AGREGAMOS EL SUPERADMIN!)
+        // 2. Crear Roles Oficiales
         $roleSuperAdmin = Role::firstOrCreate(['name' => 'superadmin']);
         $roleAdmin = Role::firstOrCreate(['name' => 'admin']);
         $roleProveedor = Role::firstOrCreate(['name' => 'proveedor']);
 
-        // 3. Asignar permisos
-        // El Admin tiene todo (opcionalmente el superadmin no necesita asignar permisos si usamos un Gate global, pero lo dejamos así para el admin normal)
+        // 3. Asignar permisos a los roles
         $roleAdmin->syncPermissions(Permission::all());
-
-        // El proveedor solo lo suyo
         $roleProveedor->syncPermissions(['list archivos', 'upload archivos']);
 
-        // 4. Tu usuario personal (Super Admin) - ¡AQUÍ CAMBIAMOS A SUPERADMIN!
+        // 4. Crear a tu usuario personal (Super Admin) - EL ÚNICO USUARIO INICIAL
         $myUser = User::updateOrCreate(
             ['email' => 'admin@ragon.com'],
             [
                 'name'     => 'Administrador Principal',
-                'password' => 'holamundo1234',
-                'role'     => 'superadmin', // <-- CAMBIO AQUÍ
+                'password' => bcrypt('holamundo1234'), // Asegúrate de encriptarlo con bcrypt() si tu modelo no lo hace solo
+                'role'     => 'superadmin', 
             ]
         );
-        $myUser->assignRole($roleSuperAdmin); // <-- CAMBIO AQUÍ
+        $myUser->assignRole($roleSuperAdmin); 
 
-        // 5. Crear 5 ADMINISTRADORES extra
-        User::factory(5)->create([
-            'role' => 'admin',
-        ])->each(function ($user) use ($roleAdmin) {
-            $user->assignRole($roleAdmin);
-        });
 
-        // 6. Crear 95 PROVEEDORES
-        User::factory(95)->create([
-            'role' => 'proveedor',
-            'password' => 'password',
-        ])->each(function ($user) use ($roleProveedor) {
-            $user->assignRole($roleProveedor);
-        });
-
-        // 7. Crear 100 archivos y sus logs
-        Archivo::factory(100)->create()->each(function ($archivo) {
-            Log::create([
-                'user_id'    => $archivo->user_id,
-                'accion'     => 'SUBIDA DE ARCHIVO',
-                'modulo'     => $archivo->modulo ?? 'ORDENES DE COMPRA',
-                'created_at' => $archivo->created_at,
-            ]);
-        });
-
-        $this->call([
-            PermissionSeeder::class, 
-        ]);
     }
 }
