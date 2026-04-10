@@ -35,7 +35,7 @@ class UserController extends Controller
         $roles = $this->getRolesPermitidos();
         return view('users.create', compact('roles'));
     }
-    
+
     public function store(Request $request)
     {
         $rolesPermitidos = $this->getRolesPermitidos();
@@ -46,7 +46,7 @@ class UserController extends Controller
             'email' => ['required', 'email', Rule::unique('users')->whereNull('deleted_at')],
             'telefono' => ['nullable', 'string', 'max:20'],
             'role'     => ['required', Rule::in($rolesPermitidos)],
-            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
         ], [
             'rfc.max' => 'El RFC no puede tener más de 13 caracteres.',
             'email.unique' => 'Este correo ya está registrado por otro usuario.',

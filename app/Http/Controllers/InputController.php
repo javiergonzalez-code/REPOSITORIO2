@@ -24,7 +24,7 @@ class InputController extends Controller
                 'required',
                 'file',
                 'mimes:csv,txt,xlsx,xls,xml',
-                'extensions:csv,xlsx,xls,xml',
+                'extensions:csv,xlsx,xls,xml,txt',
                 'max:5120',
             ]
         ], [
@@ -49,7 +49,8 @@ class InputController extends Controller
         try {
             $file = $request->file('archivo');
 
-            $originalName = preg_replace('/[^a-zA-Z0-9-_\.]/', '', $file->getClientOriginalName());
+            $nombreSinExt = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $originalName = \Illuminate\Support\Str::slug($nombreSinExt, '_') . '.' . $file->getClientOriginalExtension();
             if (strlen($originalName) > 200) {
                 $originalName = substr($originalName, -200);
             }
@@ -89,6 +90,10 @@ class InputController extends Controller
             Alert::success('¡Subida Exitosa!', 'Archivo subido y verificado correctamente.');
             return back();
         } catch (QueryException $e) {
+            if (isset($path) && Storage::disk('local')->exists($path)) {
+                Storage::disk('local')->delete($path);
+            }
+
             Log::create([
                 'user_id' => auth()->id(),
                 'accion'  => 'Error interno (Base de Datos): ' . $e->getMessage(),
@@ -101,7 +106,6 @@ class InputController extends Controller
             Log::create([
                 'user_id' => auth()->id(),
                 'accion'  => 'Error interno (Seguridad/Servidor): ' . $e->getMessage(),
-                // CORRECCIÓN 3: El módulo correcto para que no diga OC
                 'modulo'  => 'INPUTS',
             ]);
 
@@ -115,17 +119,16 @@ class InputController extends Controller
         $archivo = Archivo::findOrFail($id);
         $user = auth()->user();
 
+        // 1. Validación de seguridad (¡Esto lo hiciste perfecto!)
         if (($user->hasRole('proveedor') || $user->role === 'proveedor') && $archivo->user_id !== $user->id) {
             abort(403, 'No tienes permiso para descargar este archivo.');
         }
 
-        $rutaLimpia = str_replace('private/', '', $archivo->ruta);
-        $path = storage_path('app/private/' . $rutaLimpia);
-
-        if (!file_exists($path)) {
+        // 2. Búsqueda y descarga limpia y nativa de Laravel (Sin str_replace)
+        if (!\Illuminate\Support\Facades\Storage::disk('local')->exists($archivo->ruta)) {
             abort(404, 'El archivo físico no se encuentra en el servidor.');
         }
 
-        return response()->download($path, $archivo->nombre_original);
+        return \Illuminate\Support\Facades\Storage::disk('local')->download($archivo->ruta, $archivo->nombre_original);
     }
 }
