@@ -42,6 +42,7 @@ class DatabaseSeeder extends Seeder
         $roleProveedor = Role::firstOrCreate(['name' => 'proveedor']);
 
         // 3. Asignar permisos a los roles
+        $roleSuperAdmin->syncPermissions(Permission::all());
         $roleAdmin->syncPermissions(Permission::all());
         $roleProveedor->syncPermissions(['list archivos', 'upload archivos']);
 
@@ -50,12 +51,10 @@ class DatabaseSeeder extends Seeder
             ['email' => 'admin@ragon.com'],
             [
                 'name'     => 'Administrador Principal',
-                'password' => bcrypt('holamundo1234'), // Asegúrate de encriptarlo con bcrypt() si tu modelo no lo hace solo
-                'role'     => 'superadmin', 
+                'password' => bcrypt('holamundo1234'),
+                'role'     => 'superadmin',
             ]
         );
-        $myUser->assignRole($roleSuperAdmin); 
-
-
+        $myUser->assignRole($roleSuperAdmin);
     }
 }
