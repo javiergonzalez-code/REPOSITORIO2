@@ -44,14 +44,16 @@ Route::middleware(['auth'])->group(function () {
     // ==========================================
     Route::post('/mantenimiento/toggle/{modulo}', [MantenimientoController::class, 'toggle'])->name('mantenimiento.toggle');
 
-// ==========================================
+    // ==========================================
+    // MÓDULO DE PAPELERA DE RECICLAJE
+    // ==========================================
+    // ==========================================
     // MÓDULO DE PAPELERA DE RECICLAJE - PROTEGIDO
     // ==========================================
-    Route::middleware(['can:list users'])->group(function () {
-        Route::get('/papelera', [App\Http\Controllers\PapeleraController::class, 'index'])->name('papelera.index');
-        Route::post('/papelera/restaurar/{tipo}/{id}', [App\Http\Controllers\PapeleraController::class, 'restaurar'])->name('papelera.restaurar');
-        Route::delete('/papelera/eliminar/{tipo}/{id}', [App\Http\Controllers\PapeleraController::class, 'eliminarPermanente'])->name('papelera.eliminar');
-    }); 
+    // SE QUITÓ EL MIDDLEWARE 'can:list users' PARA QUE EL CONTROLADOR HAGA EL FILTRO DINÁMICO
+    Route::get('/papelera', [App\Http\Controllers\PapeleraController::class, 'index'])->name('papelera.index');
+    Route::post('/papelera/restaurar/{tipo}/{id}', [App\Http\Controllers\PapeleraController::class, 'restaurar'])->name('papelera.restaurar');
+    Route::delete('/papelera/eliminar/{tipo}/{id}', [App\Http\Controllers\PapeleraController::class, 'eliminarPermanente'])->name('papelera.eliminar');
     // EL `});` SE ELIMINÓ DE AQUÍ PARA NO ROMPER LA SEGURIDAD
 
     // ==========================================
@@ -119,5 +121,4 @@ Route::middleware(['auth'])->group(function () {
             ->name('users.show')
             ->middleware('can:list users');
     });
-
 });

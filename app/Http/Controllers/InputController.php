@@ -89,27 +89,36 @@ class InputController extends Controller
 
             Alert::success('¡Subida Exitosa!', 'Archivo subido y verificado correctamente.');
             return back();
-        } catch (QueryException $e) {
+} catch (QueryException $e) {
             if (isset($path) && Storage::disk('local')->exists($path)) {
                 Storage::disk('local')->delete($path);
             }
 
-            Log::create([
-                'user_id' => auth()->id(),
-                'accion'  => 'Error interno (Base de Datos): ' . $e->getMessage(),
-                'modulo'  => 'INPUTS'
-            ]);
+            try {
+                Log::create([
+                    'user_id' => auth()->id(),
+                    'accion'  => \Illuminate\Support\Str::limit('Error interno (Base de Datos): ' . $e->getMessage(), 250),
+                    'modulo'  => 'INPUTS'
+                ]);
+            } catch (\Exception $logE) {
+                \Illuminate\Support\Facades\Log::error('Fallo log Input BD: ' . $logE->getMessage());
+            }
 
             Alert::error('Error Crítico', 'No se pudo registrar en la base de datos.');
             return back();
+            
         } catch (\Exception $e) {
-            Log::create([
-                'user_id' => auth()->id(),
-                'accion'  => 'Error interno (Seguridad/Servidor): ' . $e->getMessage(),
-                'modulo'  => 'INPUTS',
-            ]);
+            try {
+                Log::create([
+                    'user_id' => auth()->id(),
+                    'accion'  => \Illuminate\Support\Str::limit('Error interno (Servidor): ' . $e->getMessage(), 250),
+                    'modulo'  => 'INPUTS',
+                ]);
+            } catch (\Exception $logE) {
+                \Illuminate\Support\Facades\Log::error('Fallo log Input Servidor: ' . $logE->getMessage());
+            }
 
-            Alert::error('Error del Servidor', 'Error al procesar el archivo: ' . $e->getMessage());
+            Alert::error('Error del Servidor', 'Error al procesar el archivo.');
             return back();
         }
     }
