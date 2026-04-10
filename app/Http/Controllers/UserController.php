@@ -54,15 +54,20 @@ class UserController extends Controller
 
         try {
             DB::transaction(function () use ($validatedData) {
-                $user = User::create([
+                // 1. Creamos la instancia sin el rol
+                $user = new User([
                     'name'     => $validatedData['name'],
                     'rfc'      => $validatedData['rfc'] ?? null,
                     'email'    => $validatedData['email'],
                     'telefono' => $validatedData['telefono'] ?? null,
                     'password' => Hash::make($validatedData['password']),
-                    'role'     => $validatedData['role'],
                 ]);
 
+                // 2. Forzamos la asignación del rol manualmente
+                $user->role = $validatedData['role'];
+                $user->save();
+
+                // 3. Asignamos en Spatie
                 $user->assignRole($validatedData['role']);
 
                 \App\Models\Log::create([
@@ -126,13 +131,18 @@ class UserController extends Controller
 
         try {
             DB::transaction(function () use ($request, $user, $validatedData) {
-                $user->fill($request->except('password'));
+                // 1. Llenamos los datos ignorando explícitamente password y role
+                $user->fill($request->except(['password', 'role']));
 
                 if ($request->filled('password')) {
                     $user->password = Hash::make($request->password);
                 }
 
+                // 2. Forzamos la asignación del rol manualmente
+                $user->role = $validatedData['role'];
                 $user->save();
+
+                // 3. Sincronizamos en Spatie
                 $user->syncRoles([$validatedData['role']]);
 
                 \App\Models\Log::create([

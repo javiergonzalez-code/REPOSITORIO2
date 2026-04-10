@@ -44,13 +44,14 @@ Route::middleware(['auth'])->group(function () {
     // ==========================================
     Route::post('/mantenimiento/toggle/{modulo}', [MantenimientoController::class, 'toggle'])->name('mantenimiento.toggle');
 
+// ==========================================
+    // MÓDULO DE PAPELERA DE RECICLAJE - PROTEGIDO
     // ==========================================
-    // MÓDULO DE PAPELERA DE RECICLAJE
-    // ==========================================
-    Route::get('/papelera', [App\Http\Controllers\PapeleraController::class, 'index'])->name('papelera.index');
-    Route::post('/papelera/restaurar/{tipo}/{id}', [App\Http\Controllers\PapeleraController::class, 'restaurar'])->name('papelera.restaurar');
-    Route::delete('/papelera/eliminar/{tipo}/{id}', [App\Http\Controllers\PapeleraController::class, 'eliminarPermanente'])->name('papelera.eliminar');
-    
+    Route::middleware(['can:list users'])->group(function () {
+        Route::get('/papelera', [App\Http\Controllers\PapeleraController::class, 'index'])->name('papelera.index');
+        Route::post('/papelera/restaurar/{tipo}/{id}', [App\Http\Controllers\PapeleraController::class, 'restaurar'])->name('papelera.restaurar');
+        Route::delete('/papelera/eliminar/{tipo}/{id}', [App\Http\Controllers\PapeleraController::class, 'eliminarPermanente'])->name('papelera.eliminar');
+    }); 
     // EL `});` SE ELIMINÓ DE AQUÍ PARA NO ROMPER LA SEGURIDAD
 
     // ==========================================
