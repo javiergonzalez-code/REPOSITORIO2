@@ -8,18 +8,18 @@
                 <div class="text-center mb-4">
                     <h1 class="display-5 fw-bold">Panel de Control</h1>
                     <p class="text-muted lead">
-                        Bienvenido de nuevo, <span class="fw-bold text-primary">{{ Auth::user()->name }}</span>.
+                        {{-- CRÍTICO: Cambiamos ->name por ->CardName para SQL Server --}}
+                        Bienvenido de nuevo, <span class="fw-bold text-primary">{{ Auth::user()->CardName }}</span>.
                         Selecciona una sección para empezar a gestionar.
                     </p>
                 </div>
             </div>
 
             {{-- PANEL CENTRAL DE MANTENIMIENTO --}}
-            @if (auth()->user()->hasRole('Super Admin') ||
-                    auth()->user()->hasRole('Administrador') ||
-                    auth()->user()->email === 'admin@ragon.com')
+            {{-- Limpieza: Usamos directiva de Spatie y eliminamos el correo hardcodeado --}}
+            @hasanyrole('superadmin|admin')
                 <div class="row justify-content-center mb-4">
-                    <div class="col-md-8"> {{-- Se hizo más ancho (col-md-8) para que quepan bien --}}
+                    <div class="col-md-8">
                         <div class="card border-warning shadow-sm">
                             <div class="card-header bg-warning text-dark fw-bold">
                                 <i class="fas fa-tools"></i> Panel Central de Mantenimiento (Admin)
@@ -75,7 +75,7 @@
                                     </div>
 
                                     {{-- Switch Errores --}}
-                                    <div class="col-md-6 mb-3">
+                                    <div class="col-md-6 mb-3 mt-3">
                                         <div class="form-check form-switch fs-6">
                                             <input class="form-check-input cursor-pointer" type="checkbox"
                                                 id="switchErrores" {{ $mantenimientoErrores ? 'checked' : '' }}
@@ -90,7 +90,7 @@
                         </div>
                     </div>
                 </div>
-            @endif
+            @endhasanyrole
 
             {{-- Contenedor de la Cuadrícula (Grid) --}}
             <div class="dashboard-grid">
@@ -104,17 +104,14 @@
                 <x-dashboard-card route="{{ route('oc.index') }}" icon="fas fa-file-invoice-dollar" title="OC" />
 
                 {{-- Tarjeta para Manejo de usuarios --}}
-                @if (auth()->user()->role === 'admin' ||
-                        auth()->user()->role === 'superadmin' ||
-                        auth()->user()->email === 'admin@ragon.com')
+                @hasanyrole('superadmin|admin')
                     <x-dashboard-card route="{{ route('users.index') }}" icon="fas fa-user" title="Usuarios" />
-                @endif
-
-
+                @endhasanyrole
 
             </div>
 
-            @role('Super Admin')
+            {{-- Limpieza: Cambiamos 'Super Admin' por 'superadmin' que es el nombre oficial en tu base de datos --}}
+            @role('superadmin')
                 <div class="mt-4 module-header">
                     <h3>Panel de Administración General</h3>
                 </div>

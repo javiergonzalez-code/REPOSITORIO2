@@ -5,22 +5,41 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 
 class PermissionSeeder extends Seeder
 {
-// database/seeders/PermissionSeeder.php
-public function run()
-{
-    app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+    public function run(): void
+    {
+        // 1. Limpiar caché de Spatie (Obligatorio antes de sembrar)
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-    // Crear todos los permisos usados en web.php
-    Permission::firstOrCreate(['name' => 'list users']);
-    Permission::firstOrCreate(['name' => 'create users']);
-    Permission::firstOrCreate(['name' => 'edit users']);   // <--- Importante
-    Permission::firstOrCreate(['name' => 'delete users']); // <--- Importante
+        // 2. Crear la lista completa de permisos de tu sistema
+        $permissions = [
+            'manage roles',
+            'manage permissions',
+            'create users',
+            'edit users',
+            'list users',
+            'delete users',
+            'list archivos',
+            'upload archivos',
+            'delete archivos',
+            'list logs'
+        ];
 
-    $admin = Role::firstOrCreate(['name' => 'admin']);
-    // Asignar todos los permisos al admin
-    $admin->syncPermissions(Permission::all());
-}
+        foreach ($permissions as $permission) {
+            Permission::firstOrCreate(['name' => $permission]);
+        }
+
+        // 3. Crear los roles oficiales del sistema
+        $roleSuperAdmin = Role::firstOrCreate(['name' => 'superadmin']);
+        $roleAdmin      = Role::firstOrCreate(['name' => 'admin']);
+        $roleProveedor  = Role::firstOrCreate(['name' => 'proveedor']);
+
+        // 4. Asignar los permisos correspondientes a cada rol
+        $roleSuperAdmin->syncPermissions(Permission::all()); // Superadmin tiene todo
+        $roleAdmin->syncPermissions(Permission::all());      // Admin tiene todo
+        $roleProveedor->syncPermissions(['list archivos', 'upload archivos']); // Proveedor está limitado
+    }
 }

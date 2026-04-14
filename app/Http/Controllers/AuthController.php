@@ -19,7 +19,7 @@ class AuthController extends Controller
         return view('login');
     }
 
-    public function login(Request $request)
+public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
@@ -31,14 +31,20 @@ class AuthController extends Controller
             return back()->withErrors($validator)->withInput($request->except('password'));
         }
 
-        $credentials = $validator->validated();
+        $validData = $validator->validated();
 
+        // AQUÍ ESTÁ LA MAGIA: Mapeamos el input 'email' del formulario a la columna 'E_Mail' de tu BD
+        $credentials = [
+            'E_Mail'   => $validData['email'],
+            'password' => $validData['password'],
+        ];
+
+        // Intentamos el login con las credenciales mapeadas
         if (Auth::attempt($credentials)) {
-
             $request->session()->regenerate();
 
             \App\Models\Log::create([
-                'user_id' => auth()->id(),
+                'user_id' => auth()->id(), // Ya te devolverá el CardCode
                 'accion'  => 'Inicio de sesión exitoso',
                 'modulo'  => 'AUTH'
             ]);
@@ -46,8 +52,9 @@ class AuthController extends Controller
             return redirect()->route('home');
         }
 
-        Alert::error('Error de acceso', 'Las credenciales ingresadas son incorrectas.');
-        return back();
+        // Si las credenciales no coinciden
+        Alert::error('Acceso Denegado', 'Las credenciales proporcionadas son incorrectas.');
+        return back()->withInput($request->except('password'));
     }
 
     public function home()

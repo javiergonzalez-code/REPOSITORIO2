@@ -46,11 +46,12 @@ class DatabaseSeeder extends Seeder
         $roleAdmin->syncPermissions(Permission::all());
         $roleProveedor->syncPermissions(['list archivos', 'upload archivos']);
 
-        // 4. Crear a tu usuario personal (Super Admin) - EL ÚNICO USUARIO INICIAL
+        // 4. Crear a tu usuario personal (Super Admin) - ADAPTADO A SQL SERVER
         $myUser = User::updateOrCreate(
-            ['email' => 'admin@ragon.com'],
+            ['E_Mail' => 'admin@ragon.com'], // Se busca por la nueva columna de correo
             [
-                'name'     => 'Administrador Principal',
+                'CardCode' => 'SUPERADMIN01', // CRÍTICO: Debemos enviarle la llave primaria manualmente (máx 15 chars)
+                'CardName' => 'Administrador Principal', // Sustituye a 'name'
                 'password' => bcrypt('holamundo1234'),
                 'role'     => 'superadmin',
             ]

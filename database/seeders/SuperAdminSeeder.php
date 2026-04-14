@@ -16,10 +16,11 @@ class SuperAdminSeeder extends Seeder
         Role::firstOrCreate(['name' => 'proveedor', 'guard_name' => 'web']);
 
         // 2. Asignar rol al admin principal tanto en la columna normal como en Spatie
-        $user = User::where('email', 'admin@ragon.com')->first();
+        // BUSCAMOS POR "E_Mail" en lugar de "email"
+        $user = User::where('E_Mail', 'admin@ragon.com')->first();
         
         if ($user) {
-            // Actualiza la columna de tu base de datos MySQL
+            // Actualiza la columna de tu base de datos MySQL (este atributo se llama 'role')
             $user->role = 'superadmin';
             $user->save();
             
