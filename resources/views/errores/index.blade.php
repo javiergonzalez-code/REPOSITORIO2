@@ -22,20 +22,21 @@
                     <div class="card-body p-0">
                         <div class="table-responsive">
                             <table class="table table-hover align-middle mb-0 border-top-0">
-                                {{-- Quitamos el background fijo para que se adapte al dark mode --}}
+
+
                                 <thead>
-                                    <tr class="text-uppercase"
-                                        style="font-size: 0.7rem; font-weight: 700; color: #64748b; letter-spacing: 0.5px;">
-                                        <th class="ps-4 py-3 border-0">Nivel / Estado</th>
+                                    <tr class="text-muted"
+                                        style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                                        <th class="ps-4 py-3 border-0 rounded-start">Nivel / Estado</th>
                                         <th class="py-3 border-0">Usuario Afectado</th>
                                         <th class="py-3 border-0">Detalle del Error</th>
                                         <th class="text-center py-3 pe-4 border-0">Fecha y Hora</th>
+                                        <th class="text-center py-3 pe-4 border-0 rounded-end">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody class="border-top-0">
-                                    @forelse($logs ?? $errores as $error)
+                                    @forelse($erroresCarga as $error)
                                         <tr style="transition: all 0.2s ease;">
-
                                             {{-- COLUMNA 1: Nivel de Error --}}
                                             <td class="ps-4 py-3">
                                                 <div class="status-indicator status-error">
@@ -45,47 +46,60 @@
 
                                             {{-- COLUMNA 2: Usuario --}}
                                             <td class="py-3">
-                                                <x-user-avatar :name="$error->user->name ?? 'Desconocido'" :userId="$error->user->id ?? 0" :subtitle="$error->user->role ?? 'SISTEMA'" />
+                                                @if ($error->user)
+                                                    <div class="d-flex align-items-center">
+                                                        {{-- El componente ya dibuja la foto, el nombre y el rol --}}
+                                                        <x-user-avatar :user="$error->user" />
+                                                    </div>
+                                                @else
+                                                    <span class="text-muted fst-italic">Usuario Eliminado /
+                                                        Desconocido</span>
+                                                @endif
                                             </td>
 
-                                            {{-- COLUMNA 3: Descripción del Error --}}
-                                            <td class="py-3" style="max-width: 320px;">
-                                                <div class="text-danger fw-bold mb-1"
-                                                    style="font-size: 0.85rem; line-height: 1.4;">
-                                                    <i class="fas fa-times-circle me-1"></i>
-                                                    {{ $error->accion ?? 'Error no especificado' }}
-                                                </div>
-                                                <div class="d-inline-flex align-items-center rounded px-2 py-1 shadow-sm mt-1 border"
-                                                    style="font-size: 0.7rem; font-family: monospace;">
-                                                    <i class="fas fa-cube me-2" style="opacity: 0.6;"></i> Módulo:
-                                                    {{ $error->modulo ?? 'Global' }}
+                                            {{-- COLUMNA 3: Detalle del Error (Resumido) --}}
+                                            <td class="py-3">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="bg-light rounded p-2 me-3">
+                                                        <i class="fas fa-exclamation-triangle text-danger"></i>
+                                                    </div>
+                                                    <div>
+                                                        {{-- Muestra solo un resumen para no saturar la tabla --}}
+                                                        <span class="d-block text-dark fw-medium"
+                                                            style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                                            {{ $error->accion ?? 'Error no especificado' }}
+                                                        </span>
+                                                        <span
+                                                            class="badge bg-danger bg-opacity-10 text-danger border border-danger-subtle mt-1">
+                                                            Módulo: {{ $error->modulo ?? 'Global' }}
+                                                        </span>
+                                                    </div>
                                                 </div>
                                             </td>
 
                                             {{-- COLUMNA 4: Fecha y Hora --}}
-                                            <td class="text-center py-3 pe-4">
-                                                <div class="d-flex flex-column align-items-center justify-content-center">
-                                                    {{-- Se eliminó text-dark para que las letras se vuelvan blancas en modo oscuro --}}
-                                                    <span class="fw-bold mb-1" style="font-size: 0.85rem;">
-                                                        {{ $error->created_at->format('d M, Y') }}
-                                                    </span>
-                                                    <span class="badge border font-monospace shadow-sm"
-                                                        style="font-size: 0.75rem; padding: 4px 8px; color: #64748b; background-color: transparent;">
-                                                        <i class="far fa-clock me-1 opacity-50"></i>
-                                                        {{ $error->created_at->format('H:i:s') }}
-                                                    </span>
-                                                </div>
+                                            <td class="text-center py-3">
+                                                <span
+                                                    class="d-block fw-bold text-dark">{{ $error->created_at->format('d M, Y') }}</span>
+                                                <span
+                                                    class="text-muted small">{{ $error->created_at->format('H:i:s') }}</span>
                                             </td>
 
+                                            {{-- COLUMNA 5: Acciones --}}
+                                            <td class="text-center py-3 pe-4">
+                                                <a href="{{ route('errores.show', $error->id) }}"
+                                                    class="btn btn-sm btn-outline-primary shadow-sm" title="Ver Detalles">
+                                                    <i class="fas fa-eye"></i> Ver
+                                                </a>
+                                            </td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="4" class="text-center py-5">
-                                                <div class="py-4">
-                                                    <i class="fas fa-check-circle fa-3x text-success mb-3 opacity-50"></i>
-                                                    <h5 class="text-muted fw-bold">Sistema Estable</h5>
-                                                    <p class="text-muted small">No se han registrado errores o excepciones
-                                                        recientemente.</p>
+                                            <td colspan="5" class="text-center py-5 text-muted">
+                                                <div class="d-flex flex-column align-items-center">
+                                                    <i class="fas fa-check-circle fs-1 text-success opacity-50 mb-3"></i>
+                                                    <h5 class="fw-bold text-dark">No hay errores reportados</h5>
+                                                    <p class="mb-0">El sistema funciona correctamente.</p>
                                                 </div>
                                             </td>
                                         </tr>

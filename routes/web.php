@@ -36,8 +36,10 @@ Route::middleware(['auth'])->group(function () {
     // Cierre de sesión
     Route::post('/logout', [LogoutController::class, 'destroy'])->name('logout');
 
-    // Gestión de Errores
-    Route::get('/errores', [ErroresController::class, 'index'])->name('errores.index');
+
+    // Módulo de Errores 
+    Route::get('/errores', [App\Http\Controllers\ErroresController::class, 'index'])->name('errores.index');
+    Route::get('/errores/{id}', [App\Http\Controllers\ErroresController::class, 'show'])->name('errores.show'); // <- RUTA NUEVA
 
 // ==========================================
     // RUTA PARA EL SWITCH DE MANTENIMIENTO (AJAX)
@@ -47,19 +49,11 @@ Route::middleware(['auth'])->group(function () {
         ->middleware('can:list users');
 
     // ==========================================
-    // MÓDULO DE PAPELERA DE RECICLAJE - PROTEGIDO
-    // ==========================================
-    Route::get('/papelera', [App\Http\Controllers\PapeleraController::class, 'index'])->name('papelera.index');
-    Route::post('/papelera/restaurar/{tipo}/{id}', [App\Http\Controllers\PapeleraController::class, 'restaurar'])->name('papelera.restaurar');
-    Route::delete('/papelera/eliminar/{tipo}/{id}', [App\Http\Controllers\PapeleraController::class, 'eliminarPermanente'])->name('papelera.eliminar');
-
-    // ==========================================
     // MÓDULO DE CARGA DE ARCHIVOS (INPUTS) - PROTEGIDO
     // ==========================================
     Route::middleware(['mantenimiento:inputs'])->group(function () {
         Route::get('/inputs', [InputController::class, 'index'])->name('input.index');
         Route::post('/inputs/store', [InputController::class, 'store'])->name('input.store');
-        // Ruta para descargar archivos de forma segura
         Route::get('/archivos/descargar/{id}', [InputController::class, 'download'])->name('archivos.download');
     });
 

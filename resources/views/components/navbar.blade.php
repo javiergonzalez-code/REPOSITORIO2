@@ -5,13 +5,11 @@
                 style="max-height: 50px; object-fit: contain;">
         </a>
 
-        {{-- Botón de Hamburguesa para Móvil --}}
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarNav">
-            {{-- LADO IZQUIERDO: Enlaces de navegación protegidos --}}
             <ul class="navbar-nav me-auto">
                 @auth
                     <li class="nav-item">
@@ -19,7 +17,6 @@
                             href="{{ route('home') }}">Inicio</a>
                     </li>
 
-                    {{-- IMPLEMENTACIÓN DE ROLES Y PERMISOS --}}
                     @can('list users')
                         <li class="nav-item">
                             <a class="nav-link {{ request()->is('users*') ? 'active' : '' }}" href="{{ route('users.index') }}">
@@ -42,12 +39,15 @@
                         <a class="nav-link {{ request()->is('logs*') ? 'active' : '' }}"
                             href="{{ route('logs.index') }}">Logs</a>
                     </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->is('errores*') ? 'active' : '' }}"
+                            href="{{ route('errores.index') }}">Errores</a>
+                    </li>
                 @endauth
             </ul>
 
-            {{-- LADO DERECHO: Herramientas y Usuario --}}
             <div class="d-flex align-items-center gap-3">
-                {{-- Botón Modo Oscuro --}}
                 <button id="dark-mode-toggle" class="btn btn-link text-white p-0 shadow-none">
                     <i class="fas fa-moon" id="dark-mode-icon"></i>
                 </button>

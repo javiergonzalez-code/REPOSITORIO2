@@ -17,7 +17,7 @@ class InputController extends Controller
         return view('inputs.index');
     }
 
-    public function store(Request $request)
+public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'archivo' => [
@@ -35,89 +35,94 @@ class InputController extends Controller
 
         if ($validator->fails()) {
             $errores = implode(' | ', $validator->errors()->all());
-
             Log::create([
                 'user_id' => auth()->id(),
                 'accion'  => 'Intento fallido (Validación/Seguridad): ' . $errores,
                 'modulo'  => 'INPUTS',
             ]);
-
             Alert::error('Archivo no válido', $errores);
             return back();
         }
 
         try {
             $file = $request->file('archivo');
-
             $nombreSinExt = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
             $originalName = \Illuminate\Support\Str::slug($nombreSinExt, '_') . '.' . $file->getClientOriginalExtension();
+            
             if (strlen($originalName) > 200) {
                 $originalName = substr($originalName, -200);
             }
 
-            $extension = $file->getClientOriginalExtension();
-
-            $allowedExtensions = ['csv', 'xlsx', 'xls', 'xml', 'txt'];
-            if (!in_array(strtolower($extension), $allowedExtensions)) {
-                throw new \Exception("Extensión de archivo maliciosa detectada.");
-            }
-
+            $extension = strtolower($file->getClientOriginalExtension());
             $systemName = time() . '_' . uniqid() . '_' . $originalName;
 
-            // CORRECCIÓN 1: Guardar físicamente en la carpeta privada
+            // Guardar físicamente
             $path = $file->storeAs('private/uploads', $systemName, 'local');
 
             if (!$path) {
-                throw new \Exception("El servidor denegó el permiso de escritura en el disco duro.");
+                throw new \Exception("El servidor denegó el permiso de escritura.");
             }
 
+            // ====================================================================
+            // CLASIFICADOR UNIFICADO (A PRUEBA DE ERRORES)
+            // ====================================================================
+            
+            // Leemos el encabezado y lo pasamos a MAYÚSCULAS
+            $contenidoParcial = file_get_contents($file->getRealPath(), false, null, 0, 500);
+            $contenidoUpper = strtoupper($contenidoParcial);
+            
+            $moduloDestino = 'OC'; // Valor por defecto
+
+            if (
+                str_contains($contenidoUpper, 'TIPOERROR') || 
+                str_contains($contenidoUpper, 'EXCEPCION') || 
+                str_contains($contenidoUpper, 'FORMATO')
+            ) {
+                $moduloDestino = 'ERRORES';
+            } 
+            elseif (
+                str_contains($contenidoUpper, 'EXTRA') || 
+                str_contains($contenidoUpper, 'EXITOSA') || 
+                str_contains($contenidoUpper, 'OC HIJA CREADA')
+            ) {
+                $moduloDestino = 'LOGS';
+            }
+
+            // Crear registro en Base de Datos
             Archivo::create([
                 'user_id'         => auth()->id(),
                 'nombre_original' => $originalName,
                 'nombre_sistema'  => $systemName,
-                'tipo_archivo'    => strtolower($extension),
-                // CORRECCIÓN 2: Guardar la ruta correcta en la base de datos
+                'tipo_archivo'    => $extension,
                 'ruta'            => 'private/uploads/' . $systemName,
-                'modulo'          => 'INPUTS',
+                'modulo'          => $moduloDestino, 
             ]);
 
+            // Registrar el Log de la acción
             Log::create([
                 'user_id' => auth()->id(),
                 'accion'  => 'Subió con éxito: ' . $originalName,
-                'modulo'  => 'INPUTS',
+                'modulo'  => $moduloDestino,
             ]);
 
-            Alert::success('¡Subida Exitosa!', 'Archivo subido y verificado correctamente.');
+            Alert::success('¡Subida Exitosa!', 'Archivo clasificado en el módulo: ' . $moduloDestino);
             return back();
-} catch (QueryException $e) {
-            if (isset($path) && Storage::disk('local')->exists($path)) {
-                Storage::disk('local')->delete($path);
-            }
 
-            try {
-                Log::create([
-                    'user_id' => auth()->id(),
-                    'accion'  => \Illuminate\Support\Str::limit('Error interno (Base de Datos): ' . $e->getMessage(), 250),
-                    'modulo'  => 'INPUTS'
-                ]);
-            } catch (\Exception $logE) {
-                \Illuminate\Support\Facades\Log::error('Fallo log Input BD: ' . $logE->getMessage());
-            }
-
+        } catch (QueryException $e) {
+            if (isset($path)) Storage::disk('local')->delete($path);
+            Log::create([
+                'user_id' => auth()->id(),
+                'accion'  => \Illuminate\Support\Str::limit('Error BD: ' . $e->getMessage(), 250),
+                'modulo'  => 'INPUTS'
+            ]);
             Alert::error('Error Crítico', 'No se pudo registrar en la base de datos.');
             return back();
-            
         } catch (\Exception $e) {
-            try {
-                Log::create([
-                    'user_id' => auth()->id(),
-                    'accion'  => \Illuminate\Support\Str::limit('Error interno (Servidor): ' . $e->getMessage(), 250),
-                    'modulo'  => 'INPUTS',
-                ]);
-            } catch (\Exception $logE) {
-                \Illuminate\Support\Facades\Log::error('Fallo log Input Servidor: ' . $logE->getMessage());
-            }
-
+            Log::create([
+                'user_id' => auth()->id(),
+                'accion'  => \Illuminate\Support\Str::limit('Error Servidor: ' . $e->getMessage(), 250),
+                'modulo'  => 'INPUTS',
+            ]);
             Alert::error('Error del Servidor', 'Error al procesar el archivo.');
             return back();
         }

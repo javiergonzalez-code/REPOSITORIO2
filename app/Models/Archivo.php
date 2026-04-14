@@ -4,13 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
 class Archivo extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
     use LogsActivity;
 
     protected $fillable = [
@@ -25,8 +24,7 @@ class Archivo extends Model
     public function getActivitylogOptions(): \Spatie\Activitylog\LogOptions
     {
         return LogOptions::defaults()
-            // AÑADIMOS los campos correctos de la tabla archivos
-            ->logOnly(['nombre_original', 'nombre_sistema', 'tipo_archivo', 'modulo', 'ruta', 'deleted_at'])
+            ->logOnly(['nombre_original', 'nombre_sistema', 'tipo_archivo', 'modulo', 'ruta'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->useLogName('archivo')
@@ -34,7 +32,6 @@ class Archivo extends Model
                 'created' => 'Creación',
                 'updated' => 'Actualización',
                 'deleted' => 'Eliminación',
-                'restored' => 'Restauración',
                 default => $eventName,
             });
     }

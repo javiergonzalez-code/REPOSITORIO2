@@ -92,56 +92,6 @@
                 </div>
             @endif
 
-            {{-- CONTADORES DE PAPELERA DE RECICLAJE --}}
-            @if (auth()->user()->hasRole('Super Admin') || auth()->user()->email === 'admin@ragon.com')
-                <div class="row justify-content-center mb-4">
-                    <div class="col-md-8">
-                        <div class="row">
-                            {{-- Usuarios Eliminados --}}
-                            <div class="col-md-6 mb-3">
-                                <div class="card border-danger shadow-sm h-100">
-                                    <div class="card-body d-flex align-items-center">
-                                        <div class="flex-shrink-0 bg-danger-lt p-3 rounded">
-                                            <i class="fas fa-user-slash fa-2x text-danger"></i>
-                                        </div>
-                                        <div class="flex-grow-1 ms-3">
-                                            <div class="text-uppercase text-muted fw-bold small">Usuarios en Papelera</div>
-                                            <div class="h2 mb-0 fw-bold">{{ \App\Models\User::onlyTrashed()->count() }}
-                                            </div>
-                                            {{-- <a href="{{ backpack_url('user') }}?trashed=1"
-                                                class="small text-danger fw-bold">
-                                                <i class="fas fa-external-link-alt"></i> Gestionar en Backpack
-                                            </a> --}}
-                                        </div>
-                                    </div>
-                                    </div>
-                                </div>
-
-                                {{-- Archivos Eliminados --}}
-                                <div class="col-md-6 mb-3">
-                                    <div class="card border-info shadow-sm h-100">
-                                        <div class="card-body d-flex align-items-center">
-                                            <div class="flex-shrink-0 bg-info-lt p-3 rounded">
-                                                <i class="fas fa-file-excel fa-2x text-info"></i>
-                                            </div>
-                                            <div class="flex-grow-1 ms-3">
-                                                <div class="text-uppercase text-muted fw-bold small">Archivos en Papelera
-                                                </div>
-                                                <div class="h2 mb-0 fw-bold">
-                                                    {{ \App\Models\Archivo::onlyTrashed()->count() }}
-                                                </div>
-                                                {{-- <a href="{{ backpack_url('archivo') }}?trashed=1"
-                                                    class="small text-info fw-bold">
-                                                    <i class="fas fa-external-link-alt"></i> Ver archivos borrados
-                                                </a> --}}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-            @endif
             {{-- Contenedor de la Cuadrícula (Grid) --}}
             <div class="dashboard-grid">
 
@@ -158,7 +108,6 @@
                         auth()->user()->role === 'superadmin' ||
                         auth()->user()->email === 'admin@ragon.com')
                     <x-dashboard-card route="{{ route('users.index') }}" icon="fas fa-user" title="Usuarios" />
-                    <x-dashboard-card route="{{ route('papelera.index') }}" icon="fas fa-trash-restore" title="Papelera" />
                 @endif
 
 
@@ -183,7 +132,6 @@
         </div>
     </main>
 
-    {{-- SCRIPT AJAX PARA GUARDAR EL CAMBIO SIN RECARGAR LA PÁGINA --}}
     <script>
         function toggleMantenimiento(modulo) {
             // Hacemos la petición a la ruta que actualiza el estado
@@ -198,7 +146,6 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Mostrar alerta de éxito (asumiendo que usas SweetAlert)
                         Swal.fire({
                             icon: 'success',
                             title: 'Actualizado',

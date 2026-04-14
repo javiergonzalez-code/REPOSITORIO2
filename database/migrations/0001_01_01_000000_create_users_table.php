@@ -9,19 +9,23 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('rfc', 13)->unique()->nullable();
-            $table->string('telefono')->nullable(); 
+            // Mapeo de SQL Server
+            $table->string('CardCode', 15)->primary(); // Reemplaza al id()
+            $table->string('CardName', 100)->nullable(); // Reemplaza al name
+            $table->string('LicTradNum', 32)->unique()->nullable(); // Reemplaza al rfc
+            $table->string('Cellular', 50)->nullable(); // Reemplaza al telefono
+            $table->string('E_Mail', 100)->unique()->nullable(); // Reemplaza al email
+            
+            // Campos nativos de Laravel necesarios para que el sistema funcione
             $table->string('role')->default('Proveedor'); 
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes(); // Porque vi que usas SoftDeletes en tu modelo
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
@@ -32,7 +36,8 @@ return new class extends Migration
 
         Schema::create('sessions', function (Blueprint $table) {
             $table->string('id')->primary();
-            $table->foreignId('user_id')->nullable()->index();
+            // CRÍTICO: user_id ahora debe ser un string de 15 caracteres para coincidir con CardCode
+            $table->string('user_id', 15)->nullable()->index(); 
             $table->string('ip_address', 45)->nullable();
             $table->text('user_agent')->nullable();
             $table->longText('payload');

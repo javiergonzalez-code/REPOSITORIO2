@@ -23,5 +23,12 @@ LicTradNum	nvarchar	32	YES
 Cellular	nvarchar	50	YES
 E_Mail	nvarchar	100	YES
 
+CardCode=id
+CardName=name
+LicTradNum=rfc
+Cellular=telefono
+E_Mail=email
+
+
 UPDATE archivos SET modulo = 'OC' WHERE modulo = 'INPUTS';
 
