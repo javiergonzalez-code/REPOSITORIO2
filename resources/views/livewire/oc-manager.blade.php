@@ -5,28 +5,25 @@ use App\Models\User;
 
 usesPagination(theme: 'bootstrap');
 
-// Variables de estado
 state(['search' => '', 'userFilter' => '', 'extension' => '', 'fecha' => '']);
 
-// Verificar si es proveedor
 $esProveedor = computed(function () {
     $user = auth()->user();
     return $user->hasRole('proveedor') || $user->role === 'proveedor';
 });
 
-// Lógica inteligente para la lista desplegable de usuarios (Autocompletado)
 $sugerencias_usuarios = computed(function () {
     if ($this->esProveedor || strlen($this->userFilter) < 1) {
         return collect();
     }
 
-    $sugerencias = User::select('name')
-        ->where('name', 'like', "%{$this->userFilter}%")
-        ->orderBy('name', 'asc')
+    $sugerencias = User::select('CardName')
+        ->where('CardName', 'like', "%{$this->userFilter}%")
+        ->orderBy('CardName', 'asc')
         ->take(6)
         ->get();
 
-    if ($sugerencias->count() === 1 && strtolower($sugerencias->first()->name) === strtolower($this->userFilter)) {
+    if ($sugerencias->count() === 1 && strtolower($sugerencias->first()->CardName) === strtolower($this->userFilter)) {
         return collect();
     }
 
@@ -37,7 +34,8 @@ $ordenes = computed(function () {
     $user = auth()->user();
     $query = Archivo::with('user')->whereIn('modulo', ['OC', 'INPUTS']);
     if ($this->esProveedor) {
-        $query->where('user_id', $user->id);
+        // 3. CAMBIO: Usar CardCode en vez de id
+        $query->where('user_id', $user->CardCode);
     }
 
     if ($this->search) {
@@ -45,7 +43,8 @@ $ordenes = computed(function () {
     }
 
     if ($this->userFilter && !$this->esProveedor) {
-        $query->whereHas('user', fn($q) => $q->where('name', 'like', "%{$this->userFilter}%"));
+        // 4. CAMBIO: Filtrar la relación por CardName
+        $query->whereHas('user', fn($q) => $q->where('CardName', 'like', "%{$this->userFilter}%"));
     }
 
     if ($this->extension) {
@@ -60,10 +59,8 @@ $ordenes = computed(function () {
 });
 ?>
 
-{{-- DIV PADRE ÚNICO (ESTO EVITA EL ERROR 500) --}}
 <div>
 
-    {{-- Indicador de total de registros --}}
     <div class="mb-3 text-end" style="font-size: 0.8rem; color: #64748b; font-weight: 700;">
         {{ $this->ordenes->total() }} DOCUMENTOS ENCONTRADOS
     </div>
@@ -104,13 +101,14 @@ $ordenes = computed(function () {
                                     <ul class="list-unstyled mb-0">
                                         @foreach ($this->sugerencias_usuarios as $sugerencia)
                                             <li>
+                                                {{-- 5. CAMBIO: Mostrar CardName al dar click en sugerencias --}}
                                                 <button type="button" class="w-100 border-0 text-start px-3 py-2"
                                                     style="font-size: 0.9rem; background-color: transparent; color: #1e293b; transition: all 0.2s;"
-                                                    wire:click="$set('userFilter', '{{ $sugerencia->name }}')"
+                                                    wire:click="$set('userFilter', '{{ $sugerencia->CardName }}')"
                                                     onmouseover="this.style.backgroundColor='#f1f5f9'"
                                                     onmouseout="this.style.backgroundColor='transparent'">
                                                     <i class="fas fa-user-circle text-primary me-2"></i>
-                                                    {{ $sugerencia->name }}
+                                                    {{ $sugerencia->CardName }}
                                                 </button>
                                             </li>
                                         @endforeach
@@ -169,7 +167,8 @@ $ordenes = computed(function () {
                                 </span>
                             </td>
                             <td>
-                                <x-user-avatar :name="$oc->user->name ?? '?'" :userId="$oc->user?->id" />
+                                {{-- 6. CAMBIO CRÍTICO: Mandar CardName y CardCode al componente avatar --}}
+                                <x-user-avatar :name="$oc->user->CardName ?? '?'" :userId="$oc->user?->CardCode" />
                             </td>
                             <td>
                                 <div class="d-flex align-items-center">
@@ -186,7 +185,6 @@ $ordenes = computed(function () {
                                     hrs</span>
                             </td>
                             <td class="text-end pe-4">
-                                {{-- AQUÍ ESTÁ LA MAGIA, RUTA CORREGIDA A oc.download --}}
                                 <x-table-actions viewRoute="{{ route('oc.preview', $oc->id) }}"
                                     downloadRoute="{{ route('oc.download', $oc->id) }}"
                                     deleteRoute="{{ route('oc.destroy', $oc->id) }}" />

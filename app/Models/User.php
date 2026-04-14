@@ -15,15 +15,22 @@ class User extends Authenticatable
 
     protected $guard_name = 'web';
 
+    // 1. CONFIGURACIÓN CRÍTICA: Definir la nueva Llave Primaria
+    protected $primaryKey = 'CardCode';
+    public $incrementing = false; // Ya no es un número autoincrementable
+    protected $keyType = 'string'; // Ahora es un texto (nvarchar)
+
     protected static $recordEvents = ['created', 'updated'];
 
+    // 2. Mapeo de las nuevas columnas de SQL Server
     protected $fillable = [
-        'name',
-        'email',
+        'CardCode',
+        'CardName',
+        'E_Mail',
         'password',
-        'codigo',
-        'rfc',
-        'telefono',
+        'LicTradNum',
+        'Cellular',
+        'role'
     ];
 
     protected $hidden = [
@@ -38,11 +45,17 @@ class User extends Authenticatable
         ];
     }
 
+    // 3. Indicarle al sistema de verificación nativo de Laravel cuál es el campo de correo
+    public function getEmailForVerification()
+    {
+        return $this->E_Mail;
+    }
 
+    // 4. Actualizar el registro de Logs para que rastree las columnas correctas
     public function getActivitylogOptions(): \Spatie\Activitylog\LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['name', 'email', 'codigo', 'rfc', 'telefono', 'role'])
+            ->logOnly(['CardCode', 'CardName', 'E_Mail', 'LicTradNum', 'Cellular', 'role'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->useLogName('user')
@@ -53,8 +66,9 @@ class User extends Authenticatable
             });
     }
 
+    // 5. Asegurar que la relación con archivos busque 'CardCode' en lugar de 'id'
     public function archivos()
     {
-        return $this->hasMany(Archivo::class);
+        return $this->hasMany(Archivo::class, 'user_id', 'CardCode');
     }
-}
+}   

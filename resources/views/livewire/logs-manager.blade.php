@@ -17,18 +17,19 @@ $sugerencias_usuarios = computed(function () {
         return collect();
     }
 
-    $query = User::select('name');
+    // 1. CAMBIO: Seleccionamos 'CardName' en vez de 'name'
+    $query = User::select('CardName');
 
     // Filtrar solo si hay algo escrito
     if (strlen($this->userFilter) > 0) {
-        $query->where('name', 'like', "%{$this->userFilter}%");
+        $query->where('CardName', 'like', "%{$this->userFilter}%");
     }
 
-    // AUMENTAMOS EL LÍMITE (ej. 50) PARA QUE TENGAS SUFICIENTES DATOS PARA HACER SCROLL
-    $sugerencias = $query->orderBy('name', 'asc')->take(50)->get();
+    // AUMENTAMOS EL LÍMITE PARA QUE TENGAS SUFICIENTES DATOS PARA HACER SCROLL
+    $sugerencias = $query->orderBy('CardName', 'asc')->take(50)->get();
 
     // Ocultar si hay coincidencia exacta
-    if (strlen($this->userFilter) > 0 && $sugerencias->count() === 1 && strtolower($sugerencias->first()->name) === strtolower($this->userFilter)) {
+    if (strlen($this->userFilter) > 0 && $sugerencias->count() === 1 && strtolower($sugerencias->first()->CardName) === strtolower($this->userFilter)) {
         return collect();
     }
 
@@ -40,7 +41,8 @@ $logs = computed(function () {
     $query = Log::with('user');
 
     if ($this->esProveedor) {
-        $query->where('user_id', $user->id);
+        // 2. CAMBIO: Usamos CardCode en vez de id
+        $query->where('user_id', $user->CardCode);
     }
 
     if ($this->search) {
@@ -50,7 +52,8 @@ $logs = computed(function () {
     }
 
     if ($this->userFilter && !$this->esProveedor) {
-        $query->whereHas('user', fn($q) => $q->where('name', 'like', "%{$this->userFilter}%"));
+        // 3. CAMBIO: Buscamos por CardName en la relación de Eloquent
+        $query->whereHas('user', fn($q) => $q->where('CardName', 'like', "%{$this->userFilter}%"));
     }
 
     if ($this->accion) {
@@ -107,8 +110,7 @@ $logs = computed(function () {
                 <div class="col-lg-3 col-md-6">
                     <label class="form-label-custom text-uppercase x-small fw-bold">Descripción</label>
                     <div class="position-relative">
-                        <i
-                            class="fas fa-search text-muted position-absolute top-50 start-0 translate-middle-y ms-3"></i>
+                        <i class="fas fa-search text-muted position-absolute top-50 start-0 translate-middle-y ms-3"></i>
                         <input type="text" wire:model.live.debounce.300ms="search" class="form-control ps-5"
                             placeholder="Buscar en logs...">
                     </div>
@@ -127,21 +129,20 @@ $logs = computed(function () {
 
                             {{-- LISTA DESPLEGABLE FLOTANTE CON FONDO BLANCO FORZADO Y SCROLL --}}
                             @if (count($this->sugerencias_usuarios) > 0)
-                                <div class="w-100 border rounded-3 shadow-lg"
-                                    x-show="showDropdown"
-                                    x-transition.opacity
+                                <div class="w-100 border rounded-3 shadow-lg" x-show="showDropdown" x-transition.opacity
                                     style="display: none; position: absolute !important; top: 100% !important; left: 0 !important; margin-top: 5px !important; z-index: 10000 !important; overflow-y: auto; max-height: 250px; background-color: #ffffff !important;">
                                     <ul class="list-unstyled mb-0">
                                         @foreach ($this->sugerencias_usuarios as $sugerencia)
                                             <li>
+                                                {{-- 4. CAMBIO: Imprimimos CardName en la lista desplegable --}}
                                                 <button type="button" class="w-100 border-0 text-start px-3 py-2"
                                                     style="font-size: 0.9rem; background-color: transparent; color: #1e293b; transition: all 0.2s;"
-                                                    wire:click="$set('userFilter', '{{ $sugerencia->name }}')"
+                                                    wire:click="$set('userFilter', '{{ $sugerencia->CardName }}')"
                                                     @click="showDropdown = false"
                                                     onmouseover="this.style.backgroundColor='#f1f5f9'"
                                                     onmouseout="this.style.backgroundColor='transparent'">
                                                     <i class="fas fa-user-circle text-primary me-2"></i>
-                                                    {{ $sugerencia->name }}
+                                                    {{ $sugerencia->CardName }}
                                                 </button>
                                             </li>
                                         @endforeach
@@ -175,17 +176,17 @@ $logs = computed(function () {
                 <div class="{{ $this->esProveedor ? 'col-lg-5' : 'col-lg-2' }} col-md-12">
                     <button
                         wire:click="$set('search', ''); $set('userFilter', ''); $set('accion', ''); $set('fecha', '')"
-                        wire:loading.attr="disabled"
-                        class="btn btn-outline-secondary rounded-pill w-100 fw-bold">
-                        
+                        wire:loading.attr="disabled" class="btn btn-outline-secondary rounded-pill w-100 fw-bold">
+
                         <span wire:loading.remove wire:target="$set">
                             <i class="fas fa-eraser me-1"></i> Limpiar
                         </span>
-                        
+
                         <span wire:loading wire:target="$set">
-                            <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>...
+                            <span class="spinner-border spinner-border-sm me-1" role="status"
+                                aria-hidden="true"></span>...
                         </span>
-                        
+
                     </button>
                 </div>
             </div>
@@ -220,7 +221,8 @@ $logs = computed(function () {
                         @endphp
                         <tr class="log-row">
                             <td class="ps-4 py-3">
-                                <x-user-avatar :name="$log->user->name ?? 'Sistema'" :userId="$log->user->id ?? 0" :subtitle="$log->user->role ?? 'N/A'" />
+                                {{-- 5. CAMBIO CRÍTICO: Mandamos CardName y CardCode al avatar --}}
+                                <x-user-avatar :name="$log->user->CardName ?? 'Sistema'" :userId="$log->user->CardCode ?? 0" :subtitle="$log->user->role ?? 'N/A'" />
                             </td>
                             <td class="text-center py-3">
                                 <div class="status-indicator {{ $badgeStyle }}">

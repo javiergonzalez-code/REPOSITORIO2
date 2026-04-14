@@ -7,18 +7,19 @@ usesPagination(theme: 'bootstrap');
 state(['search' => '', 'userFilter' => '', 'roleFilter' => '']);
 
 $sugerencias_usuarios = computed(function () {
-    $query = User::select('name');
+    // 1. CAMBIO: Seleccionar CardName
+    $query = User::select('CardName');
 
     // Filtrar solo si hay texto en el input
     if (strlen($this->userFilter) > 0) {
-        $query->where('name', 'like', "%{$this->userFilter}%");
+        $query->where('CardName', 'like', "%{$this->userFilter}%");
     }
 
     // Aumentamos el límite para tener scroll
-    $sugerencias = $query->orderBy('name', 'asc')->take(50)->get();
+    $sugerencias = $query->orderBy('CardName', 'asc')->take(50)->get();
 
     // Ocultar la lista si hay una coincidencia exacta
-    if (strlen($this->userFilter) > 0 && $sugerencias->count() === 1 && strtolower($sugerencias->first()->name) === strtolower($this->userFilter)) {
+    if (strlen($this->userFilter) > 0 && $sugerencias->count() === 1 && strtolower($sugerencias->first()->CardName) === strtolower($this->userFilter)) {
         return collect();
     }
 
@@ -29,10 +30,12 @@ $usuarios = computed(function () {
     $query = User::query();
 
     if ($this->search) {
-        $query->where('email', 'like', "%{$this->search}%");
+        // 2. CAMBIO: Buscar en la columna E_Mail
+        $query->where('E_Mail', 'like', "%{$this->search}%");
     }
     if ($this->userFilter) {
-        $query->where('name', 'like', "%{$this->userFilter}%");
+        // 3. CAMBIO: Buscar en la columna CardName
+        $query->where('CardName', 'like', "%{$this->userFilter}%");
     }
     if ($this->roleFilter) {
         $query->where('role', $this->roleFilter);
@@ -79,14 +82,15 @@ $usuarios = computed(function () {
                                 <ul class="list-unstyled mb-0">
                                     @foreach ($this->sugerencias_usuarios as $sugerencia)
                                         <li>
+                                            {{-- 4. CAMBIO: Renderizar CardName en sugerencias --}}
                                             <button type="button" class="w-100 border-0 text-start px-3 py-2"
                                                 style="font-size: 0.9rem; background-color: transparent; color: #1e293b; transition: all 0.2s;"
-                                                wire:click="$set('userFilter', '{{ $sugerencia->name }}')"
+                                                wire:click="$set('userFilter', '{{ $sugerencia->CardName }}')"
                                                 @click="showDropdown = false"
                                                 onmouseover="this.style.backgroundColor='#f1f5f9'"
                                                 onmouseout="this.style.backgroundColor='transparent'">
                                                 <i class="fas fa-user-circle text-primary me-2"></i>
-                                                {{ $sugerencia->name }}
+                                                {{ $sugerencia->CardName }}
                                             </button>
                                         </li>
                                     @endforeach
@@ -152,7 +156,8 @@ $usuarios = computed(function () {
                         <tr style="transition: all 0.2s ease;">
 
                             <td class="ps-4 py-3">
-                                <x-user-avatar :name="$user->name" :userId="$user->id" :subtitle="$user->email" />
+                                {{-- 5. CAMBIO CRÍTICO: Mandar atributos correctos de SQL Server al Avatar --}}
+                                <x-user-avatar :name="$user->CardName" :userId="$user->CardCode" :subtitle="$user->E_Mail" />
                             </td>
 
                             <td class="py-3">
@@ -185,9 +190,10 @@ $usuarios = computed(function () {
                             </td>
 
                             <td class="text-end pe-4 py-3">
-                                <x-table-actions viewRoute="{{ route('users.show', $user->id) }}"
-                                    editRoute="{{ route('users.edit', $user->id) }}"
-                                    deleteRoute="{{ route('users.destroy', $user->id) }}" />
+                                {{-- 6. CAMBIO CRÍTICO: Usar CardCode para generar las rutas de los botones --}}
+                                <x-table-actions viewRoute="{{ route('users.show', $user->CardCode) }}"
+                                    editRoute="{{ route('users.edit', $user->CardCode) }}"
+                                    deleteRoute="{{ route('users.destroy', $user->CardCode) }}" />
                             </td>
                         </tr>
                     @empty
