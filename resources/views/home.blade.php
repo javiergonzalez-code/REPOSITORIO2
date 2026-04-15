@@ -17,7 +17,7 @@
 
             {{-- PANEL CENTRAL DE MANTENIMIENTO --}}
             {{-- Limpieza: Usamos directiva de Spatie y eliminamos el correo hardcodeado --}}
-            @hasanyrole('superadmin|admin')
+            @if (Auth::check() && in_array(Auth::user()->role, ['superadmin', 'admin']))
                 <div class="row justify-content-center mb-4">
                     <div class="col-md-8">
                         <div class="card border-warning shadow-sm">
@@ -90,7 +90,7 @@
                         </div>
                     </div>
                 </div>
-            @endhasanyrole
+            @endif
 
             {{-- Contenedor de la Cuadrícula (Grid) --}}
             <div class="dashboard-grid">
@@ -104,14 +104,14 @@
                 <x-dashboard-card route="{{ route('oc.index') }}" icon="fas fa-file-invoice-dollar" title="OC" />
 
                 {{-- Tarjeta para Manejo de usuarios --}}
-                @hasanyrole('superadmin|admin')
+                @if (in_array(Auth::user()->role, ['superadmin', 'admin']))
                     <x-dashboard-card route="{{ route('users.index') }}" icon="fas fa-user" title="Usuarios" />
-                @endhasanyrole
+                @endif
 
             </div>
 
             {{-- Limpieza: Cambiamos 'Super Admin' por 'superadmin' que es el nombre oficial en tu base de datos --}}
-            @role('superadmin')
+            @if (Auth::check() && Auth::user()->role === 'superadmin')
                 <div class="mt-4 module-header">
                     <h3>Panel de Administración General</h3>
                 </div>
@@ -125,7 +125,7 @@
                         @livewire('logs-manager')
                     </div>
                 </div>
-            @endrole
+            @endif
         </div>
     </main>
 
