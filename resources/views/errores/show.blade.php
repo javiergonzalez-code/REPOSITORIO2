@@ -30,9 +30,11 @@
                             <h6 class="text-muted fw-bold mb-2 text-uppercase" style="font-size: 0.8rem; letter-spacing: 0.5px;">Usuario Afectado</h6>
                             @if($error->user)
                                 <div class="d-flex align-items-center bg-light p-3 rounded border">
-                                    <x-user-avatar :user="$error->user" />
+                                    {{-- CORRECCIÓN 1: Inyección manual de propiedades SQL Server al Avatar --}}
+                                    <x-user-avatar :name="$error->user->CardName" :userId="$error->user->CardCode" />
                                     <div class="ms-3">
-                                        <span class="d-block fw-bold text-dark fs-5">{{ $error->user->name }}</span>
+                                        {{-- CORRECCIÓN 2: Llamada a CardName en lugar de name --}}
+                                        <span class="d-block fw-bold text-dark fs-5">{{ $error->user->CardName }}</span>
                                         <span class="badge bg-secondary">{{ strtoupper($error->user->role ?? 'N/A') }}</span>
                                     </div>
                                 </div>

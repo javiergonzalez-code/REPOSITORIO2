@@ -23,7 +23,6 @@
                         <div class="table-responsive">
                             <table class="table table-hover align-middle mb-0 border-top-0">
 
-
                                 <thead>
                                     <tr class="text-muted"
                                         style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">
@@ -48,12 +47,11 @@
                                             <td class="py-3">
                                                 @if ($error->user)
                                                     <div class="d-flex align-items-center">
-                                                        {{-- El componente ya dibuja la foto, el nombre y el rol --}}
-                                                        <x-user-avatar :user="$error->user" />
+                                                        {{-- CRÍTICO: Mandamos CardName y CardCode al avatar --}}
+                                                        <x-user-avatar :name="$error->user->CardName" :userId="$error->user->CardCode" :subtitle="$error->user->role" />
                                                     </div>
                                                 @else
-                                                    <span class="text-muted fst-italic">Usuario Eliminado /
-                                                        Desconocido</span>
+                                                    <span class="text-muted fst-italic">Usuario Eliminado / Desconocido</span>
                                                 @endif
                                             </td>
 
@@ -85,7 +83,7 @@
                                                     class="text-muted small">{{ $error->created_at->format('H:i:s') }}</span>
                                             </td>
 
-                                            {{-- COLUMNA 5: Acciones --}}
+                                            {{-- COLUMNA 5: Acciones (Cerrado correctamente) --}}
                                             <td class="text-center py-3 pe-4">
                                                 <a href="{{ route('errores.show', $error->id) }}"
                                                     class="btn btn-sm btn-outline-primary shadow-sm" title="Ver Detalles">
@@ -115,9 +113,9 @@
                     <div class="mt-4 d-flex justify-content-center">
                         {{ $logs->links('pagination::bootstrap-5') }}
                     </div>
-                @elseif(isset($errores) && method_exists($errores, 'links'))
+                @elseif(isset($erroresCarga) && method_exists($erroresCarga, 'links'))
                     <div class="mt-4 d-flex justify-content-center">
-                        {{ $errores->links('pagination::bootstrap-5') }}
+                        {{ $erroresCarga->links('pagination::bootstrap-5') }}
                     </div>
                 @endif
 
