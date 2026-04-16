@@ -4,12 +4,15 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Log;
 
 class MantenimientoController extends Controller
 {
     public function toggle($modulo)
     {
-        if (!in_array(auth()->user()->role, ['superadmin', 'admin'])) {
+        $user = auth()->user();
+
+        if (!in_array($user->role, ['superadmin', 'admin'])) {
             return response()->json(['success' => false, 'message' => 'No autorizado'], 403);
         }
 
@@ -32,6 +35,12 @@ class MantenimientoController extends Controller
         }
 
         $mensaje = $nuevoEstado ? 'Módulo en mantenimiento' : 'Módulo abierto al público';
+
+        Log::create([
+            'user_id' => $user->CardCode,
+            'accion'  => 'MANTENIMIENTO - Cambió estado de ' . strtoupper($modulo) . ' a: ' . ($nuevoEstado ? 'CERRADO' : 'ABIERTO'),
+            'modulo'  => 'AJUSTES'
+        ]);
 
         return response()->json(['success' => true, 'message' => $mensaje]);
     }

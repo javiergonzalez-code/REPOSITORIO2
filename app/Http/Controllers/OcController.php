@@ -6,6 +6,8 @@ use App\Models\Archivo;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use RealRashid\SweetAlert\Facades\Alert;
+use Illuminate\Support\Facades\Storage;
+use App\Models\Log;
 
 class OcController extends Controller
 {
@@ -18,20 +20,22 @@ class OcController extends Controller
     {
         $oc = Archivo::findOrFail($id);
         $user = auth()->user();
-        $esProveedor = $user->hasRole('proveedor') || $user->role === 'proveedor';
+        
+        // 🚨 Validación nativa de rol y comparación por CardCode
+        $esProveedor = $user->role === 'proveedor';
 
-        if ($esProveedor && $oc->user_id !== $user->id) {
-            \App\Models\Log::create([
-                'user_id' => auth()->id(),
+        if ($esProveedor && $oc->user_id !== $user->CardCode) {
+            Log::create([
+                'user_id' => $user->CardCode,
                 'accion'  => 'Intento de descarga denegado (sin permisos): ' . $oc->nombre_original,
                 'modulo'  => 'OC',
             ]);
             abort(403, 'No tienes permiso para descargar este archivo.');
         }
 
-        if (!\Illuminate\Support\Facades\Storage::disk('local')->exists($oc->ruta)) {
-            \App\Models\Log::create([
-                'user_id' => auth()->id(),
+        if (!Storage::disk('local')->exists($oc->ruta)) {
+            Log::create([
+                'user_id' => $user->CardCode,
                 'accion'  => 'Intento de descarga fallido (archivo físico extraviado): ' . $oc->nombre_original,
                 'modulo'  => 'OC',
             ]);
@@ -39,45 +43,47 @@ class OcController extends Controller
             return back();
         }
 
-        \App\Models\Log::create([
-            'user_id' => auth()->id(),
+        Log::create([
+            'user_id' => $user->CardCode,
             'accion'  => 'Descargó con éxito el archivo: ' . $oc->nombre_original,
             'modulo'  => 'OC',
         ]);
 
-        return \Illuminate\Support\Facades\Storage::disk('local')->download($oc->ruta, $oc->nombre_original);
+        return Storage::disk('local')->download($oc->ruta, $oc->nombre_original);
     }
 
     public function preview($id)
     {
         $oc = Archivo::findOrFail($id);
         $user = auth()->user();
-        $esProveedor = $user->hasRole('proveedor') || $user->role === 'proveedor';
+        
+        // 🚨 Validación nativa de rol
+        $esProveedor = $user->role === 'proveedor';
 
-        if ($esProveedor && $oc->user_id !== $user->id) {
+        if ($esProveedor && $oc->user_id !== $user->CardCode) {
             abort(403, 'No tienes permiso para previsualizar este archivo.');
         }
 
-        // AGREGANDO RASTREO DE AUDITORÍA FALTANTE
-        \App\Models\Log::create([
-            'user_id' => auth()->id(),
+        // 🚨 Auditoría usando CardCode
+        Log::create([
+            'user_id' => $user->CardCode,
             'accion'  => 'Previsualizó el archivo: ' . $oc->nombre_original,
             'modulo'  => 'OC',
         ]);
 
-        if (!\Illuminate\Support\Facades\Storage::disk('local')->exists($oc->ruta)) {
+        if (!Storage::disk('local')->exists($oc->ruta)) {
             Alert::error('Extraviado', 'El archivo físico no existe en el servidor.');
             return back();
         }
 
-        // Extraer ruta real para procesos internos como libxml_load
         $path = storage_path('app/' . $oc->ruta);
-
         $tamanoArchivo = filesize($path);
+
         if ($tamanoArchivo > 5242880) {
             Alert::warning('Archivo muy grande', 'El archivo es demasiado grande para previsualizarlo. Por favor, descárgalo.');
             return back();
         }
+
         $extension = strtolower($oc->tipo_archivo);
         
         try {
@@ -113,19 +119,20 @@ class OcController extends Controller
     {
         $oc = Archivo::findOrFail($id);
         $user = auth()->user();
-        $esProveedor = $user->hasRole('proveedor') || $user->role === 'proveedor';
+        
+        // 🚨 Validación nativa de rol
+        $esProveedor = $user->role === 'proveedor';
 
-        if ($esProveedor && $oc->user_id !== $user->id) {
+        if ($esProveedor && $oc->user_id !== $user->CardCode) {
             abort(403, 'No tienes permiso para eliminar este archivo.');
         }
 
         try {
             $nombreOriginal = $oc->nombre_original;
-
             $oc->delete();
 
-            \App\Models\Log::create([
-                'user_id' => auth()->id(),
+            Log::create([
+                'user_id' => $user->CardCode,
                 'accion'  => 'Envió a la papelera la OC: ' . $nombreOriginal,
                 'modulo'  => 'OC',
             ]);
@@ -133,8 +140,8 @@ class OcController extends Controller
             Alert::success('¡Eliminado!', 'La orden de compra ha sido eliminada correctamente.');
             return redirect()->route('oc.index');
         } catch (\Exception $e) {
-            \App\Models\Log::create([
-                'user_id' => auth()->id(),
+            Log::create([
+                'user_id' => $user->CardCode,
                 'accion'  => 'Error al intentar eliminar OC: ' . $e->getMessage(),
                 'modulo'  => 'OC',
             ]);
