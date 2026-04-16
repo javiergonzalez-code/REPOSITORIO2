@@ -21,14 +21,23 @@ class UserFactory extends Factory
      *
      * @return array<string, mixed>
      */
-public function definition(): array
+    public function definition(): array
     {
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
+            // 🚨 Mapeo a estructura SAP Business One
+            'CardCode'   => strtoupper($this->faker->unique()->bothify('USR####??')), // Ej: USR1234AB
+            'CardName'   => fake()->name(),
+            'E_Mail'     => fake()->unique()->safeEmail(),
+            'LicTradNum' => strtoupper($this->faker->bothify('????######???')), // Simulación de RFC de 13 caracteres
+            'Cellular'   => fake()->numerify('##########'), // Teléfono de 10 dígitos
+            
+            // 🚨 Campos de sistema requeridos
+            'role'       => fake()->randomElement(['admin', 'proveedor']), // Superadmin suele sembrarse manualmente
+            'password'   => static::$password ??= Hash::make('password'), 
+            
+            // Campos por defecto de Laravel
             'email_verified_at' => now(),
-            'password' => static::$password ??= 'password', 
-            'remember_token' => Str::random(10),
+            'remember_token'    => Str::random(10),
         ];
     }
 

@@ -14,7 +14,8 @@ class ArchivoFactory extends Factory
         $nombreBase = $this->faker->word;
 
         return [
-            'user_id' => User::inRandomOrder()->first()?->id ?? User::factory(),
+            // 🚨 Cambiamos la propiedad 'id' por 'CardCode'
+            'user_id' => User::inRandomOrder()->first()?->CardCode ?? User::factory(),
             'nombre_original' => $nombreBase . '.' . $ext,
             'nombre_sistema' => $this->faker->uuid . '.' . $ext,
             'tipo_archivo' => ($ext === 'csv') ? 'text/csv' : 'application/xml',
