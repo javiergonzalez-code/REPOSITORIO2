@@ -124,13 +124,13 @@ $usuarios = computed(function () {
                 {{-- 4. Botón Limpiar (Con protección anti-doble clic) --}}
                 <div class="col-lg-2 col-md-12">
                     <button wire:click="$set('search', ''); $set('userFilter', ''); $set('roleFilter', '')"
-                        wire:loading.attr="disabled"
-                        class="btn btn-outline-secondary rounded-pill w-100 fw-bold">
+                        wire:loading.attr="disabled" class="btn btn-outline-secondary rounded-pill w-100 fw-bold">
                         <span wire:loading.remove wire:target="$set">
                             <i class="fas fa-eraser me-1"></i> Limpiar
                         </span>
                         <span wire:loading wire:target="$set">
-                            <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>...
+                            <span class="spinner-border spinner-border-sm me-1" role="status"
+                                aria-hidden="true"></span>...
                         </span>
                     </button>
                 </div>
@@ -157,7 +157,7 @@ $usuarios = computed(function () {
 
                             <td class="ps-4 py-3">
                                 {{-- 5. CAMBIO CRÍTICO: Mandar atributos correctos de SQL Server al Avatar --}}
-                                <x-user-avatar :name="$user->CardName" :userId="$user->CardCode" :subtitle="$user->E_Mail" />
+                                <x-user-avatar :user="$user" />
                             </td>
 
                             <td class="py-3">

@@ -8,6 +8,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Log;
+use Illuminate\Support\Facades\Auth; // 🚨 Importamos la fachada Auth
 
 class OcController extends Controller
 {
@@ -19,11 +20,12 @@ class OcController extends Controller
     public function download($id)
     {
         $oc = Archivo::findOrFail($id);
-        $user = auth()->user();
+        $user = Auth::user(); // 🚨 Fachada Auth estandarizada
         
-        // 🚨 Validación nativa de rol y comparación por CardCode
+        // Validación nativa de rol
         $esProveedor = $user->role === 'proveedor';
 
+        // 🚨 Mapeo: CardCode=id. Comparamos contra la llave primaria string de SAP
         if ($esProveedor && $oc->user_id !== $user->CardCode) {
             Log::create([
                 'user_id' => $user->CardCode,
@@ -55,11 +57,12 @@ class OcController extends Controller
     public function preview($id)
     {
         $oc = Archivo::findOrFail($id);
-        $user = auth()->user();
+        $user = Auth::user(); 
         
-        // 🚨 Validación nativa de rol
+        // Validación nativa de rol
         $esProveedor = $user->role === 'proveedor';
 
+        // 🚨 Mapeo: Usamos CardCode para validar propiedad del archivo
         if ($esProveedor && $oc->user_id !== $user->CardCode) {
             abort(403, 'No tienes permiso para previsualizar este archivo.');
         }
@@ -118,22 +121,25 @@ class OcController extends Controller
     public function destroy($id)
     {
         $oc = Archivo::findOrFail($id);
-        $user = auth()->user();
+        $user = Auth::user();
         
-        // 🚨 Validación nativa de rol
+        // Validación nativa de rol
         $esProveedor = $user->role === 'proveedor';
 
+        // 🚨 Mapeo: Validación de seguridad con CardCode
         if ($esProveedor && $oc->user_id !== $user->CardCode) {
             abort(403, 'No tienes permiso para eliminar este archivo.');
         }
 
         try {
             $nombreOriginal = $oc->nombre_original;
+            
+            // Eliminación directa (Sin papelera de reciclaje / Soft Deletes)
             $oc->delete();
 
             Log::create([
                 'user_id' => $user->CardCode,
-                'accion'  => 'Envió a la papelera la OC: ' . $nombreOriginal,
+                'accion'  => 'Eliminó la OC: ' . $nombreOriginal,
                 'modulo'  => 'OC',
             ]);
 

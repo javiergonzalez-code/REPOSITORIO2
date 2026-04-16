@@ -110,7 +110,8 @@ $logs = computed(function () {
                 <div class="col-lg-3 col-md-6">
                     <label class="form-label-custom text-uppercase x-small fw-bold">Descripción</label>
                     <div class="position-relative">
-                        <i class="fas fa-search text-muted position-absolute top-50 start-0 translate-middle-y ms-3"></i>
+                        <i
+                            class="fas fa-search text-muted position-absolute top-50 start-0 translate-middle-y ms-3"></i>
                         <input type="text" wire:model.live.debounce.300ms="search" class="form-control ps-5"
                             placeholder="Buscar en logs...">
                     </div>
@@ -222,7 +223,7 @@ $logs = computed(function () {
                         <tr class="log-row">
                             <td class="ps-4 py-3">
                                 {{-- 5. CAMBIO CRÍTICO: Mandamos CardName y CardCode al avatar --}}
-                                <x-user-avatar :name="$log->user->CardName ?? 'Sistema'" :userId="$log->user->CardCode ?? 0" :subtitle="$log->user->role ?? 'N/A'" />
+                                <x-user-avatar :user="$log->user" />
                             </td>
                             <td class="text-center py-3">
                                 <div class="status-indicator {{ $badgeStyle }}">

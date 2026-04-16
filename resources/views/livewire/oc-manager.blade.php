@@ -168,7 +168,7 @@ $ordenes = computed(function () {
                             </td>
                             <td>
                                 {{-- 6. CAMBIO CRÍTICO: Mandar CardName y CardCode al componente avatar --}}
-                                <x-user-avatar :name="$oc->user->CardName ?? '?'" :userId="$oc->user?->CardCode" />
+                                <x-user-avatar :user="$oc->user" />
                             </td>
                             <td>
                                 <div class="d-flex align-items-center">

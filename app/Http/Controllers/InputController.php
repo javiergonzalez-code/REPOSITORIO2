@@ -9,6 +9,8 @@ use App\Models\Archivo;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\QueryException;
 use RealRashid\SweetAlert\Facades\Alert;
+use Illuminate\Support\Str; // 🚨 Importación agregada
+use Illuminate\Support\Facades\Auth; // 🚨 Importación agregada
 
 class InputController extends Controller
 {
@@ -17,8 +19,10 @@ class InputController extends Controller
         return view('inputs.index');
     }
 
-public function store(Request $request)
+    public function store(Request $request)
     {
+        $user = Auth::user(); // 🚨 Extraemos el usuario autenticado
+
         $validator = Validator::make($request->all(), [
             'archivo' => [
                 'required',
@@ -36,7 +40,7 @@ public function store(Request $request)
         if ($validator->fails()) {
             $errores = implode(' | ', $validator->errors()->all());
             Log::create([
-                'user_id' => auth()->id(),
+                'user_id' => $user->CardCode, // 🚨 Usamos CardCode
                 'accion'  => 'Intento fallido (Validación/Seguridad): ' . $errores,
                 'modulo'  => 'INPUTS',
             ]);
@@ -47,7 +51,7 @@ public function store(Request $request)
         try {
             $file = $request->file('archivo');
             $nombreSinExt = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-            $originalName = \Illuminate\Support\Str::slug($nombreSinExt, '_') . '.' . $file->getClientOriginalExtension();
+            $originalName = Str::slug($nombreSinExt, '_') . '.' . $file->getClientOriginalExtension();
             
             if (strlen($originalName) > 200) {
                 $originalName = substr($originalName, -200);
@@ -90,7 +94,7 @@ public function store(Request $request)
 
             // Crear registro en Base de Datos
             Archivo::create([
-                'user_id'         => auth()->id(),
+                'user_id'         => $user->CardCode, // 🚨 Usamos CardCode
                 'nombre_original' => $originalName,
                 'nombre_sistema'  => $systemName,
                 'tipo_archivo'    => $extension,
@@ -100,7 +104,7 @@ public function store(Request $request)
 
             // Registrar el Log de la acción
             Log::create([
-                'user_id' => auth()->id(),
+                'user_id' => $user->CardCode, // 🚨 Usamos CardCode
                 'accion'  => 'Subió con éxito: ' . $originalName,
                 'modulo'  => $moduloDestino,
             ]);
@@ -111,16 +115,16 @@ public function store(Request $request)
         } catch (QueryException $e) {
             if (isset($path)) Storage::disk('local')->delete($path);
             Log::create([
-                'user_id' => auth()->id(),
-                'accion'  => \Illuminate\Support\Str::limit('Error BD: ' . $e->getMessage(), 250),
+                'user_id' => $user->CardCode, // 🚨 Usamos CardCode
+                'accion'  => Str::limit('Error BD: ' . $e->getMessage(), 250),
                 'modulo'  => 'INPUTS'
             ]);
             Alert::error('Error Crítico', 'No se pudo registrar en la base de datos.');
             return back();
         } catch (\Exception $e) {
             Log::create([
-                'user_id' => auth()->id(),
-                'accion'  => \Illuminate\Support\Str::limit('Error Servidor: ' . $e->getMessage(), 250),
+                'user_id' => $user->CardCode, // 🚨 Usamos CardCode
+                'accion'  => Str::limit('Error Servidor: ' . $e->getMessage(), 250),
                 'modulo'  => 'INPUTS',
             ]);
             Alert::error('Error del Servidor', 'Error al procesar el archivo.');
@@ -131,18 +135,19 @@ public function store(Request $request)
     public function download($id)
     {
         $archivo = Archivo::findOrFail($id);
-        $user = auth()->user();
+        $user = Auth::user(); // 🚨 Fachada Auth estandarizada
 
-        // 1. Validación de seguridad (¡Esto lo hiciste perfecto!)
-        if (($user->hasRole('proveedor') || $user->role === 'proveedor') && $archivo->user_id !== $user->id) {
+        // 1. Validación de seguridad con verificación de Rol Nativo
+        // 🚨 Comparamos CardCode con user_id (string)
+        if ($user->role === 'proveedor' && $archivo->user_id !== $user->CardCode) {
             abort(403, 'No tienes permiso para descargar este archivo.');
         }
 
-        // 2. Búsqueda y descarga limpia y nativa de Laravel (Sin str_replace)
-        if (!\Illuminate\Support\Facades\Storage::disk('local')->exists($archivo->ruta)) {
+        // 2. Búsqueda y descarga limpia y nativa de Laravel
+        if (!Storage::disk('local')->exists($archivo->ruta)) {
             abort(404, 'El archivo físico no se encuentra en el servidor.');
         }
 
-        return \Illuminate\Support\Facades\Storage::disk('local')->download($archivo->ruta, $archivo->nombre_original);
+        return Storage::disk('local')->download($archivo->ruta, $archivo->nombre_original);
     }
 }

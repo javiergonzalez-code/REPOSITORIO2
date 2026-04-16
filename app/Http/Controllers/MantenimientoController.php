@@ -5,12 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Log;
+use Illuminate\Support\Facades\Auth; // 🚨 Importamos la fachada Auth para mantener el estándar
 
 class MantenimientoController extends Controller
 {
     public function toggle($modulo)
     {
-        $user = auth()->user();
+        $user = Auth::user(); // 🚨 Uso de la fachada
 
         if (!in_array($user->role, ['superadmin', 'admin'])) {
             return response()->json(['success' => false, 'message' => 'No autorizado'], 403);
