@@ -13,7 +13,7 @@ class Archivo extends Model
     use LogsActivity;
 
     protected $fillable = [
-        'user_id',
+        'user_id', // 🚨 Ahora guardará el CardCode (String) en lugar del id numérico
         'nombre_original',
         'nombre_sistema',
         'tipo_archivo',
@@ -38,11 +38,14 @@ class Archivo extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        // 🚨 MUY IMPORTANTE: Hacemos la relación explícita para SQL Server
+        // Le indicamos que el 'user_id' de esta tabla se conecta con el 'CardCode' de la tabla User
+        return $this->belongsTo(User::class, 'user_id', 'CardCode');
     }
 
     public function getRutaUrlAttribute()
     {
+        // El ID del archivo sí sigue siendo numérico y autoincrementable, por lo que esto se queda igual
         return route('archivos.download', $this->id);
     }
 }
