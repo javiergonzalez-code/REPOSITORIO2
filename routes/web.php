@@ -36,17 +36,17 @@ Route::middleware(['auth'])->group(function () {
     // Cierre de sesión
     Route::post('/logout', [LogoutController::class, 'destroy'])->name('logout');
 
-
     // Módulo de Errores 
     Route::get('/errores', [App\Http\Controllers\ErroresController::class, 'index'])->name('errores.index');
-    Route::get('/errores/{id}', [App\Http\Controllers\ErroresController::class, 'show'])->name('errores.show'); // <- RUTA NUEVA
+    Route::get('/errores/{id}', [App\Http\Controllers\ErroresController::class, 'show'])->name('errores.show');
 
-// ==========================================
+    // ==========================================
     // RUTA PARA EL SWITCH DE MANTENIMIENTO (AJAX)
     // ==========================================
+    // 🚨 Usamos la clase de tu Middleware en lugar de 'can:'
     Route::post('/mantenimiento/toggle/{modulo}', [MantenimientoController::class, 'toggle'])
         ->name('mantenimiento.toggle')
-        ->middleware('can:list users');
+        ->middleware(\App\Http\Middleware\CheckIfAdmin::class);
 
     // ==========================================
     // MÓDULO DE CARGA DE ARCHIVOS (INPUTS) - PROTEGIDO
@@ -75,41 +75,26 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // ==========================================
-    // GESTIÓN DE USUARIOS (PROTEGIDA POR MANTENIMIENTO)
+    // GESTIÓN DE USUARIOS (PROTEGIDA POR MANTENIMIENTO Y ADMIN)
     // ==========================================
-    Route::middleware(['mantenimiento:users'])->group(function () {
+    // 🚨 Agregamos CheckIfAdmin al grupo y quitamos los 'can:' individuales
+    Route::middleware(['mantenimiento:users', \App\Http\Middleware\CheckIfAdmin::class])->group(function () {
 
         // Ver lista de usuarios
-        Route::get('users', [UserController::class, 'index'])
-            ->name('users.index')
-            ->middleware('can:list users');
+        Route::get('users', [UserController::class, 'index'])->name('users.index');
 
         // Crear usuarios
-        Route::get('users/create', [UserController::class, 'create'])
-            ->name('users.create')
-            ->middleware('can:create users');
+        Route::get('users/create', [UserController::class, 'create'])->name('users.create');
+        Route::post('users', [UserController::class, 'store'])->name('users.store');
 
-        Route::post('users', [UserController::class, 'store'])
-            ->name('users.store')
-            ->middleware('can:create users');
+        // Editar usuarios (🚨 Cambiamos {user} por {id})
+        Route::get('users/{id}/edit', [UserController::class, 'edit'])->name('users.edit');
+        Route::put('users/{id}', [UserController::class, 'update'])->name('users.update');
 
-        // Editar usuarios
-        Route::get('users/{user}/edit', [UserController::class, 'edit'])
-            ->name('users.edit')
-            ->middleware('can:edit users');
+        // Eliminar usuarios (🚨 Cambiamos {user} por {id})
+        Route::delete('users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
 
-        Route::put('users/{user}', [UserController::class, 'update'])
-            ->name('users.update')
-            ->middleware('can:edit users');
-
-        // Eliminar usuarios
-        Route::delete('users/{user}', [UserController::class, 'destroy'])
-            ->name('users.destroy')
-            ->middleware('can:delete users');
-
-        // Ver detalles de un usuario
-        Route::get('users/{user}/show', [UserController::class, 'show'])
-            ->name('users.show')
-            ->middleware('can:list users');
+        // Ver detalles de un usuario (🚨 Cambiamos {user} por {id})
+        Route::get('users/{id}/show', [UserController::class, 'show'])->name('users.show');
     });
 });
