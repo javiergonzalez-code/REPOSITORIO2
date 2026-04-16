@@ -15,18 +15,13 @@ class CheckIfAdmin
         }
     }
 
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
-        if (auth()->guest()) { // Usar auth() nativo
-            return $this->respondToUnauthorizedRequest($request);
-        }
-
-        $user = auth()->user(); // Usar auth() nativo
-
-        if ($user->hasRole('admin') || $user->hasRole('superadmin') || in_array($user->role, ['admin', 'superadmin'])) {
+        // Validamos directamente contra la columna 'role'
+        if (Auth::check() && in_array(Auth::user()->role, ['admin', 'superadmin'])) {
             return $next($request);
         }
 
-        return $this->respondToUnauthorizedRequest($request);
+        abort(403, 'Acceso denegado. Se requiere rol de Administrador.');
     }
 }

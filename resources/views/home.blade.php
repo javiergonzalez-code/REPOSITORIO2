@@ -110,22 +110,7 @@
 
             </div>
 
-            {{-- Limpieza: Cambiamos 'Super Admin' por 'superadmin' que es el nombre oficial en tu base de datos --}}
-            @if (Auth::check() && Auth::user()->role === 'superadmin')
-                <div class="mt-4 module-header">
-                    <h3>Panel de Administración General</h3>
-                </div>
 
-                <div class="row">
-                    <div class="col-md-12">
-                        @livewire('user-manager')
-                    </div>
-
-                    <div class="col-md-12 mt-4">
-                        @livewire('logs-manager')
-                    </div>
-                </div>
-            @endif
         </div>
     </main>
 

@@ -11,7 +11,6 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-
 class UserController extends Controller
 {
     private function getRolesPermitidos()
@@ -40,10 +39,11 @@ class UserController extends Controller
     {
         $rolesPermitidos = $this->getRolesPermitidos();
 
+        // 🚨 Asumimos que la columna en base de datos es email, si es E_Mail debes cambiar 'users' por 'users', 'E_Mail'
         $validatedData = $request->validate([
             'name'     => ['required', 'string', 'max:255'],
             'rfc'      => ['nullable', 'string', 'max:13', Rule::unique('users')],
-            'email' => ['required', 'email', Rule::unique('users')->whereNull('deleted_at')],
+            'email'    => ['required', 'email', Rule::unique('users')->whereNull('deleted_at')],
             'telefono' => ['nullable', 'string', 'max:20'],
             'role'     => ['required', Rule::in($rolesPermitidos)],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
@@ -56,9 +56,9 @@ class UserController extends Controller
             DB::transaction(function () use ($validatedData) {
                 // 1. Creamos la instancia sin el rol
                 $user = new User([
-                    'name'     => $validatedData['name'],
+                    'name'     => $validatedData['name'], // Si tu modelo usa mutators, esto funciona. Si no, usa 'CardName' => ...
                     'rfc'      => $validatedData['rfc'] ?? null,
-                    'email'    => $validatedData['email'],
+                    'email'    => $validatedData['email'], // Igual aquí, si no usa mutators, pon 'E_Mail' => ...
                     'telefono' => $validatedData['telefono'] ?? null,
                     'password' => Hash::make($validatedData['password']),
                 ]);
@@ -71,8 +71,8 @@ class UserController extends Controller
                 $user->assignRole($validatedData['role']);
 
                 \App\Models\Log::create([
-                    'user_id' => auth()->id(),
-                    'accion'  => 'CARGA - Registró con éxito al usuario: ' . $user->name,
+                    'user_id' => auth()->user()->CardCode, // 🚨 Usamos CardCode en lugar de id()
+                    'accion'  => 'CARGA - Registró con éxito al usuario: ' . $user->CardName, // 🚨 CardName
                     'modulo'  => 'USUARIOS',
                 ]);
             });
@@ -82,7 +82,7 @@ class UserController extends Controller
         } catch (\Exception $e) {
             try {
                 \App\Models\Log::create([
-                    'user_id' => auth()->id(),
+                    'user_id' => auth()->user()->CardCode, // 🚨
                     'accion'  => Str::limit('ERROR DE REGISTRO - Falló al crear usuario: ' . $e->getMessage(), 250),
                     'modulo'  => 'USUARIOS',
                 ]);
@@ -95,33 +95,28 @@ class UserController extends Controller
         }
     }
 
-    public function edit(User $user)
+    public function edit($id) // 🚨 $id recibe el CardCode
     {
-        $rolesPermitidos = $this->getRolesPermitidos();
-        if ($user->role === 'superadmin' && !in_array('superadmin', $rolesPermitidos)) {
-            Alert::error('Acceso Denegado', 'No tienes permisos para editar a un Superusuario.');
-            return redirect()->route('users.index');
-        }
-
-        $roles = $rolesPermitidos;
-        return view('users.edit', compact('user', 'roles'));
+        $user = User::where('CardCode', $id)->firstOrFail();
+        return view('users.edit', compact('user'));
     }
 
-    public function update(Request $request, User $user)
+    // 🚨 Cambiamos (User $user) por ($id) para que busque por CardCode igual que en edit()
+    public function update(Request $request, $id) 
     {
+        $user = User::where('CardCode', $id)->firstOrFail();
         $rolesPermitidos = $this->getRolesPermitidos();
 
-        // 🚨 1. CORRECCIÓN DE SEGURIDAD: Evitar que editen al superadmin si no tienen el rol
         if ($user->role === 'superadmin' && !in_array('superadmin', $rolesPermitidos)) {
             Alert::error('Acceso Denegado', 'No tienes permisos para modificar a un Superusuario.');
             return redirect()->route('users.index');
         }
 
-        // ⚠️ 2. CORRECCIÓN DE PAPELERA: Agregar ->whereNull('deleted_at') al email y rfc
+        // 🚨 CORRECCIÓN UNIQUE: Agregamos 'CardCode' a la regla ignore para que no explote buscando el campo 'id'
         $validatedData = $request->validate([
             'name'     => ['required', 'string', 'max:255'],
-            'rfc'      => ['nullable', 'string', 'max:13', Rule::unique('users')->ignore($user->id)->whereNull('deleted_at')],
-            'email'    => ['required', 'email', Rule::unique('users')->ignore($user->id)->whereNull('deleted_at')],
+            'rfc'      => ['nullable', 'string', 'max:13', Rule::unique('users')->ignore($user->CardCode, 'CardCode')->whereNull('deleted_at')],
+            'email'    => ['required', 'email', Rule::unique('users')->ignore($user->CardCode, 'CardCode')->whereNull('deleted_at')],
             'role'     => ['required', Rule::in($rolesPermitidos)],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
         ], [
@@ -131,23 +126,20 @@ class UserController extends Controller
 
         try {
             DB::transaction(function () use ($request, $user, $validatedData) {
-                // 1. Llenamos los datos ignorando explícitamente password y role
                 $user->fill($request->except(['password', 'role']));
 
                 if ($request->filled('password')) {
                     $user->password = Hash::make($request->password);
                 }
 
-                // 2. Forzamos la asignación del rol manualmente
                 $user->role = $validatedData['role'];
                 $user->save();
 
-                // 3. Sincronizamos en Spatie
                 $user->syncRoles([$validatedData['role']]);
 
                 \App\Models\Log::create([
-                    'user_id' => auth()->id(),
-                    'accion'  => 'ACTUALIZACIÓN - Modificó los datos del usuario: ' . $user->name,
+                    'user_id' => auth()->user()->CardCode, // 🚨
+                    'accion'  => 'ACTUALIZACIÓN - Modificó los datos del usuario: ' . $user->CardName, // 🚨 CardName
                     'modulo'  => 'USUARIOS',
                 ]);
             });
@@ -157,7 +149,7 @@ class UserController extends Controller
         } catch (\Exception $e) {
             try {
                 \App\Models\Log::create([
-                    'user_id' => auth()->id(),
+                    'user_id' => auth()->user()->CardCode, // 🚨
                     'accion'  => Str::limit('ERROR ACTUALIZACIÓN - ' . $e->getMessage(), 200),
                     'modulo'  => 'USUARIOS',
                 ]);
@@ -170,9 +162,13 @@ class UserController extends Controller
         }
     }
 
-    public function destroy(User $user)
+    // 🚨 Cambiamos a ($id)
+    public function destroy($id)
     {
-        if (auth()->id() === $user->id) {
+        $user = User::where('CardCode', $id)->firstOrFail();
+
+        // 🚨 Comparamos CardCode con CardCode
+        if (auth()->user()->CardCode === $user->CardCode) {
             Alert::error('Operación Denegada', 'No puedes revocar tu propio acceso del sistema.');
             return back();
         }
@@ -183,12 +179,12 @@ class UserController extends Controller
         }
 
         try {
-            $nombreOriginal = $user->name;
+            $nombreOriginal = $user->CardName; // 🚨 CardName
 
             $user->delete();
 
             \App\Models\Log::create([
-                'user_id' => auth()->id(),
+                'user_id' => auth()->user()->CardCode, // 🚨
                 'accion'  => 'ELIMINACION - Revocó acceso del usuario: ' . $nombreOriginal,
                 'modulo'  => 'USUARIOS',
             ]);
@@ -198,8 +194,8 @@ class UserController extends Controller
         } catch (\Exception $e) {
             try {
                 \App\Models\Log::create([
-                    'user_id' => auth()->id(),
-                    'accion'  => Str::limit('ERROR ELIMINACIÓN - Falló al eliminar usuario ' . $user->name . ': ' . $e->getMessage(), 250),
+                    'user_id' => auth()->user()->CardCode, // 🚨
+                    'accion'  => Str::limit('ERROR ELIMINACIÓN - Falló al eliminar usuario ' . $user->CardName . ': ' . $e->getMessage(), 250),
                     'modulo'  => 'USUARIOS',
                 ]);
             } catch (\Exception $logError) {
@@ -211,8 +207,10 @@ class UserController extends Controller
         }
     }
 
-    public function show(User $user)
+    // 🚨 Cambiamos a ($id)
+    public function show($id)
     {
+        $user = User::where('CardCode', $id)->firstOrFail();
         return view('users.show', compact('user'));
     }
 }
