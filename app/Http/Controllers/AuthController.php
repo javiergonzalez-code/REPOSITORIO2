@@ -7,7 +7,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use RealRashid\SweetAlert\Facades\Alert;
-use Illuminate\Support\Facades\Validator; // <-- Esta es la línea que faltaba
+use Illuminate\Support\Facades\Validator;
+use App\Models\Log; // 🚨 Importamos el modelo Log
 
 class AuthController extends Controller
 {
@@ -19,7 +20,7 @@ class AuthController extends Controller
         return view('login');
     }
 
-public function login(Request $request)
+    public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
@@ -43,8 +44,9 @@ public function login(Request $request)
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
-            \App\Models\Log::create([
-                'user_id' => auth()->id(), // Ya te devolverá el CardCode
+            // 🚨 Usamos explícitamente CardCode como String para evitar errores de tipo de dato
+            Log::create([
+                'user_id' => auth()->user()->CardCode,
                 'accion'  => 'Inicio de sesión exitoso',
                 'modulo'  => 'AUTH'
             ]);
