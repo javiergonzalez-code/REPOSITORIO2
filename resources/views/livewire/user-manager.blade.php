@@ -156,7 +156,6 @@ $usuarios = computed(function () {
                         <tr style="transition: all 0.2s ease;">
 
                             <td class="ps-4 py-3">
-                                {{-- 5. CAMBIO CRÍTICO: Mandar atributos correctos de SQL Server al Avatar --}}
                                 <x-user-avatar :user="$user" />
                             </td>
 

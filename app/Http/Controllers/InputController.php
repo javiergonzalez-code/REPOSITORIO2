@@ -40,9 +40,9 @@ class InputController extends Controller
         if ($validator->fails()) {
             $errores = implode(' | ', $validator->errors()->all());
             Log::create([
-                'user_id' => $user->CardCode, // 🚨 Usamos CardCode
+                'user_id' => $user->CardCode,
                 'accion'  => 'Intento fallido (Validación/Seguridad): ' . $errores,
-                'modulo'  => 'INPUTS',
+                'modulo'  => 'ERRORES',
             ]);
             Alert::error('Archivo no válido', $errores);
             return back();
@@ -117,7 +117,7 @@ class InputController extends Controller
             Log::create([
                 'user_id' => $user->CardCode, // 🚨 Usamos CardCode
                 'accion'  => Str::limit('Error BD: ' . $e->getMessage(), 250),
-                'modulo'  => 'INPUTS'
+                'modulo'  => 'ERRORES'
             ]);
             Alert::error('Error Crítico', 'No se pudo registrar en la base de datos.');
             return back();
@@ -125,7 +125,7 @@ class InputController extends Controller
             Log::create([
                 'user_id' => $user->CardCode, // 🚨 Usamos CardCode
                 'accion'  => Str::limit('Error Servidor: ' . $e->getMessage(), 250),
-                'modulo'  => 'INPUTS',
+                'modulo'  => 'ERRORES',
             ]);
             Alert::error('Error del Servidor', 'Error al procesar el archivo.');
             return back();

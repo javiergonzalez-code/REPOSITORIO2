@@ -27,10 +27,8 @@ class ErroresController extends Controller
 
     public function show($id)
     {
-        // Buscamos el log por su ID (El ID de la tabla logs sigue siendo autoincrementable numérico)
         $error = Log::findOrFail($id);
 
-        // 🚨 Verificamos permisos usando la columna nativa 'role' y comparando contra 'CardCode'
         $user = Auth::user();
         
         if ($user->role === 'proveedor' && $error->user_id !== $user->CardCode) {

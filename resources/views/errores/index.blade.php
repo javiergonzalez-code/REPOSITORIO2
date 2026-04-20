@@ -5,16 +5,16 @@
         <div class="row justify-content-center">
             <div class="col-12 col-xl-11">
 
-                {{-- RECUADRO 1: TÍTULO (Usando nuestro componente reutilizable) --}}
+                {{-- RECUADRO 1: TÍTULO --}}
                 <x-module-header icon="fas fa-bug" title="REGISTRO DE ERRORES" subtitle="MÓDULO DE MONITOREO DEL SISTEMA" />
 
-                {{-- RECUADRO 2: TABLA DE ERRORES (DISEÑO PREMIUM) --}}
+                {{-- RECUADRO 2: TABLA DE ERRORES --}}
                 <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden custom-card">
 
                     {{-- Encabezado de la tabla --}}
                     <div
                         class="card-header bg-transparent border-0 pt-4 px-4 pb-2 d-flex justify-content-between align-items-center">
-                        <h6 class="text-uppercase fw-black mb-0 text-danger" style="font-size: 0.9rem; letter-spacing: 1px;">
+                        <h6 class="text-uppercase fw-bold mb-0 text-danger" style="font-size: 0.9rem; letter-spacing: 1px;">
                             <i class="fas fa-exclamation-triangle me-2"></i> Excepciones Detectadas
                         </h6>
                     </div>
@@ -24,18 +24,20 @@
                             <table class="table table-hover align-middle mb-0 border-top-0">
 
                                 <thead>
-                                    <tr class="text-muted"
-                                        style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                                    <tr class="text-muted text-uppercase"
+                                        style="font-size: 0.85rem; letter-spacing: 0.5px;">
                                         <th class="ps-4 py-3 border-0 rounded-start">Nivel / Estado</th>
                                         <th class="py-3 border-0">Usuario Afectado</th>
                                         <th class="py-3 border-0">Detalle del Error</th>
-                                        <th class="text-center py-3 pe-4 border-0">Fecha y Hora</th>
+                                        <th class="text-center py-3 border-0">Fecha y Hora</th>
                                         <th class="text-center py-3 pe-4 border-0 rounded-end">Acciones</th>
                                     </tr>
                                 </thead>
+
                                 <tbody class="border-top-0">
                                     @forelse($erroresCarga as $error)
                                         <tr style="transition: all 0.2s ease;">
+
                                             {{-- COLUMNA 1: Nivel de Error --}}
                                             <td class="ps-4 py-3">
                                                 <div class="status-indicator status-error">
@@ -43,28 +45,30 @@
                                                 </div>
                                             </td>
 
-                                            {{-- COLUMNA 2: Usuario --}}
+                                            {{-- COLUMNA 2: Usuario (REFACTORIZADO CON MAPEO ESTÁNDAR) --}}
                                             <td class="py-3">
                                                 @if ($error->user)
                                                     <div class="d-flex align-items-center">
-                                                        {{-- CRÍTICO: Mandamos CardName y CardCode al avatar --}}
-                                                        <x-user-avatar :name="$error->user->CardName" :userId="$error->user->CardCode" :subtitle="$error->user->role" />
+                                                        {{-- 🚨 Se actualizó CardName -> name y CardCode -> id --}}
+                                                        <x-user-avatar :name="$error->user->CardName ?? 'Sin Nombre'" :userId="$error->user->CardCode ?? 'N/A'"
+                                                            :subtitle="$error->user->role ?? 'Sin rol'" />
                                                     </div>
                                                 @else
-                                                    <span class="text-muted fst-italic">Usuario Eliminado / Desconocido</span>
+                                                    <span class="text-muted fst-italic">Usuario Eliminado /
+                                                        Desconocido</span>
                                                 @endif
                                             </td>
 
-                                            {{-- COLUMNA 3: Detalle del Error (Resumido) --}}
+                                            {{-- COLUMNA 3: Detalle del Error --}}
                                             <td class="py-3">
                                                 <div class="d-flex align-items-center">
                                                     <div class="bg-light rounded p-2 me-3">
                                                         <i class="fas fa-exclamation-triangle text-danger"></i>
                                                     </div>
                                                     <div>
-                                                        {{-- Muestra solo un resumen para no saturar la tabla --}}
-                                                        <span class="d-block text-dark fw-medium"
-                                                            style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                                        {{-- Se reemplazó el CSS manual por la clase nativa 'text-truncate' --}}
+                                                        <span class="d-block text-dark fw-medium text-truncate"
+                                                            style="max-width: 250px;">
                                                             {{ $error->accion ?? 'Error no especificado' }}
                                                         </span>
                                                         <span
@@ -83,13 +87,14 @@
                                                     class="text-muted small">{{ $error->created_at->format('H:i:s') }}</span>
                                             </td>
 
-                                            {{-- COLUMNA 5: Acciones (Cerrado correctamente) --}}
+                                            {{-- COLUMNA 5: Acciones --}}
                                             <td class="text-center py-3 pe-4">
                                                 <a href="{{ route('errores.show', $error->id) }}"
                                                     class="btn btn-sm btn-outline-primary shadow-sm" title="Ver Detalles">
                                                     <i class="fas fa-eye"></i> Ver
                                                 </a>
                                             </td>
+
                                         </tr>
                                     @empty
                                         <tr>
@@ -108,12 +113,8 @@
                     </div>
                 </div>
 
-                {{-- Paginación --}}
-                @if (isset($logs) && method_exists($logs, 'links'))
-                    <div class="mt-4 d-flex justify-content-center">
-                        {{ $logs->links('pagination::bootstrap-5') }}
-                    </div>
-                @elseif(isset($erroresCarga) && method_exists($erroresCarga, 'links'))
+                {{-- Paginación (Lógica simplificada y limpia) --}}
+                @if (isset($erroresCarga) && $erroresCarga->hasPages())
                     <div class="mt-4 d-flex justify-content-center">
                         {{ $erroresCarga->links('pagination::bootstrap-5') }}
                     </div>
