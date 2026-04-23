@@ -37,4 +37,24 @@ class ErroresController extends Controller
 
         return view('errores.show', compact('error'));
     }
+
+    public function destroy($id)
+    {
+        $error = Log::findOrFail($id);
+        
+        $user = Auth::user();
+        
+        // Medida de seguridad: Si es proveedor, validamos que el error sea suyo antes de dejarlo borrar
+        if ($user->role === 'proveedor' && $error->user_id !== $user->CardCode) {
+            abort(403, 'No tienes permiso para eliminar este registro.');
+        }
+
+        // Eliminamos el registro
+        $error->delete();
+
+
+        \RealRashid\SweetAlert\Facades\Alert::success('¡Eliminado!', 'El registro del error ha sido borrado correctamente.');
+        
+        return back();
+    }
 }

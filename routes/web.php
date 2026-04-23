@@ -39,6 +39,7 @@ Route::middleware(['auth'])->group(function () {
     // Módulo de Errores 
     Route::get('/errores', [App\Http\Controllers\ErroresController::class, 'index'])->name('errores.index');
     Route::get('/errores/{id}', [App\Http\Controllers\ErroresController::class, 'show'])->name('errores.show');
+    Route::delete('/errores/{id}', [App\Http\Controllers\ErroresController::class, 'destroy'])->name('errores.destroy');
 
     // ==========================================
     // RUTA PARA EL SWITCH DE MANTENIMIENTO (AJAX)
@@ -73,6 +74,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/oc/preview/{id}', [OcController::class, 'preview'])->name('oc.preview');
         Route::delete('/oc/{id}', [OcController::class, 'destroy'])->name('oc.destroy');
     });
+
+    
 
     // ==========================================
     // GESTIÓN DE USUARIOS (PROTEGIDA POR MANTENIMIENTO Y ADMIN)

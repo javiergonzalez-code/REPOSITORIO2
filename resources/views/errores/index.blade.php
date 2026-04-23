@@ -44,14 +44,11 @@
                                                     <span class="dot"></span> FALLO DEL SISTEMA
                                                 </div>
                                             </td>
-
-                                            {{-- COLUMNA 2: Usuario (REFACTORIZADO CON MAPEO ESTÁNDAR) --}}
+                                            {{-- COLUMNA 2: Usuario --}}
                                             <td class="py-3">
                                                 @if ($error->user)
                                                     <div class="d-flex align-items-center">
-                                                        {{-- 🚨 Se actualizó CardName -> name y CardCode -> id --}}
-                                                        <x-user-avatar :name="$error->user->CardName ?? 'Sin Nombre'" :userId="$error->user->CardCode ?? 'N/A'"
-                                                            :subtitle="$error->user->role ?? 'Sin rol'" />
+                                                        <x-user-avatar :user="$error->user" />
                                                     </div>
                                                 @else
                                                     <span class="text-muted fst-italic">Usuario Eliminado /
@@ -89,10 +86,27 @@
 
                                             {{-- COLUMNA 5: Acciones --}}
                                             <td class="text-center py-3 pe-4">
-                                                <a href="{{ route('errores.show', $error->id) }}"
-                                                    class="btn btn-sm btn-outline-primary shadow-sm" title="Ver Detalles">
-                                                    <i class="fas fa-eye"></i> Ver
-                                                </a>
+                                                <div class="d-flex justify-content-center gap-2">
+                                                    {{-- Botón Ver --}}
+                                                    <a href="{{ route('errores.show', $error->id) }}"
+                                                        class="btn btn-sm btn-outline-primary shadow-sm"
+                                                        title="Ver Detalles">
+                                                        <i class="fas fa-eye"></i> Ver
+                                                    </a>
+
+                                                    {{-- Botón Eliminar con SweetAlert --}}
+                                                    <form id="delete-form-{{ $error->id }}"
+                                                        action="{{ route('errores.destroy', $error->id) }}" method="POST">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-outline-danger shadow-sm"
+                                                            title="Eliminar Registro"
+                                                            onclick="confirmarEliminacion({{ $error->id }})">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
                                             </td>
 
                                         </tr>
@@ -123,4 +137,28 @@
             </div>
         </div>
     </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmarEliminacion(id) {
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "¡No podrás revertir esto! El registro se eliminará de forma permanente.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="fas fa-trash-alt me-1"></i> Sí, eliminar',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Si el usuario confirma, buscamos el formulario por su ID y lo enviamos
+                    document.getElementById('delete-form-' + id).submit();
+                    window.history.back();
+                }
+            });
+        }
+    </script>
 @endsection

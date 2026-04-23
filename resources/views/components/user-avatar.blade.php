@@ -2,8 +2,7 @@
 
 @php
     // Extraemos las propiedades de forma segura. Si no hay usuario, ponemos valores por defecto.
-    $name = $user ? ($user->name ?? 'Usuario') : 'Desconocido';
-    $subtitle = $user ? ($user->role ?? 'N/A') : 'N/A';
+    $name = $user ? ($user->role ?? 'N/A') : 'N/A';
     $userId = $user ? ($user->id ?? 0) : 0;
     
     // Obtenemos la primera letra para el círculo del avatar
@@ -18,8 +17,6 @@
         <div class="fw-bold text-main mb-0" style="font-size: 0.9rem;">
             {{ $name }}
         </div>
-        <div class="x-small text-muted" style="font-size: 0.75rem;">
-            {{ strtoupper($subtitle) }}
-        </div>
+
     </div>
 </div>

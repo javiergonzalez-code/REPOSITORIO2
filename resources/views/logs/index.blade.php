@@ -9,7 +9,6 @@
                 <x-module-header 
                     icon="fas fa-file-medical-alt" 
                     title="REGISTRO DE ACTIVIDAD (LOGS)" 
-                    subtitle="MÓDULO DE AUDITORÍA"
                 />
 
                 {{-- RECUADRO 2: EL COMPONENTE LIVEWIRE --}}
