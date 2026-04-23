@@ -21,32 +21,51 @@
                             </h6>
 
                             <div class="row g-4 mb-4 justify-content-center">
-                                <div class="col-12">
-                                    <label for="name" class="form-label-custom">Nombre Completo</label>
+                                
+                                {{-- CardCode (Sustituye al ID) --}}
+                                <div class="col-md-4">
+                                    <label for="CardCode" class="form-label-custom">Código de Usuario</label>
                                     <div class="input-group-modern">
-                                        <i class="fas fa-user icon"></i>
-                                        <input type="text" class="form-input @error('name') is-invalid @enderror"
-                                            id="name" name="name" value="{{ old('name') }}"
-                                            placeholder="Ej. Juan Pérez" required autofocus>
+                                        <i class="fas fa-fingerprint icon"></i>
+                                        <input type="text" class="form-input @error('CardCode') is-invalid @enderror"
+                                            id="CardCode" name="CardCode" value="{{ old('CardCode') }}"
+                                            placeholder="Ej. USR01" required autofocus>
                                     </div>
-                                    @error('name')
+                                    @error('CardCode')
                                         <div class="error-msg text-danger small mt-1">{{ $message }}</div>
                                     @enderror
                                 </div>
 
-
-
-                                <div class="col-md-6">
-                                    <label for="rfc" class="form-label-custom">RFC</label>
+                                {{-- CardName (Sustituye a name) --}}
+                                <div class="col-md-8">
+                                    <label for="CardName" class="form-label-custom">Nombre Completo</label>
                                     <div class="input-group-modern">
-                                        <i class="fas fa-passport icon"></i>
-                                        <input type="text" class="form-input @error('rfc') is-invalid @enderror"
-                                            id="rfc" name="rfc" value="{{ old('rfc') }}"
-                                            placeholder="Clave RFC">
+                                        <i class="fas fa-user icon"></i>
+                                        <input type="text" class="form-input @error('CardName') is-invalid @enderror"
+                                            id="CardName" name="CardName" value="{{ old('CardName') }}"
+                                            placeholder="Ej. Juan Pérez" required>
                                     </div>
-                                    @error('rfc')
+                                    @error('CardName')
                                         <div class="error-msg text-danger small mt-1">{{ $message }}</div>
                                     @enderror
+                                </div>
+
+                                {{-- LicTradNum (Sustituye a rfc) --}}
+                                <div class="col-md-6">
+                                    <label for="LicTradNum" class="form-label-custom">RFC</label>
+                                    <div class="input-group-modern">
+                                        <i class="fas fa-passport icon"></i>
+                                        <input type="text" class="form-input @error('LicTradNum') is-invalid @enderror"
+                                            id="LicTradNum" name="LicTradNum" value="{{ old('LicTradNum') }}"
+                                            placeholder="Clave RFC" maxlength="13">
+                                    </div>
+                                    @error('LicTradNum')
+                                        <div class="error-msg text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    {{-- Espacio vacío para mantener el diseño en cuadrícula --}}
                                 </div>
                             </div>
 
@@ -56,30 +75,33 @@
                             </h6>
 
                             <div class="row g-4 mb-4 justify-content-center">
+                                
+                                {{-- E_Mail (Sustituye a email) --}}
                                 <div class="col-md-7">
-                                    <label for="email" class="form-label-custom">Correo Electrónico</label>
+                                    <label for="E_Mail" class="form-label-custom">Correo Electrónico</label>
                                     <div class="input-group-modern">
                                         <i class="fas fa-envelope icon"></i>
-                                        <input type="email" class="form-input @error('email') is-invalid @enderror"
-                                            id="email" name="email" value="{{ old('email') }}"
+                                        <input type="email" class="form-input @error('E_Mail') is-invalid @enderror"
+                                            id="E_Mail" name="E_Mail" value="{{ old('E_Mail') }}"
                                             placeholder="usuario@empresa.com" required>
                                     </div>
-                                    @error('email')
+                                    @error('E_Mail')
                                         <div class="error-msg text-danger small mt-1">{{ $message }}</div>
                                     @enderror
                                 </div>
 
+                                {{-- Cellular (Sustituye a telefono) --}}
                                 <div class="col-md-5">
-                                    <label for="telefono" class="form-label-custom text-uppercase x-small fw-bold">Teléfono
+                                    <label for="Cellular" class="form-label-custom text-uppercase x-small fw-bold">Teléfono
                                         de Contacto</label>
                                     <div class="input-group-modern">
                                         <i class="fas fa-phone icon text-muted"></i>
-                                        <input type="text" class="form-input @error('telefono') is-invalid @enderror"
-                                            id="telefono" name="telefono"
-                                            value="{{ old('telefono', $user->telefono ?? '') }}"
+                                        <input type="text" class="form-input @error('Cellular') is-invalid @enderror"
+                                            id="Cellular" name="Cellular"
+                                            value="{{ old('Cellular') }}"
                                             placeholder="Ej. 222 123 4567" maxlength="15">
                                     </div>
-                                    @error('telefono')
+                                    @error('Cellular')
                                         <div class="error-msg text-danger small mt-1">
                                             <i class="fas fa-exclamation-circle me-1"></i> {{ $message }}
                                         </div>
@@ -130,8 +152,7 @@
                                 </div>
                             </div>
 
-                            <div
-                                class="d-flex flex-column flex-md-row justify-content-end align-items-center pt-4 mt-4 border-top gap-3">
+                            <div class="d-flex flex-column flex-md-row justify-content-end align-items-center pt-4 mt-4 border-top gap-3">
                                 <a href="{{ route('users.index') }}"
                                     class="btn btn-light border fw-bold text-secondary px-4 py-2 rounded-pill">
                                     Cancelar

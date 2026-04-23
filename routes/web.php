@@ -59,10 +59,18 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // ==========================================
-    // MÓDULO DE AUDITORÍA (LOGS) - PROTEGIDO
+    // MÓDULO DE LOGS - PROTEGIDO
     // ==========================================
     Route::middleware(['mantenimiento:logs'])->group(function () {
+
+        // Ver lista de logs (Tu tabla Livewire)
         Route::get('/logs', [LogsController::class, 'index'])->name('logs.index');
+
+        // Ver detalle de un log específico (Tu nueva vista show)
+        Route::get('/logs/{id}', [LogsController::class, 'show'])->name('logs.show');
+
+        // Eliminar un log (La función de tu botón rojo)
+        Route::delete('/logs/{id}', [LogsController::class, 'destroy'])->name('logs.destroy');
     });
 
     // ==========================================
@@ -75,7 +83,7 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/oc/{id}', [OcController::class, 'destroy'])->name('oc.destroy');
     });
 
-    
+
 
     // ==========================================
     // GESTIÓN DE USUARIOS (PROTEGIDA POR MANTENIMIENTO Y ADMIN)
