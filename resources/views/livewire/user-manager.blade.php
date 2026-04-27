@@ -155,8 +155,37 @@ $usuarios = computed(function () {
                     @forelse($this->usuarios as $user)
                         <tr style="transition: all 0.2s ease;">
 
+                        <tr style="transition: all 0.2s ease;">
                             <td class="ps-4 py-3">
-                                <x-user-avatar :user="$user" />
+                                <div class="d-flex align-items-center gap-3">
+
+                                    {{-- 1. Círculo del Avatar dinámico --}}
+                                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold shadow-sm"
+                                        style="width: 38px; height: 38px; font-size: 1rem; min-width: 38px; border: 2px solid rgba(255,255,255,0.1);">
+                                        @php
+                                            // Usamos $user directamente
+                                            $nombreParaAvatar = $user->CardName ?? ($user->name ?? 'U');
+                                            $inicial = strtoupper(substr($nombreParaAvatar, 0, 1));
+                                        @endphp
+                                        {{ $inicial }}
+                                    </div>
+
+                                    {{-- 2. Información de Nombre y Email --}}
+                                    <div>
+                                        {{-- Nombre principal --}}
+                                        <span class="d-block fw-bold mb-0"
+                                            style="font-size: 0.9rem; color: inherit; line-height: 1.2;">
+                                            {{ $user->CardName ?? 'Sin Nombre' }}
+                                        </span>
+
+                                        {{-- Correo electrónico debajo (más útil aquí) --}}
+                                        <span class="text-lowercase fw-medium"
+                                            style="font-size: 0.7rem; letter-spacing: 0.5px; color: #94a3b8;">
+                                            {{ $user->E_Mail ?? ($user->email ?? 'S/C') }}
+                                        </span>
+                                    </div>
+
+                                </div>
                             </td>
 
                             <td class="py-3">

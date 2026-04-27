@@ -21,7 +21,7 @@ class InputController extends Controller
 
     public function store(Request $request)
     {
-        $user = Auth::user(); // 🚨 Extraemos el usuario autenticado
+        $user = Auth::user();
 
         $validator = Validator::make($request->all(), [
             'archivo' => [

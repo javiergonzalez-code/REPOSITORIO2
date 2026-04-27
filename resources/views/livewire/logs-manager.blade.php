@@ -112,8 +112,10 @@ $deleteLog = function ($logId) {
                 <div class="col-lg-3 col-md-6">
                     <label class="form-label-custom text-uppercase x-small fw-bold">Descripción</label>
                     <div class="position-relative">
-                        <i class="fas fa-search text-muted position-absolute top-50 start-0 translate-middle-y ms-3"></i>
-                        <input type="text" wire:model.live.debounce.300ms="search" class="form-control ps-5" placeholder="Buscar en logs...">
+                        <i
+                            class="fas fa-search text-muted position-absolute top-50 start-0 translate-middle-y ms-3"></i>
+                        <input type="text" wire:model.live.debounce.300ms="search" class="form-control ps-5"
+                            placeholder="Buscar en logs...">
                     </div>
                 </div>
 
@@ -122,16 +124,25 @@ $deleteLog = function ($logId) {
                     <div class="col-lg-3 col-md-6" x-data="{ showDropdown: false }" @click.outside="showDropdown = false">
                         <label class="form-label-custom text-uppercase x-small fw-bold">Usuario</label>
                         <div style="position: relative !important;">
-                            <i class="fas fa-user text-muted position-absolute top-50 start-0 translate-middle-y ms-3" style="z-index: 10;"></i>
-                            <input type="text" wire:model.live.debounce.300ms="userFilter" class="form-control ps-5" placeholder="Seleccionar usuario..." autocomplete="off" @focus="showDropdown = true" @input="showDropdown = true">
+                            <i class="fas fa-user text-muted position-absolute top-50 start-0 translate-middle-y ms-3"
+                                style="z-index: 10;"></i>
+                            <input type="text" wire:model.live.debounce.300ms="userFilter" class="form-control ps-5"
+                                placeholder="Seleccionar usuario..." autocomplete="off" @focus="showDropdown = true"
+                                @input="showDropdown = true">
 
                             {{-- LISTA DESPLEGABLE FLOTANTE --}}
                             @if (count($this->sugerencias_usuarios) > 0)
-                                <div class="w-100 border rounded-3 shadow-lg" x-show="showDropdown" x-transition.opacity style="display: none; position: absolute !important; top: 100% !important; left: 0 !important; margin-top: 5px !important; z-index: 10000 !important; overflow-y: auto; max-height: 250px; background-color: #ffffff !important;">
+                                <div class="w-100 border rounded-3 shadow-lg" x-show="showDropdown" x-transition.opacity
+                                    style="display: none; position: absolute !important; top: 100% !important; left: 0 !important; margin-top: 5px !important; z-index: 10000 !important; overflow-y: auto; max-height: 250px; background-color: #ffffff !important;">
                                     <ul class="list-unstyled mb-0">
                                         @foreach ($this->sugerencias_usuarios as $sugerencia)
                                             <li>
-                                                <button type="button" class="w-100 border-0 text-start px-3 py-2" style="font-size: 0.9rem; background-color: transparent; color: #1e293b; transition: all 0.2s;" wire:click="$set('userFilter', '{{ $sugerencia->CardName }}')" @click="showDropdown = false" onmouseover="this.style.backgroundColor='#f1f5f9'" onmouseout="this.style.backgroundColor='transparent'">
+                                                <button type="button" class="w-100 border-0 text-start px-3 py-2"
+                                                    style="font-size: 0.9rem; background-color: transparent; color: #1e293b; transition: all 0.2s;"
+                                                    wire:click="$set('userFilter', '{{ $sugerencia->CardName }}')"
+                                                    @click="showDropdown = false"
+                                                    onmouseover="this.style.backgroundColor='#f1f5f9'"
+                                                    onmouseout="this.style.backgroundColor='transparent'">
                                                     <i class="fas fa-user-circle text-primary me-2"></i>
                                                     {{ $sugerencia->CardName }}
                                                 </button>
@@ -165,12 +176,15 @@ $deleteLog = function ($logId) {
 
                 {{-- Botón Limpiar con Protección Livewire --}}
                 <div class="{{ $this->esProveedor ? 'col-lg-5' : 'col-lg-2' }} col-md-12">
-                    <button wire:click="$set('search', ''); $set('userFilter', ''); $set('accion', ''); $set('fecha', '')" wire:loading.attr="disabled" class="btn btn-outline-secondary rounded-pill w-100 fw-bold">
+                    <button
+                        wire:click="$set('search', ''); $set('userFilter', ''); $set('accion', ''); $set('fecha', '')"
+                        wire:loading.attr="disabled" class="btn btn-outline-secondary rounded-pill w-100 fw-bold">
                         <span wire:loading.remove wire:target="$set">
                             <i class="fas fa-eraser me-1"></i> Limpiar
                         </span>
                         <span wire:loading wire:target="$set">
-                            <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>...
+                            <span class="spinner-border spinner-border-sm me-1" role="status"
+                                aria-hidden="true"></span>...
                         </span>
                     </button>
                 </div>
@@ -183,7 +197,8 @@ $deleteLog = function ($logId) {
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
                 <thead style="background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
-                    <tr class="text-uppercase" style="font-size: 0.7rem; font-weight: 800;letter-spacing: 0.5px; color: #64748b;">
+                    <tr class="text-uppercase"
+                        style="font-size: 0.7rem; font-weight: 800;letter-spacing: 0.5px; color: #64748b;">
                         <th class="ps-4 py-3 border-0">Operador</th>
                         <th class="text-center py-3 border-0">Actividad</th>
                         <th class="py-3 border-0">Módulo</th>
@@ -206,7 +221,29 @@ $deleteLog = function ($logId) {
                         @endphp
                         <tr class="log-row">
                             <td class="ps-4 py-3">
-                                <x-user-avatar :user="$log->user" />
+                                <div class="d-flex align-items-center gap-3">
+
+                                    {{-- 1. Círculo del Avatar (hecho a mano para evitar el texto extra) --}}
+                                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold shadow-sm"
+                                        style="width: 38px; height: 38px; font-size: 1rem; min-width: 38px;">
+                                        {{ strtoupper(substr($log->user->name ?? ($log->user->CardName ?? 'U'), 0, 1)) }}
+                                    </div>
+
+                                    {{-- 2. Información de Nombre y Rol --}}
+                                    <div>
+                                        {{-- Nombre real del usuario --}}
+                                        <span class="d-block fw-bold mb-0" style="font-size: 0.9rem; color: inherit;">
+                                            {{ $log->user->CardName ?? 'Usuario del Sistema' }}
+                                        </span>
+
+                                        {{-- Rol o Username debajo --}}
+                                        <span class="text-uppercase"
+                                            style="font-size: 0.7rem; letter-spacing: 0.5px; color: #94a3b8;">
+                                            {{ $log->user->role ?? 'superadmin' }}
+                                        </span>
+                                    </div>
+
+                                </div>
                             </td>
                             <td class="text-center py-3">
                                 <div class="status-indicator {{ $badgeStyle }}">
@@ -214,28 +251,31 @@ $deleteLog = function ($logId) {
                                 </div>
                             </td>
                             <td class="py-3">
-                                <span class="badge-outline text-muted fw-bold" style="border: 1px solid #e2e8f0; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem;">
+                                <span class="badge-outline text-muted fw-bold"
+                                    style="border: 1px solid #e2e8f0; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem;">
                                     <i class="fas fa-cube me-1"></i> {{ $log->modulo ?? 'N/A' }}
                                 </span>
                             </td>
                             <td class="text-center py-3">
-                                <span class="fw-bold d-block text-main mb-0" style="font-size: 0.85rem;">{{ $log->created_at->format('d/m/Y') }}</span>
-                                <span class="x-small text-muted font-monospace">{{ $log->created_at->format('h:i A') }}</span>
+                                <span class="fw-bold d-block text-main mb-0"
+                                    style="font-size: 0.85rem;">{{ $log->created_at->format('d/m/Y') }}</span>
+                                <span
+                                    class="x-small text-muted font-monospace">{{ $log->created_at->format('h:i A') }}</span>
                             </td>
-                            
+
                             {{-- NUEVA COLUMNA DE BOTONES: VER Y ELIMINAR --}}
                             <td class="text-center py-3">
                                 <div class="d-flex justify-content-center gap-2">
                                     {{-- Botón Ver (Ruta show del controlador) --}}
-                                    <a href="{{ route('logs.show', $log->id) }}" class="btn btn-sm btn-outline-primary rounded-circle" title="Ver Detalle">
+                                    <a href="{{ route('logs.show', $log->id) }}"
+                                        class="btn btn-sm btn-outline-primary rounded-circle" title="Ver Detalle">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    
+
                                     {{-- Botón Eliminar (Llama a la función $deleteLog con confirmación) --}}
-                                    <button wire:click="deleteLog({{ $log->id }})" 
-                                            wire:confirm="¿Estás seguro de que deseas eliminar este registro de auditoría permanentemente?"
-                                            class="btn btn-sm btn-outline-danger rounded-circle" 
-                                            title="Eliminar Log">
+                                    <button wire:click="deleteLog({{ $log->id }})"
+                                        wire:confirm="¿Estás seguro de que deseas eliminar este registro de auditoría permanentemente?"
+                                        class="btn btn-sm btn-outline-danger rounded-circle" title="Eliminar Log">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </div>
@@ -244,7 +284,8 @@ $deleteLog = function ($logId) {
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="text-center py-5 text-muted fw-bold">No se encontraron logs con estos filtros.</td>
+                            <td colspan="5" class="text-center py-5 text-muted fw-bold">No se encontraron logs con
+                                estos filtros.</td>
                         </tr>
                     @endforelse
                 </tbody>

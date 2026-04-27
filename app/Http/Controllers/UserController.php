@@ -9,7 +9,7 @@ use Illuminate\Validation\Rule;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Log; // Facade para errores de sistema
 
 class UserController extends Controller
 {
@@ -40,7 +40,6 @@ class UserController extends Controller
         $rolesPermitidos = $this->getRolesPermitidos();
 
         // Se mapean las validaciones únicas a las columnas de SAP. 
-        // Se elimina la lógica de la papelera de reciclaje (Soft Deletes).
         $validatedData = $request->validate([
             'name'     => ['required', 'string', 'max:255'],
             'rfc'      => ['nullable', 'string', 'max:13', Rule::unique('users', 'LicTradNum')],
@@ -55,8 +54,13 @@ class UserController extends Controller
 
         try {
             DB::transaction(function () use ($validatedData) {
+                
+                // 🚨 GENERAMOS EL CARDCODE AUTOMÁTICAMENTE (Ej: U20260423123045)
+                $nuevoCardCode = 'U' . date('YmdHis');
+
                 // Mapeo exacto de los inputs del formulario a las columnas de SAP Business One
                 $user = new User([
+                    'CardCode'   => $nuevoCardCode, // Asignado por el sistema
                     'CardName'   => $validatedData['name'],
                     'LicTradNum' => $validatedData['rfc'] ?? null,
                     'E_Mail'     => $validatedData['email'],
@@ -80,18 +84,25 @@ class UserController extends Controller
             return redirect()->route('users.index');
         } catch (\Exception $e) {
             try {
+                // 🚨 ENVIAMOS EL FALLO AL MÓDULO 'ERRORES'
                 \App\Models\Log::create([
                     'user_id' => auth()->user()->CardCode, 
                     'accion'  => Str::limit('ERROR DE REGISTRO - Falló al crear usuario: ' . $e->getMessage(), 250),
-                    'modulo'  => 'USUARIOS',
+                    'modulo'  => 'ERRORES',
                 ]);
             } catch (\Exception $logError) {
                 Log::error('Fallo al guardar log de creación de usuario: ' . $logError->getMessage());
             }
 
-            Alert::error('Error', 'Ocurrió un error al registrar los datos. Verifica que la información sea correcta.');
+            Alert::error('Error Crítico', 'Ocurrió un error al registrar los datos. Verifica que la información sea correcta.');
             return back()->withInput();
         }
+    }
+
+    public function show($id)
+    {
+        $user = User::where('CardCode', $id)->firstOrFail();
+        return view('users.show', compact('user'));
     }
 
     public function edit($id) 
@@ -110,7 +121,6 @@ class UserController extends Controller
             return redirect()->route('users.index');
         }
 
-        // Corrección de validación unique para las columnas nativas, excluyendo la papelera
         $validatedData = $request->validate([
             'name'     => ['required', 'string', 'max:255'],
             'rfc'      => ['nullable', 'string', 'max:13', Rule::unique('users', 'LicTradNum')->ignore($user->CardCode, 'CardCode')],
@@ -124,7 +134,6 @@ class UserController extends Controller
 
         try {
             DB::transaction(function () use ($request, $user, $validatedData) {
-                // Asignación directa en lugar de fill() para sincronizar los nombres dispares (input vs bd)
                 $user->CardName = $validatedData['name'];
                 $user->LicTradNum = $request->input('rfc');
                 $user->E_Mail = $validatedData['email'];
@@ -153,7 +162,7 @@ class UserController extends Controller
                 \App\Models\Log::create([
                     'user_id' => auth()->user()->CardCode,
                     'accion'  => Str::limit('ERROR ACTUALIZACIÓN - ' . $e->getMessage(), 200),
-                    'modulo'  => 'USUARIOS',
+                    'modulo'  => 'ERRORES',
                 ]);
             } catch (\Exception $logError) {
                 Log::error('Fallo al guardar log de actualización de usuario: ' . $logError->getMessage());
@@ -197,20 +206,14 @@ class UserController extends Controller
                 \App\Models\Log::create([
                     'user_id' => auth()->user()->CardCode,
                     'accion'  => Str::limit('ERROR ELIMINACIÓN - Falló al eliminar usuario ' . $user->CardName . ': ' . $e->getMessage(), 250),
-                    'modulo'  => 'USUARIOS',
+                    'modulo'  => 'ERRORES',
                 ]);
             } catch (\Exception $logError) {
                 Log::error('Fallo al guardar log de eliminación de usuario: ' . $logError->getMessage());
             }
 
-            Alert::error('Error', 'Ocurrió un error al procesar la solicitud.');
+            Alert::error('Error', 'Ocurrió un error en el servidor al procesar la solicitud.');
             return back()->withInput();
         }
-    }
-
-    public function show($id)
-    {
-        $user = User::where('CardCode', $id)->firstOrFail();
-        return view('users.show', compact('user'));
     }
 }

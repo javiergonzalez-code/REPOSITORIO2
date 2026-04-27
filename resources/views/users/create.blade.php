@@ -22,44 +22,30 @@
 
                             <div class="row g-4 mb-4 justify-content-center">
                                 
-                                {{-- CardCode (Sustituye al ID) --}}
-                                <div class="col-md-4">
-                                    <label for="CardCode" class="form-label-custom">Código de Usuario</label>
-                                    <div class="input-group-modern">
-                                        <i class="fas fa-fingerprint icon"></i>
-                                        <input type="text" class="form-input @error('CardCode') is-invalid @enderror"
-                                            id="CardCode" name="CardCode" value="{{ old('CardCode') }}"
-                                            placeholder="Ej. USR01" required autofocus>
-                                    </div>
-                                    @error('CardCode')
-                                        <div class="error-msg text-danger small mt-1">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
                                 {{-- CardName (Sustituye a name) --}}
-                                <div class="col-md-8">
-                                    <label for="CardName" class="form-label-custom">Nombre Completo</label>
+                                <div class="col-12">
+                                    <label for="name" class="form-label-custom">Nombre Completo</label>
                                     <div class="input-group-modern">
                                         <i class="fas fa-user icon"></i>
-                                        <input type="text" class="form-input @error('CardName') is-invalid @enderror"
-                                            id="CardName" name="CardName" value="{{ old('CardName') }}"
-                                            placeholder="Ej. Juan Pérez" required>
+                                        <input type="text" class="form-input @error('name') is-invalid @enderror"
+                                            id="name" name="name" value="{{ old('name') }}"
+                                            placeholder="Ej. Juan Pérez" required autofocus>
                                     </div>
-                                    @error('CardName')
+                                    @error('name')
                                         <div class="error-msg text-danger small mt-1">{{ $message }}</div>
                                     @enderror
                                 </div>
 
                                 {{-- LicTradNum (Sustituye a rfc) --}}
                                 <div class="col-md-6">
-                                    <label for="LicTradNum" class="form-label-custom">RFC</label>
+                                    <label for="rfc" class="form-label-custom">RFC</label>
                                     <div class="input-group-modern">
                                         <i class="fas fa-passport icon"></i>
-                                        <input type="text" class="form-input @error('LicTradNum') is-invalid @enderror"
-                                            id="LicTradNum" name="LicTradNum" value="{{ old('LicTradNum') }}"
+                                        <input type="text" class="form-input @error('rfc') is-invalid @enderror"
+                                            id="rfc" name="rfc" value="{{ old('rfc') }}"
                                             placeholder="Clave RFC" maxlength="13">
                                     </div>
-                                    @error('LicTradNum')
+                                    @error('rfc')
                                         <div class="error-msg text-danger small mt-1">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -78,30 +64,30 @@
                                 
                                 {{-- E_Mail (Sustituye a email) --}}
                                 <div class="col-md-7">
-                                    <label for="E_Mail" class="form-label-custom">Correo Electrónico</label>
+                                    <label for="email" class="form-label-custom">Correo Electrónico</label>
                                     <div class="input-group-modern">
                                         <i class="fas fa-envelope icon"></i>
-                                        <input type="email" class="form-input @error('E_Mail') is-invalid @enderror"
-                                            id="E_Mail" name="E_Mail" value="{{ old('E_Mail') }}"
+                                        <input type="email" class="form-input @error('email') is-invalid @enderror"
+                                            id="email" name="email" value="{{ old('email') }}"
                                             placeholder="usuario@empresa.com" required>
                                     </div>
-                                    @error('E_Mail')
+                                    @error('email')
                                         <div class="error-msg text-danger small mt-1">{{ $message }}</div>
                                     @enderror
                                 </div>
 
                                 {{-- Cellular (Sustituye a telefono) --}}
                                 <div class="col-md-5">
-                                    <label for="Cellular" class="form-label-custom text-uppercase x-small fw-bold">Teléfono
+                                    <label for="telefono" class="form-label-custom text-uppercase x-small fw-bold">Teléfono
                                         de Contacto</label>
                                     <div class="input-group-modern">
                                         <i class="fas fa-phone icon text-muted"></i>
-                                        <input type="text" class="form-input @error('Cellular') is-invalid @enderror"
-                                            id="Cellular" name="Cellular"
-                                            value="{{ old('Cellular') }}"
+                                        <input type="text" class="form-input @error('telefono') is-invalid @enderror"
+                                            id="telefono" name="telefono"
+                                            value="{{ old('telefono') }}"
                                             placeholder="Ej. 222 123 4567" maxlength="15">
                                     </div>
-                                    @error('Cellular')
+                                    @error('telefono')
                                         <div class="error-msg text-danger small mt-1">
                                             <i class="fas fa-exclamation-circle me-1"></i> {{ $message }}
                                         </div>
