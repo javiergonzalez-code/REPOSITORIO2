@@ -42,12 +42,11 @@ class InputController extends Controller
 
             try {
                 Log::create([
-                    'user_id' => $user->CardCode,
+                    'user_id' => $user ? $user->CardCode : 'Atacante Anónimo',
                     'accion'  => 'Intento fallido (Validación/Seguridad): ' . $errores . ' | IP: ' . $request->ip(),
                     'modulo'  => 'ERRORES',
                 ]);
             } catch (\Exception $logE) {
-                // Escribimos en storage/logs/laravel.log si la BD no responde
                 \Illuminate\Support\Facades\Log::warning('Alerta de Seguridad (BD CAÍDA) | IP: ' . $request->ip() . ' | Errores: ' . $errores);
             }
 
