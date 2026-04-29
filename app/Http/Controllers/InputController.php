@@ -38,19 +38,59 @@ class InputController extends Controller
         ]);
 
         if ($validator->fails()) {
-            $errores = implode(' | ', $validator->errors()->all());
+            $file = $request->file('archivo');
+            $nivelAmenaza = 'Advertencia';
+            $detalleFallo = 'Error de validación desconocido.';
 
+            // 1. CLASIFICADOR DE AMENAZAS AL VUELO
+            if ($file) {
+                $ext = strtolower($file->getClientOriginalExtension());
+                $mimeReal = $file->getMimeType(); // Laravel lee los bytes reales del archivo, no se fía del nombre
+
+                $maliciosos = ['exe', 'php', 'sh', 'bat', 'js', 'vbs', 'msi', 'cmd', 'ps1'];
+
+                // CASO A: HACKER (Ataque Directo) - Sube explícitamente un ejecutable o script
+                if (in_array($ext, $maliciosos)) {
+                    $nivelAmenaza = '🚨 CRÍTICO (Intento de Malware)';
+                    $detalleFallo = "Se intentó subir un archivo ejecutable/script explícito. Extensión enviada: .$ext";
+                }
+                // CASO B: HACKER (Spoofing/Disfraz) - Sube un archivo malicioso renombrado a .csv o .xlsx
+                elseif (in_array($ext, ['csv', 'xlsx', 'xls', 'xml']) && $validator->errors()->has('archivo.mimes')) {
+                    $nivelAmenaza = '🚨 CRÍTICO (Archivo Disfrazado/Spoofing)';
+                    $detalleFallo = "El archivo finge ser un .$ext pero su contenido interno real detectado es: $mimeReal";
+                }
+                // CASO C: USUARIO TORPE - Subió un PDF, JPG o Word por equivocación
+                elseif (!in_array($ext, ['csv', 'xlsx', 'xls', 'xml'])) {
+                    $nivelAmenaza = '⚠️ Leve (Error de Formato)';
+                    $detalleFallo = "El usuario subió un formato no soportado (.$ext en lugar de Excel/XML). No representa una amenaza directa.";
+                }
+                // CASO D: USUARIO NORMAL - Archivo muy pesado
+                elseif ($validator->errors()->has('archivo.max')) {
+                    $nivelAmenaza = '⚠️ Leve (Exceso de Tamaño)';
+                    $detalleFallo = "El archivo es del formato correcto (.$ext), pero supera el límite de 5MB.";
+                }
+            } else {
+                // CASO E: Formulario vacío (Posible Bot escaneando)
+                $nivelAmenaza = '⚠️ Leve (Formulario Vacío)';
+                $detalleFallo = "Se envió el formulario sin ningún documento adjunto.";
+            }
+
+            // 2. Guardamos la radiografía exacta en la Base de Datos para el Admin
             try {
                 Log::create([
                     'user_id' => $user ? $user->CardCode : 'Atacante Anónimo',
-                    'accion'  => 'Intento fallido (Validación/Seguridad): ' . $errores . ' | IP: ' . $request->ip(),
+                    'accion'  => "$nivelAmenaza - $detalleFallo | IP: " . $request->ip(),
                     'modulo'  => 'ERRORES',
                 ]);
             } catch (\Exception $logE) {
-                \Illuminate\Support\Facades\Log::warning('Alerta de Seguridad (BD CAÍDA) | IP: ' . $request->ip() . ' | Errores: ' . $errores);
+                // Escribimos en storage/logs/laravel.log si la BD no responde
+                \Illuminate\Support\Facades\Log::warning("Alerta de Seguridad (BD CAÍDA) | IP: {$request->ip()} | Fallo: $detalleFallo");
             }
 
-            Alert::error('Archivo no válido', $errores);
+            // 3. Mensaje genérico y amable para el usuario / atacante (Lo que sale en SweetAlert)
+            $mensajeAmigable = 'El documento no pudo ser procesado. Verifique que sea un formato válido (Excel, CSV o XML) y no exceda los 5MB.';
+
+            Alert::error('Archivo no admitido', $mensajeAmigable);
             return back();
         }
 

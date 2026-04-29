@@ -89,7 +89,7 @@
                                             {{-- COLUMNA 3: Detalle del Error --}}
                                             <td class="py-3">
                                                 <div class="d-flex align-items-center">
-                                                    <div class="bg-light rounded p-2 me-3">
+                                                    <div class="bg-white rounded p-2 me-3">
                                                         <i class="fas fa-exclamation-triangle text-danger"></i>
                                                     </div>
                                                     <div>

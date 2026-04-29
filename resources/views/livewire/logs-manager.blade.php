@@ -85,6 +85,11 @@ $logs = computed(function () {
 
 // Función para eliminar el log desde Livewire
 $deleteLog = function ($logId) {
+    // 1. PROTECCIÓN BACKEND: Si es proveedor, abortamos la eliminación inmediatamente
+    if ($this->esProveedor) {
+        return;
+    }
+
     $log = Log::find($logId);
     if ($log) {
         $log->delete();
@@ -209,27 +214,67 @@ $deleteLog = function ($logId) {
                 <tbody>
                     @forelse($this->logs as $log)
                         @php
-                            $badgeStyle = match (true) {
-                                str_contains(strtoupper($log->accion), 'LOGIN') ||
-                                    str_contains(strtoupper($log->accion), 'SESIÓN')
-                                    => 'status-upload',
-                                str_contains(strtoupper($log->accion), 'BORRADO') ||
-                                    str_contains(strtoupper($log->accion), 'ELIMINÓ')
-                                    => 'status-error',
-                                default => 'status-general',
-                            };
+                            // 1. VARIABLE DINÁMICA DE TEXTO
+                            $textoMostrar = $log->accion;
+
+                            // 2. ENMASCARAMIENTO PARA PROVEEDORES
+                            if ($this->esProveedor) {
+                                if (
+                                    str_contains($textoMostrar, 'CRÍTICO') ||
+                                    str_contains($textoMostrar, 'Leve') ||
+                                    str_contains($textoMostrar, 'Validación/Seguridad')
+                                ) {
+                                    $textoMostrar = 'Carga bloqueada: El formato o contenido del archivo no está permitido.';
+                                } elseif (str_contains($textoMostrar, 'IP:')) {
+                                    $textoMostrar = preg_replace('/\| IP: [0-9\.]+/', '', $textoMostrar);
+                                }
+                            }
+
+                            // 3. DISTINCIÓN DE COLORES PROTEGIDA POR ROL
+                            $accionUpper = strtoupper($log->accion);
+                            $badgeStyle = 'status-general'; // Por defecto
+
+                            if ($this->esProveedor) {
+                                // 🛡️ VISTA PROVEEDOR: Colores estándar, sin revelar niveles de amenaza
+                                if (str_contains($accionUpper, 'LOGIN') || str_contains($accionUpper, 'SESIÓN')) {
+                                    $badgeStyle = 'status-upload';
+                                } elseif (
+                                    str_contains($accionUpper, 'BORRADO') || 
+                                    str_contains($accionUpper, 'ELIMINÓ') || 
+                                    str_contains($accionUpper, 'FALLIDO') ||
+                                    str_contains($accionUpper, 'CRÍTICO') ||
+                                    str_contains($accionUpper, 'LEVE')
+                                ) {
+                                    $badgeStyle = 'status-error'; // Error genérico (solo el puntito rojo)
+                                }
+                            } else {
+                                // 👁️ VISTA ADMIN: Radiografía de colores detallada
+                                if (str_contains($accionUpper, 'CRÍTICO')) {
+                                    $badgeStyle = 'status-error text-danger fw-bolder'; // Rojo intenso
+                                } elseif (str_contains($accionUpper, 'LEVE')) {
+                                    $badgeStyle = 'status-general text-warning fw-semibold'; // Naranja/Amarillo
+                                } elseif (str_contains($accionUpper, 'LOGIN') || str_contains($accionUpper, 'SESIÓN')) {
+                                    $badgeStyle = 'status-upload';
+                                } elseif (
+                                    str_contains($accionUpper, 'BORRADO') ||
+                                    str_contains($accionUpper, 'ELIMINÓ') ||
+                                    str_contains($accionUpper, 'FALLIDO')
+                                ) {
+                                    $badgeStyle = 'status-error';
+                                }
+                            }
                         @endphp
                         <tr class="log-row">
                             <td class="ps-4 py-3">
                                 <div class="d-flex align-items-center gap-3">
 
-                                    {{-- 1. Círculo del Avatar --}}
+                                    {{-- Círculo del Avatar --}}
                                     <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold shadow-sm"
                                         style="width: 38px; height: 38px; font-size: 1rem; min-width: 38px;">
                                         {{ strtoupper(substr($log->user->name ?? ($log->user->CardName ?? 'U'), 0, 1)) }}
                                     </div>
 
-                                    {{-- 2. Información de Nombre y Rol --}}
+                                    {{-- Información de Nombre y Rol --}}
                                     <div>
                                         <span class="d-block fw-bold mb-0" style="font-size: 0.9rem; color: inherit;">
                                             {{ $log->user->CardName ?? 'Usuario del Sistema' }}
@@ -243,10 +288,10 @@ $deleteLog = function ($logId) {
                                 </div>
                             </td>
                             <td class="text-center py-3">
-                                {{-- Usamos Str::limit para mostrar solo 45 caracteres y agregamos 'title' para que al pasar el mouse se vea completo --}}
-                                <div class="status-indicator {{ $badgeStyle }}" title="{{ $log->accion }}">
+                                {{-- USAMOS LA VARIABLE ENMASCARADA AQUÍ ($textoMostrar) --}}
+                                <div class="status-indicator {{ $badgeStyle }}" title="{{ $textoMostrar }}">
                                     <span class="dot"></span>
-                                    {{ \Illuminate\Support\Str::limit($log->accion, 45, '...') }}
+                                    {{ \Illuminate\Support\Str::limit($textoMostrar, 45, '...') }}
                                 </div>
                             </td>
                             <td class="py-3">
@@ -265,41 +310,43 @@ $deleteLog = function ($logId) {
                             {{-- COLUMNA DE BOTONES: VER Y ELIMINAR --}}
                             <td class="text-center py-3">
                                 <div class="d-flex justify-content-center gap-2">
-                                    {{-- Botón Ver --}}
+                                    {{-- Botón Ver (Lo ven todos) --}}
                                     <a href="{{ route('logs.show', $log->id) }}"
                                         class="btn btn-sm btn-outline-primary rounded-circle" title="Ver Detalle">
                                         <i class="fas fa-eye"></i>
                                     </a>
 
-                                    {{-- Botón Eliminar Integrado con SweetAlert 2 vía Alpine.js --}}
-                                    <button type="button"
-                                        @click="
-                                            Swal.fire({
-                                                title: '¿Estás seguro?',
-                                                text: '¿Deseas eliminar este registro de auditoría permanentemente?',
-                                                icon: 'warning',
-                                                showCancelButton: true,
-                                                confirmButtonColor: '#d33',
-                                                cancelButtonColor: '#6c757d',
-                                                confirmButtonText: '<i class=\'fas fa-trash me-1\'></i> Sí, eliminar',
-                                                cancelButtonText: 'Cancelar',
-                                                reverseButtons: true
-                                            }).then((result) => {
-                                                if (result.isConfirmed) {
-                                                    $wire.deleteLog({{ $log->id }});
-                                                    Swal.fire({
-                                                        title: '¡Eliminado!',
-                                                        text: 'El log ha sido borrado exitosamente.',
-                                                        icon: 'success',
-                                                        timer: 2000,
-                                                        showConfirmButton: false
-                                                    });
-                                                }
-                                            })
-                                        "
-                                        class="btn btn-sm btn-outline-danger rounded-circle" title="Eliminar Log">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
+                                    {{-- PROTECCIÓN FRONTEND: Botón Eliminar (Solo Admin / Superadmin) --}}
+                                    @if (!$this->esProveedor)
+                                        <button type="button"
+                                            @click="
+                                                Swal.fire({
+                                                    title: '¿Estás seguro?',
+                                                    text: '¿Deseas eliminar este registro de auditoría permanentemente?',
+                                                    icon: 'warning',
+                                                    showCancelButton: true,
+                                                    confirmButtonColor: '#d33',
+                                                    cancelButtonColor: '#6c757d',
+                                                    confirmButtonText: '<i class=\'fas fa-trash me-1\'></i> Sí, eliminar',
+                                                    cancelButtonText: 'Cancelar',
+                                                    reverseButtons: true
+                                                }).then((result) => {
+                                                    if (result.isConfirmed) {
+                                                        $wire.deleteLog({{ $log->id }});
+                                                        Swal.fire({
+                                                            title: '¡Eliminado!',
+                                                            text: 'El log ha sido borrado exitosamente.',
+                                                            icon: 'success',
+                                                            timer: 2000,
+                                                            showConfirmButton: false
+                                                        });
+                                                    }
+                                                })
+                                            "
+                                            class="btn btn-sm btn-outline-danger rounded-circle" title="Eliminar Log">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    @endif
                                 </div>
                             </td>
 

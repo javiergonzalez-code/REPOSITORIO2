@@ -38,6 +38,16 @@ class LogsController extends Controller
 
     public function destroy($id)
     {
+        // 1. SEGURIDAD BACKEND: Evitar borrado por Postman/cURL de usuarios no autorizados
+        $user = auth()->user();
+        $esProveedor = $user->hasRole('proveedor') || $user->role === 'proveedor';
+
+        if ($esProveedor) {
+            // Si un proveedor intenta llegar aquí, le cortamos el paso inmediatamente
+            abort(403, 'Acceso denegado: No tienes privilegios para eliminar registros de auditoría.');
+        }
+
+        // 2. Si pasa la validación (es admin/superadmin), procedemos a borrar
         $log = Log::findOrFail($id);
         $log->delete();
 
