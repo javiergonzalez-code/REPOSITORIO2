@@ -37,11 +37,7 @@ class MantenimientoController extends Controller
 
         $mensaje = $nuevoEstado ? 'Módulo en mantenimiento' : 'Módulo abierto al público';
 
-        Log::create([
-            'user_id' => $user->CardCode,
-            'accion'  => 'MANTENIMIENTO - Cambió estado de ' . strtoupper($modulo) . ' a: ' . ($nuevoEstado ? 'CERRADO' : 'ABIERTO'),
-            'modulo'  => 'AJUSTES'
-        ]);
+
 
         return response()->json(['success' => true, 'message' => $mensaje]);
     }

@@ -32,3 +32,7 @@ E_Mail=email
 
 UPDATE archivos SET modulo = 'OC' WHERE modulo = 'INPUTS';
 
+ALTER TABLE model_has_roles MODIFY model_id VARCHAR(255) NOT NULL;
+ALTER TABLE model_has_permissions MODIFY model_id VARCHAR(255) NOT NULL;
+
+TRUNCATE TABLE `logs`;

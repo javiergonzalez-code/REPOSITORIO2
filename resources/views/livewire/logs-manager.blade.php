@@ -83,7 +83,7 @@ $logs = computed(function () {
     return $query->latest()->paginate(10);
 });
 
-// NUEVO: Función para eliminar el log desde Livewire
+// Función para eliminar el log desde Livewire
 $deleteLog = function ($logId) {
     $log = Log::find($logId);
     if ($log) {
@@ -203,7 +203,7 @@ $deleteLog = function ($logId) {
                         <th class="text-center py-3 border-0">Actividad</th>
                         <th class="py-3 border-0">Módulo</th>
                         <th class="text-center py-3 border-0">Fecha y Hora</th>
-                        <th class="text-center py-3 border-0">Acciones</th> {{-- NUEVA COLUMNA --}}
+                        <th class="text-center py-3 border-0">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -223,7 +223,7 @@ $deleteLog = function ($logId) {
                             <td class="ps-4 py-3">
                                 <div class="d-flex align-items-center gap-3">
 
-                                    {{-- 1. Círculo del Avatar (hecho a mano para evitar el texto extra) --}}
+                                    {{-- 1. Círculo del Avatar --}}
                                     <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold shadow-sm"
                                         style="width: 38px; height: 38px; font-size: 1rem; min-width: 38px;">
                                         {{ strtoupper(substr($log->user->name ?? ($log->user->CardName ?? 'U'), 0, 1)) }}
@@ -231,12 +231,9 @@ $deleteLog = function ($logId) {
 
                                     {{-- 2. Información de Nombre y Rol --}}
                                     <div>
-                                        {{-- Nombre real del usuario --}}
                                         <span class="d-block fw-bold mb-0" style="font-size: 0.9rem; color: inherit;">
                                             {{ $log->user->CardName ?? 'Usuario del Sistema' }}
                                         </span>
-
-                                        {{-- Rol o Username debajo --}}
                                         <span class="text-uppercase"
                                             style="font-size: 0.7rem; letter-spacing: 0.5px; color: #94a3b8;">
                                             {{ $log->user->role ?? 'superadmin' }}
@@ -245,11 +242,12 @@ $deleteLog = function ($logId) {
 
                                 </div>
                             </td>
-                            <td class="text-center py-3">
-                                <div class="status-indicator {{ $badgeStyle }}">
-                                    <span class="dot"></span> {{ $log->accion }}
-                                </div>
-                            </td>
+<td class="text-center py-3">
+    {{-- Usamos Str::limit para mostrar solo 45 caracteres y agregamos 'title' para que al pasar el mouse se vea completo --}}
+    <div class="status-indicator {{ $badgeStyle }}" title="{{ $log->accion }}">
+        <span class="dot"></span> {{ \Illuminate\Support\Str::limit($log->accion, 45, '...') }}
+    </div>
+</td>
                             <td class="py-3">
                                 <span class="badge-outline text-muted fw-bold"
                                     style="border: 1px solid #e2e8f0; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem;">
@@ -263,18 +261,41 @@ $deleteLog = function ($logId) {
                                     class="x-small text-muted font-monospace">{{ $log->created_at->format('h:i A') }}</span>
                             </td>
 
-                            {{-- NUEVA COLUMNA DE BOTONES: VER Y ELIMINAR --}}
+                            {{-- COLUMNA DE BOTONES: VER Y ELIMINAR --}}
                             <td class="text-center py-3">
                                 <div class="d-flex justify-content-center gap-2">
-                                    {{-- Botón Ver (Ruta show del controlador) --}}
+                                    {{-- Botón Ver --}}
                                     <a href="{{ route('logs.show', $log->id) }}"
                                         class="btn btn-sm btn-outline-primary rounded-circle" title="Ver Detalle">
                                         <i class="fas fa-eye"></i>
                                     </a>
 
-                                    {{-- Botón Eliminar (Llama a la función $deleteLog con confirmación) --}}
-                                    <button wire:click="deleteLog({{ $log->id }})"
-                                        wire:confirm="¿Estás seguro de que deseas eliminar este registro de auditoría permanentemente?"
+                                    {{-- Botón Eliminar Integrado con SweetAlert 2 vía Alpine.js --}}
+                                    <button type="button" 
+                                        @click="
+                                            Swal.fire({
+                                                title: '¿Estás seguro?',
+                                                text: '¿Deseas eliminar este registro de auditoría permanentemente?',
+                                                icon: 'warning',
+                                                showCancelButton: true,
+                                                confirmButtonColor: '#d33',
+                                                cancelButtonColor: '#6c757d',
+                                                confirmButtonText: '<i class=\'fas fa-trash me-1\'></i> Sí, eliminar',
+                                                cancelButtonText: 'Cancelar',
+                                                reverseButtons: true
+                                            }).then((result) => {
+                                                if (result.isConfirmed) {
+                                                    $wire.deleteLog({{ $log->id }});
+                                                    Swal.fire({
+                                                        title: '¡Eliminado!',
+                                                        text: 'El log ha sido borrado exitosamente.',
+                                                        icon: 'success',
+                                                        timer: 2000,
+                                                        showConfirmButton: false
+                                                    });
+                                                }
+                                            })
+                                        "
                                         class="btn btn-sm btn-outline-danger rounded-circle" title="Eliminar Log">
                                         <i class="fas fa-trash"></i>
                                     </button>

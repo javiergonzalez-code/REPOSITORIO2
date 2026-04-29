@@ -18,14 +18,7 @@ class LogoutController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        // 🚨 2. Registramos la acción usando el CardCode
-        if ($userCode) {
-            Log::create([
-                'user_id' => $userCode,
-                'accion'  => 'Cierre de sesión exitoso',
-                'modulo'  => 'AUTH'
-            ]);
-        }
+
 
         return redirect('/login'); 
     }

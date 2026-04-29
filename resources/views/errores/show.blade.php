@@ -24,24 +24,40 @@
                         {{-- Usuario Afectado --}}
                         <div class="col-md-6">
                             <label class="text-muted fw-bold text-uppercase x-small d-block mb-2" style="font-size: 0.7rem; letter-spacing: 0.5px;">
-                                Usuario Afectado
+                                Usuario
                             </label>
-                            <div class="d-flex align-items-center p-2 bg-light rounded-3 border">
+                            {{-- Aplicamos p-3, gap-3 y h-100 igual que en los logs --}}
+                            <div class="d-flex align-items-center p-3 bg-light rounded-3 border gap-3 h-100">
                                 @if($error->user)
-                                    <x-user-avatar :user="$error->user" />
-                                    <div class="ms-3">
-                                        <span class="d-block fw-bold text-dark" style="font-size: 0.9rem;">
+                                    {{-- 1. Círculo del Avatar unificado (42px) --}}
+                                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold shadow-sm"
+                                        style="width: 42px; height: 42px; font-size: 1.1rem; min-width: 42px;">
+                                        {{ strtoupper(substr($error->user->name ?? ($error->user->CardName ?? 'U'), 0, 1)) }}
+                                    </div>
+
+                                    {{-- 2. Información de Nombre y Rol/Email --}}
+                                    <div>
+                                        <span class="d-block fw-bold mb-1" style="font-size: 0.95rem; color: inherit;">
                                             {{ $error->user->CardName ?? $error->user->name ?? 'Usuario sin nombre' }}
                                         </span>
-                                        <span class="d-block text-muted" style="font-size: 0.75rem;">
-                                            {{ $error->user->E_Mail ?? $error->user->email ?? 'Sin correo' }}
+                                        <span class="text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px; color: #94a3b8;">
+                                            {{ $error->user->role ?? $error->user->email ?? 'Sin rol' }}
                                         </span>
                                     </div>
                                 @else
-                                    <div class="d-flex justify-content-center align-items-center bg-secondary text-white rounded-circle" style="width: 40px; height: 40px;">
+                                    {{-- Avatar para Sistema/Desconocido con las mismas dimensiones --}}
+                                    <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center shadow-sm" 
+                                         style="width: 42px; height: 42px; font-size: 1.1rem; min-width: 42px;">
                                         <i class="fas fa-user-slash"></i>
                                     </div>
-                                    <span class="ms-3 fw-bold text-dark">Sistema / Desconocido</span>
+                                    <div>
+                                        <span class="d-block fw-bold mb-1" style="font-size: 0.95rem; color: inherit;">
+                                            Sistema / Desconocido
+                                        </span>
+                                        <span class="text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px; color: #94a3b8;">
+                                            Automático
+                                        </span>
+                                    </div>
                                 @endif
                             </div>
                         </div>
@@ -71,7 +87,7 @@
                             </span>
                         </div>
 
-                        {{-- Descripción del Error (Caja tipo consola de código) --}}
+                        {{-- Descripción del Error --}}
                         <div class="col-md-12">
                             <label class="text-muted fw-bold text-uppercase x-small d-block mb-2" style="font-size: 0.7rem; letter-spacing: 0.5px;">
                                 Descripción Completa de la Excepción
@@ -89,11 +105,29 @@
                             <i class="fas fa-arrow-left me-1"></i> Regresar
                         </a>
 
-                        {{-- Formulario para eliminar desde la vista Show con SweetAlert --}}
-                        <form id="delete-form-{{ $error->id }}" action="{{ route('errores.destroy', $error->id) }}" method="POST" class="d-inline">
+                        {{-- Formulario interceptado con SweetAlert 2 (Mismo formato que en logs) --}}
+                        <form action="{{ route('errores.destroy', $error->id) }}" method="POST" class="d-inline">
                             @csrf
                             @method('DELETE')
-                            <button type="button" class="btn btn-danger fw-bold px-4 rounded-pill shadow-sm" onclick="confirmarEliminacion({{ $error->id }})">
+                            <button type="button" class="btn btn-danger fw-bold px-4 rounded-pill shadow-sm"
+                                onclick="
+                                    let form = this.closest('form');
+                                    Swal.fire({
+                                        title: '¿Estás seguro?',
+                                        text: '¡No podrás revertir esto! El registro de error se eliminará permanentemente.',
+                                        icon: 'warning',
+                                        showCancelButton: true,
+                                        confirmButtonColor: '#d33',
+                                        cancelButtonColor: '#6c757d',
+                                        confirmButtonText: '<i class=\'fas fa-trash me-1\'></i> Sí, eliminar',
+                                        cancelButtonText: 'Cancelar',
+                                        reverseButtons: true
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            form.submit();
+                                        }
+                                    });
+                                ">
                                 <i class="fas fa-trash me-1"></i> Eliminar Registro
                             </button>
                         </form>
@@ -111,25 +145,4 @@
         box-shadow: inset 0 2px 4px rgba(0, 0, 0, .08);
     }
 </style>
-
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    function confirmarEliminacion(id) {
-        Swal.fire({
-            title: '¿Estás seguro?',
-            text: "¡No podrás revertir esto! El registro de error se eliminará de forma permanente.",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#dc3545',
-            cancelButtonColor: '#6c757d',
-            confirmButtonText: '<i class="fas fa-trash-alt me-1"></i> Sí, eliminar',
-            cancelButtonText: 'Cancelar',
-            reverseButtons: true
-        }).then((result) => {
-            if (result.isConfirmed) {
-                document.getElementById('delete-form-' + id).submit();
-            }
-        });
-    }
-</script>
 @endsection

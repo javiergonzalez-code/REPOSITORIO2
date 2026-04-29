@@ -9,8 +9,8 @@ use App\Models\Archivo;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\QueryException;
 use RealRashid\SweetAlert\Facades\Alert;
-use Illuminate\Support\Str; // 🚨 Importación agregada
-use Illuminate\Support\Facades\Auth; // 🚨 Importación agregada
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 class InputController extends Controller
 {
@@ -68,7 +68,7 @@ class InputController extends Controller
             }
 
             // ====================================================================
-            // CLASIFICADOR UNIFICADO (A PRUEBA DE ERRORES)
+            // CLASIFICADOR UNIFICADO
             // ====================================================================
             
             // Leemos el encabezado y lo pasamos a MAYÚSCULAS
@@ -94,7 +94,7 @@ class InputController extends Controller
 
             // Crear registro en Base de Datos
             Archivo::create([
-                'user_id'         => $user->CardCode, // 🚨 Usamos CardCode
+                'user_id'         => $user->CardCode,
                 'nombre_original' => $originalName,
                 'nombre_sistema'  => $systemName,
                 'tipo_archivo'    => $extension,
@@ -104,7 +104,7 @@ class InputController extends Controller
 
             // Registrar el Log de la acción
             Log::create([
-                'user_id' => $user->CardCode, // 🚨 Usamos CardCode
+                'user_id' => $user->CardCode,
                 'accion'  => 'Subió con éxito: ' . $originalName,
                 'modulo'  => $moduloDestino,
             ]);
@@ -115,7 +115,7 @@ class InputController extends Controller
         } catch (QueryException $e) {
             if (isset($path)) Storage::disk('local')->delete($path);
             Log::create([
-                'user_id' => $user->CardCode, // 🚨 Usamos CardCode
+                'user_id' => $user->CardCode,
                 'accion'  => Str::limit('Error BD: ' . $e->getMessage(), 250),
                 'modulo'  => 'ERRORES'
             ]);
@@ -123,7 +123,7 @@ class InputController extends Controller
             return back();
         } catch (\Exception $e) {
             Log::create([
-                'user_id' => $user->CardCode, // 🚨 Usamos CardCode
+                'user_id' => $user->CardCode,
                 'accion'  => Str::limit('Error Servidor: ' . $e->getMessage(), 250),
                 'modulo'  => 'ERRORES',
             ]);
@@ -135,10 +135,9 @@ class InputController extends Controller
     public function download($id)
     {
         $archivo = Archivo::findOrFail($id);
-        $user = Auth::user(); // 🚨 Fachada Auth estandarizada
+        $user = Auth::user();
 
         // 1. Validación de seguridad con verificación de Rol Nativo
-        // 🚨 Comparamos CardCode con user_id (string)
         if ($user->role === 'proveedor' && $archivo->user_id !== $user->CardCode) {
             abort(403, 'No tienes permiso para descargar este archivo.');
         }

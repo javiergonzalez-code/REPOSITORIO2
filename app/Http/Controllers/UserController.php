@@ -39,17 +39,17 @@ class UserController extends Controller
     {
         $rolesPermitidos = $this->getRolesPermitidos();
 
-        // Se mapean las validaciones únicas a las columnas de SAP. 
+        // 1. CAMBIO: Se actualizan las llaves de validación a los nombres reales de la BD
         $validatedData = $request->validate([
-            'name'     => ['required', 'string', 'max:255'],
-            'rfc'      => ['nullable', 'string', 'max:13', Rule::unique('users', 'LicTradNum')],
-            'email'    => ['required', 'email', Rule::unique('users', 'E_Mail')],
-            'telefono' => ['nullable', 'string', 'max:20'],
-            'role'     => ['required', Rule::in($rolesPermitidos)],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'CardName'   => ['required', 'string', 'max:255'],
+            'LicTradNum' => ['nullable', 'string', 'max:13', Rule::unique('users', 'LicTradNum')],
+            'E_Mail'     => ['required', 'email', Rule::unique('users', 'E_Mail')],
+            'Cellular'   => ['nullable', 'string', 'max:20'],
+            'role'       => ['required', Rule::in($rolesPermitidos)],
+            'password'   => ['required', 'string', 'min:8', 'confirmed'],
         ], [
-            'rfc.max' => 'El RFC no puede tener más de 13 caracteres.',
-            'email.unique' => 'Este correo ya está registrado por otro usuario.',
+            'LicTradNum.max' => 'El RFC no puede tener más de 13 caracteres.',
+            'E_Mail.unique' => 'Este correo ya está registrado por otro usuario.',
         ]);
 
         try {
@@ -58,13 +58,13 @@ class UserController extends Controller
                 // 🚨 GENERAMOS EL CARDCODE AUTOMÁTICAMENTE (Ej: U20260423123045)
                 $nuevoCardCode = 'U' . date('YmdHis');
 
-                // Mapeo exacto de los inputs del formulario a las columnas de SAP Business One
+                // 2. CAMBIO: Asignamos usando el $validatedData con los nuevos nombres
                 $user = new User([
-                    'CardCode'   => $nuevoCardCode, // Asignado por el sistema
-                    'CardName'   => $validatedData['name'],
-                    'LicTradNum' => $validatedData['rfc'] ?? null,
-                    'E_Mail'     => $validatedData['email'],
-                    'Cellular'   => $validatedData['telefono'] ?? null,
+                    'CardCode'   => $nuevoCardCode,
+                    'CardName'   => $validatedData['CardName'],
+                    'LicTradNum' => $validatedData['LicTradNum'] ?? null,
+                    'E_Mail'     => $validatedData['E_Mail'],
+                    'Cellular'   => $validatedData['Cellular'] ?? null,
                     'password'   => Hash::make($validatedData['password']),
                 ]);
 
@@ -121,23 +121,27 @@ class UserController extends Controller
             return redirect()->route('users.index');
         }
 
+        // 3. CAMBIO: Validaciones actualizadas para el método Update
         $validatedData = $request->validate([
-            'name'     => ['required', 'string', 'max:255'],
-            'rfc'      => ['nullable', 'string', 'max:13', Rule::unique('users', 'LicTradNum')->ignore($user->CardCode, 'CardCode')],
-            'email'    => ['required', 'email', Rule::unique('users', 'E_Mail')->ignore($user->CardCode, 'CardCode')],
-            'role'     => ['required', Rule::in($rolesPermitidos)],
-            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+            'CardName'   => ['required', 'string', 'max:255'],
+            'LicTradNum' => ['nullable', 'string', 'max:13', Rule::unique('users', 'LicTradNum')->ignore($user->CardCode, 'CardCode')],
+            'E_Mail'     => ['required', 'email', Rule::unique('users', 'E_Mail')->ignore($user->CardCode, 'CardCode')],
+            'Cellular'   => ['nullable', 'string', 'max:20'],
+            'role'       => ['required', Rule::in($rolesPermitidos)],
+            'password'   => ['nullable', 'string', 'min:8', 'confirmed'],
         ], [
-            'rfc.max' => 'El RFC no puede tener más de 13 caracteres.',
-            'email.unique' => 'Este correo ya está registrado por otro usuario.',
+            'LicTradNum.max' => 'El RFC no puede tener más de 13 caracteres.',
+            'E_Mail.unique' => 'Este correo ya está registrado por otro usuario.',
         ]);
 
         try {
             DB::transaction(function () use ($request, $user, $validatedData) {
-                $user->CardName = $validatedData['name'];
-                $user->LicTradNum = $request->input('rfc');
-                $user->E_Mail = $validatedData['email'];
-                $user->Cellular = $request->input('telefono');
+                
+                // 4. CAMBIO: Asignación de variables limpia y directa
+                $user->CardName   = $validatedData['CardName'];
+                $user->LicTradNum = $validatedData['LicTradNum'] ?? null;
+                $user->E_Mail     = $validatedData['E_Mail'];
+                $user->Cellular   = $validatedData['Cellular'] ?? null;
 
                 if ($request->filled('password')) {
                     $user->password = Hash::make($request->password);

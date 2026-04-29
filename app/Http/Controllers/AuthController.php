@@ -44,12 +44,6 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
-            // 🚨 Usamos explícitamente CardCode como String para evitar errores de tipo de dato
-            Log::create([
-                'user_id' => auth()->user()->CardCode,
-                'accion'  => 'Inicio de sesión exitoso',
-                'modulo'  => 'AUTH'
-            ]);
 
             return redirect()->route('home');
         }

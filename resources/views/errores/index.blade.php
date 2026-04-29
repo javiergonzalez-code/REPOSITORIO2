@@ -46,14 +46,44 @@
                                             </td>
                                             {{-- COLUMNA 2: Usuario --}}
                                             <td class="py-3">
-                                                @if ($error->user)
-                                                    <div class="d-flex align-items-center">
-                                                        <x-user-avatar :user="$error->user" />
-                                                    </div>
-                                                @else
-                                                    <span class="text-muted fst-italic">Usuario Eliminado /
-                                                        Desconocido</span>
-                                                @endif
+                                                <div class="d-flex align-items-center gap-3">
+                                                    @if ($error->user)
+                                                        {{-- 1. Círculo del Avatar --}}
+                                                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold shadow-sm"
+                                                            style="width: 38px; height: 38px; font-size: 1rem; min-width: 38px;">
+                                                            {{ strtoupper(substr($error->user->name ?? ($error->user->CardName ?? 'U'), 0, 1)) }}
+                                                        </div>
+
+                                                        {{-- 2. Información de Nombre y Rol --}}
+                                                        <div>
+                                                            <span class="d-block fw-bold mb-0"
+                                                                style="font-size: 0.9rem; color: inherit;">
+                                                                {{ $error->user->CardName ?? ($error->user->name ?? 'Usuario del Sistema') }}
+                                                            </span>
+                                                            <span class="text-uppercase"
+                                                                style="font-size: 0.7rem; letter-spacing: 0.5px; color: #94a3b8;">
+                                                                {{ $error->user->role ?? 'superadmin' }}
+                                                            </span>
+                                                        </div>
+                                                    @else
+                                                        {{-- Usuario Desconocido / Eliminado --}}
+                                                        <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center shadow-sm"
+                                                            style="width: 38px; height: 38px; font-size: 1rem; min-width: 38px;">
+                                                            <i class="fas fa-user-slash"></i>
+                                                        </div>
+
+                                                        <div>
+                                                            <span class="d-block fw-bold mb-0 text-muted"
+                                                                style="font-size: 0.9rem;">
+                                                                Usuario Eliminado / Desconocido
+                                                            </span>
+                                                            <span class="text-uppercase text-muted"
+                                                                style="font-size: 0.7rem; letter-spacing: 0.5px;">
+                                                                SISTEMA
+                                                            </span>
+                                                        </div>
+                                                    @endif
+                                                </div>
                                             </td>
 
                                             {{-- COLUMNA 3: Detalle del Error --}}
@@ -84,26 +114,43 @@
                                                     class="text-muted small">{{ $error->created_at->format('H:i:s') }}</span>
                                             </td>
 
-                                            {{-- COLUMNA 5: Acciones --}}
+                                            {{-- COLUMNA DE BOTONES: VER Y ELIMINAR --}}
                                             <td class="text-center py-3 pe-4">
                                                 <div class="d-flex justify-content-center gap-2">
                                                     {{-- Botón Ver --}}
                                                     <a href="{{ route('errores.show', $error->id) }}"
-                                                        class="btn btn-sm btn-outline-primary shadow-sm"
+                                                        class="btn btn-sm btn-outline-primary rounded-circle"
                                                         title="Ver Detalles">
-                                                        <i class="fas fa-eye"></i> Ver
+                                                        <i class="fas fa-eye"></i>
                                                     </a>
 
-                                                    {{-- Botón Eliminar con SweetAlert --}}
-                                                    <form id="delete-form-{{ $error->id }}"
-                                                        action="{{ route('errores.destroy', $error->id) }}" method="POST">
+                                                    {{-- Botón Eliminar Integrado con SweetAlert 2 --}}
+                                                    <form action="{{ route('errores.destroy', $error->id) }}" method="POST"
+                                                        class="m-0 p-0">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="button"
-                                                            class="btn btn-sm btn-outline-danger shadow-sm"
-                                                            title="Eliminar Registro"
-                                                            onclick="confirmarEliminacion({{ $error->id }})">
-                                                            <i class="fas fa-trash-alt"></i>
+                                                            onclick="
+                    let form = this.closest('form');
+                    Swal.fire({
+                        title: '¿Estás seguro?',
+                        text: '¡No podrás revertir esto! El registro de error se eliminará permanentemente.',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: '<i class=\'fas fa-trash me-1\'></i> Sí, eliminar',
+                        cancelButtonText: 'Cancelar',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                "
+                                                            class="btn btn-sm btn-outline-danger rounded-circle"
+                                                            title="Eliminar Registro">
+                                                            <i class="fas fa-trash"></i>
                                                         </button>
                                                     </form>
                                                 </div>

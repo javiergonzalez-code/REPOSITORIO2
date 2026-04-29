@@ -25,6 +25,6 @@ class CheckIfAdmin
             return $next($request);
         }
 
-        abort(403, 'Acceso denegado. Se requiere rol de Administrador.');
+        abort(403, 'Acceso denegado.');
     }
 }

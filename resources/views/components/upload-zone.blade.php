@@ -3,7 +3,6 @@
 <form action="{{ $action }}" method="POST" enctype="multipart/form-data" id="upload-form">
     @csrf
 
-    {{-- Área de Arrastre --}}
     <div class="upload-zone mb-4" id="drop-zone">
         <input type="file" name="archivo" id="archivo" class="file-input-hidden"
             accept=".csv,.xlsx,.xls,.xml" required>
