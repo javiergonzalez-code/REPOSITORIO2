@@ -27,7 +27,6 @@ class InputController extends Controller
             'archivo' => [
                 'required',
                 'file',
-                // Se eliminó 'txt' de mimes y extensions
                 'mimes:csv,xlsx,xls,xml',
                 'extensions:csv,xlsx,xls,xml',
                 'max:5120',
@@ -40,11 +39,18 @@ class InputController extends Controller
 
         if ($validator->fails()) {
             $errores = implode(' | ', $validator->errors()->all());
-            Log::create([
-                'user_id' => $user->CardCode,
-                'accion'  => 'Intento fallido (Validación/Seguridad): ' . $errores,
-                'modulo'  => 'ERRORES',
-            ]);
+
+            try {
+                Log::create([
+                    'user_id' => $user->CardCode,
+                    'accion'  => 'Intento fallido (Validación/Seguridad): ' . $errores . ' | IP: ' . $request->ip(),
+                    'modulo'  => 'ERRORES',
+                ]);
+            } catch (\Exception $logE) {
+                // Escribimos en storage/logs/laravel.log si la BD no responde
+                \Illuminate\Support\Facades\Log::warning('Alerta de Seguridad (BD CAÍDA) | IP: ' . $request->ip() . ' | Errores: ' . $errores);
+            }
+
             Alert::error('Archivo no válido', $errores);
             return back();
         }
@@ -53,7 +59,7 @@ class InputController extends Controller
             $file = $request->file('archivo');
             $nombreSinExt = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
             $originalName = Str::slug($nombreSinExt, '_') . '.' . $file->getClientOriginalExtension();
-            
+
             if (strlen($originalName) > 200) {
                 $originalName = substr($originalName, -200);
             }
@@ -68,42 +74,26 @@ class InputController extends Controller
                 throw new \Exception("El servidor denegó el permiso de escritura.");
             }
 
-            // ====================================================================
             // CLASIFICADOR UNIFICADO
-            // ====================================================================
-            
-            // Leemos el encabezado y lo pasamos a MAYÚSCULAS
             $contenidoParcial = file_get_contents($file->getRealPath(), false, null, 0, 500);
             $contenidoUpper = strtoupper($contenidoParcial);
-            
             $moduloDestino = 'OC'; // Valor por defecto
 
-            if (
-                str_contains($contenidoUpper, 'TIPOERROR') || 
-                str_contains($contenidoUpper, 'EXCEPCION') || 
-                str_contains($contenidoUpper, 'FORMATO')
-            ) {
+            if (str_contains($contenidoUpper, 'TIPOERROR') || str_contains($contenidoUpper, 'EXCEPCION') || str_contains($contenidoUpper, 'FORMATO')) {
                 $moduloDestino = 'ERRORES';
-            } 
-            elseif (
-                str_contains($contenidoUpper, 'EXTRA') || 
-                str_contains($contenidoUpper, 'EXITOSA') || 
-                str_contains($contenidoUpper, 'OC HIJA CREADA')
-            ) {
+            } elseif (str_contains($contenidoUpper, 'EXTRA') || str_contains($contenidoUpper, 'EXITOSA') || str_contains($contenidoUpper, 'OC HIJA CREADA')) {
                 $moduloDestino = 'LOGS';
             }
 
-            // Crear registro en Base de Datos
             Archivo::create([
                 'user_id'         => $user->CardCode,
                 'nombre_original' => $originalName,
                 'nombre_sistema'  => $systemName,
                 'tipo_archivo'    => $extension,
                 'ruta'            => 'private/uploads/' . $systemName,
-                'modulo'          => $moduloDestino, 
+                'modulo'          => $moduloDestino,
             ]);
 
-            // Registrar el Log de la acción
             Log::create([
                 'user_id' => $user->CardCode,
                 'accion'  => 'Subió con éxito: ' . $originalName,
@@ -112,22 +102,34 @@ class InputController extends Controller
 
             Alert::success('¡Subida Exitosa!', 'Archivo clasificado en el módulo: ' . $moduloDestino);
             return back();
-
         } catch (QueryException $e) {
             if (isset($path)) Storage::disk('local')->delete($path);
-            Log::create([
-                'user_id' => $user->CardCode,
-                'accion'  => Str::limit('Error BD: ' . $e->getMessage(), 250),
-                'modulo'  => 'ERRORES'
-            ]);
+
+            // 🚨 ESCENARIO 3 RESUELTO: Prevención de Efecto Dominó si la BD cae
+            try {
+                Log::create([
+                    'user_id' => $user->CardCode,
+                    'accion'  => Str::limit('Error BD: ' . $e->getMessage(), 200) . ' | IP: ' . $request->ip(),
+                    'modulo'  => 'ERRORES'
+                ]);
+            } catch (\Exception $logE) {
+                \Illuminate\Support\Facades\Log::error('CRÍTICO BD CAÍDA | IP: ' . $request->ip() . ' | Error: ' . $e->getMessage());
+            }
+
             Alert::error('Error Crítico', 'No se pudo registrar en la base de datos.');
             return back();
         } catch (\Exception $e) {
-            Log::create([
-                'user_id' => $user->CardCode,
-                'accion'  => Str::limit('Error Servidor: ' . $e->getMessage(), 250),
-                'modulo'  => 'ERRORES',
-            ]);
+
+            try {
+                Log::create([
+                    'user_id' => $user->CardCode,
+                    'accion'  => Str::limit('Error Servidor: ' . $e->getMessage(), 200) . ' | IP: ' . $request->ip(),
+                    'modulo'  => 'ERRORES',
+                ]);
+            } catch (\Exception $logE) {
+                \Illuminate\Support\Facades\Log::error('CRÍTICO SERVIDOR | IP: ' . $request->ip() . ' | Error: ' . $e->getMessage());
+            }
+
             Alert::error('Error del Servidor', 'Error al procesar el archivo.');
             return back();
         }

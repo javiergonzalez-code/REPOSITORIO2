@@ -242,12 +242,13 @@ $deleteLog = function ($logId) {
 
                                 </div>
                             </td>
-<td class="text-center py-3">
-    {{-- Usamos Str::limit para mostrar solo 45 caracteres y agregamos 'title' para que al pasar el mouse se vea completo --}}
-    <div class="status-indicator {{ $badgeStyle }}" title="{{ $log->accion }}">
-        <span class="dot"></span> {{ \Illuminate\Support\Str::limit($log->accion, 45, '...') }}
-    </div>
-</td>
+                            <td class="text-center py-3">
+                                {{-- Usamos Str::limit para mostrar solo 45 caracteres y agregamos 'title' para que al pasar el mouse se vea completo --}}
+                                <div class="status-indicator {{ $badgeStyle }}" title="{{ $log->accion }}">
+                                    <span class="dot"></span>
+                                    {{ \Illuminate\Support\Str::limit($log->accion, 45, '...') }}
+                                </div>
+                            </td>
                             <td class="py-3">
                                 <span class="badge-outline text-muted fw-bold"
                                     style="border: 1px solid #e2e8f0; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem;">
@@ -271,7 +272,7 @@ $deleteLog = function ($logId) {
                                     </a>
 
                                     {{-- Botón Eliminar Integrado con SweetAlert 2 vía Alpine.js --}}
-                                    <button type="button" 
+                                    <button type="button"
                                         @click="
                                             Swal.fire({
                                                 title: '¿Estás seguro?',
