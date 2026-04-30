@@ -137,7 +137,7 @@
                                         style="font-size: 0.7rem; letter-spacing: 0.5px;">
                                         Descripción de la Actividad
                                     </label>
-                                    {{-- Agregamos border normal para mantener la caja y el border-start para la línea de color --}}
+                                    
                                     <div class="p-4 rounded-3 border border-start-0 border-start border-4 {{ $bordeColor }}" 
                                          style="background-color: #ffffff !important; box-shadow: none !important;">
                                         <span class="{{ $textoColor }}" style="font-size: 0.95rem; line-height: 1.5;">
