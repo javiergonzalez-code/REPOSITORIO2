@@ -49,10 +49,6 @@
             </ul>
 
             <div class="d-flex align-items-center gap-3">
-                {{-- Botón Modo Oscuro --}}
-                <button id="dark-mode-toggle" class="btn btn-link text-white p-0 shadow-none">
-                    <i class="fas fa-moon" id="dark-mode-icon"></i>
-                </button>
 
                 @auth
                     {{-- Menú Desplegable del Perfil Refactorizado --}}

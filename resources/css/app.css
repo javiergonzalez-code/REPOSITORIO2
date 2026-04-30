@@ -1070,7 +1070,7 @@ body {
 }
 
 /* Variables en modo oscuro - Usamos !important para asegurar el cambio */
-body.dark-mode {
+body {
     --bg-light: #1a202c !important;
     --text-main: #f7fafc !important;
     --card-bg: #2d3748 !important;
@@ -1113,7 +1113,7 @@ body {
 }
 
 /* Ajuste para que el icono de sol sea amarillo en modo oscuro */
-body.dark-mode #dark-mode-icon.fa-sun {
+body #dark-mode-icon.fa-sun {
     color: #fbd38d !important; /* Amarillo suave */
 }
 
@@ -1284,7 +1284,7 @@ select.form-input {
     }
 
     /* Variables para Modo Oscuro */
-body.dark-mode {
+body {
     --bg-light: #1a202c !important;
     --text-main: #f7fafc !important;
     --card-bg: #2d3748 !important;
@@ -1292,222 +1292,222 @@ body.dark-mode {
 }
 
 /* Forzar cambios en elementos específicos en modo oscuro */
-body.dark-mode .card, 
-body.dark-mode .dashboard-card, 
-body.dark-mode .login-card, 
-body.dark-mode .custom-card {
+body .card, 
+body .dashboard-card, 
+body .login-card, 
+body .custom-card {
     background-color: var(--card-bg) !important;
     color: var(--text-main) !important;
 }
 
-body.dark-mode .table {
+body .table {
     color: #f7fafc !important;
 }
 
-body.dark-mode .table tbody tr:hover {
+body .table tbody tr:hover {
     background-color: #3d4a5d !important;
 }
 
-body.dark-mode .dropdown-menu {
+body .dropdown-menu {
     background-color: #2d3748;
     border: 1px solid #4a5568;
 }
 
-body.dark-mode .dropdown-item {
+body .dropdown-item {
     color: #f7fafc;
 }
 
-body.dark-mode .dropdown-item:hover {
+body .dropdown-item:hover {
     background-color: #4a5568;
 }
 
 
-body.dark-mode .login-card {
+body .login-card {
     background-color: #2d3748 !important;
     color: #f7fafc !important;
 }
 
 /* Ajuste para la zona de arrastre de archivos */
-body.dark-mode .upload-zone {
+body .upload-zone {
     background-color: #1a202c !important;
     border-color: #4a5568 !important;
 }
 
-body.dark-mode .upload-label span.text-dark {
+body .upload-label span.text-dark {
     color: #e2e8f0 !important;
 }
 
 /* Ajuste para la pastilla de formatos permitidos */
-body.dark-mode .format-notice-pill {
+body .format-notice-pill {
     background: #2d3748 !important;
     border-color: #4a5568 !important;
     color: #f7fafc !important;
 }
 
 /* Ajustes para la vista de Logs en Modo Oscuro */
-body.dark-mode .custom-card,
-body.dark-mode .card {
+body .custom-card,
+body .card {
     background-color: var(--card-bg) !important;
     border-color: #4a5568 !important;
 }
 
-body.dark-mode .audit-title,
-body.dark-mode .fw-bold,
-body.dark-mode .text-dark {
+body .audit-title,
+body .fw-bold,
+body .text-dark {
     color: #f7fafc !important;
 }
 
 /* Encabezado de la tabla */
-body.dark-mode .table thead {
+body .table thead {
     background-color: #1a202c !important;
 }
 
-body.dark-mode .table thead th {
+body .table thead th {
     color: #a0aec0 !important;
     border-bottom-color: #4a5568 !important;
 }
 
 /* Filas y celdas */
-body.dark-mode .table tbody tr {
+body .table tbody tr {
     border-bottom-color: #2d3748 !important;
     color: #e2e8f0 !important;
 }
 
-body.dark-mode .log-row:hover {
+body .log-row:hover {
     background-color: #3d4a5d !important;
 }
 
 /* Badges de módulo y botones */
-body.dark-mode .badge-outline {
+body .badge-outline {
     background: #1a202c !important;
     border-color: #4a5568 !important;
     color: #cbd5e1 !important;
 }
 
-body.dark-mode .btn-light {
+body .btn-light {
     background-color: #4a5568 !important;
     border-color: #4a5568 !important;
     color: #ffffff !important;
 }
 
 /* Específico para Logs en Modo Oscuro */
-body.dark-mode .custom-card {
+body .custom-card {
     background-color: var(--card-bg) !important;
 }
 
-body.dark-mode .audit-title, 
-body.dark-mode .fw-bold, 
-body.dark-mode .text-dark {
+body .audit-title, 
+body .fw-bold, 
+body .text-dark {
     color: #f7fafc !important; /* Texto claro en modo oscuro */
 }
 
-body.dark-mode .table {
+body .table {
     color: #e2e8f0 !important;
 }
 
-body.dark-mode .table thead {
+body .table thead {
     background-color: #1a202c !important; /* Fondo oscuro para el header de tabla */
 }
 
-body.dark-mode .log-row:hover {
+body .log-row:hover {
     background-color: #2d3748 !important; /* Efecto hover en las filas */
 }
 
-body.dark-mode .badge-outline {
+body .badge-outline {
     background: #1a202c;
     color: #cbd5e1;
     border-color: #4a5568;
 }
 
 /* Asegura legibilidad en la vista de Logs */
-body.dark-mode .text-main,
-body.dark-mode .fw-bold,
-body.dark-mode .audit-title,
-body.dark-mode .form-label-custom {
+body .text-main,
+body .fw-bold,
+body .audit-title,
+body .form-label-custom {
     color: #f7fafc !important;
 }
 
-body.dark-mode .text-muted {
+body .text-muted {
     color: #a0aec0 !important;
 }
 
 /* Fondo de los inputs en modo oscuro */
-body.dark-mode .form-input {
+body .form-input {
     background-color: #1a202c !important;
     color: #ffffff !important;
     border-color: #4a5568 !important;
 }
 
-body.dark-mode .header-icon-box {
+body .header-icon-box {
     background: #3182ce !important; /* Azul Ragon brillante */
     color: #ffffff !important;
 }
 
 /* --- Fix para Tabla en Modo Oscuro --- */
-body.dark-mode .table {
+body .table {
     color: #e2e8f0 !important;
     border-color: #4a5568 !important;
 }
 
 /* Esto arregla específicamente el fondo de la cabecera */
-body.dark-mode .table thead,
-body.dark-mode .table thead tr,
-body.dark-mode .table thead th {
+body .table thead,
+body .table thead tr,
+body .table thead th {
     background-color: #1a202c !important; /* Gris muy oscuro */
     color: #cbd5e1 !important; /* Texto gris claro */
     border-bottom-color: #4a5568 !important;
 }
 
 /* Arreglo para las filas del cuerpo */
-body.dark-mode .table tbody tr {
+body .table tbody tr {
     background-color: transparent !important;
     color: #e2e8f0 !important;
 }
 
 /* Efecto hover para que se note la fila seleccionada */
-body.dark-mode .table-hover tbody tr:hover {
+body .table-hover tbody tr:hover {
     background-color: #2d3748 !important; 
     color: #ffffff !important;
 }
 
 /* --- ARREGLO DEFINITIVO PARA EL HEAD DE LA TABLA --- */
-body.dark-mode .table thead th {
+body .table thead th {
     background-color: #1a202c !important; /* Fondo oscuro */
     color: #cbd5e1 !important;           /* Texto claro */
     border-bottom: 2px solid #4a5568 !important;
 }
 
 /* También para las celdas del cuerpo si quedan blancas */
-body.dark-mode .table tbody td {
+body .table tbody td {
     background-color: transparent !important; 
     color: #f7fafc !important;
 }
 
 /* Quitar cualquier fondo que Bootstrap ponga por defecto a la tabla */
-body.dark-mode .table {
+body .table {
     --bs-table-bg: transparent !important;
     --bs-table-color: #f7fafc !important;   
 }
 
 /* --- Ajustes para el Search Container en Modo Oscuro --- */
-body.dark-mode .search-container {
+body .search-container {
     background-color: #1a202c !important; /* Fondo oscuro igual al body */
     border-color: #4a5568 !important;     /* Borde gris oscuro */
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
 
-body.dark-mode .search-input {
+body .search-input {
     color: #f7fafc !important;           /* Texto claro */
     background: transparent !important;
 }
 
-body.dark-mode .search-input::placeholder {
+body .search-input::placeholder {
     color: #718096 !important;           /* Placeholder más legible */
 }
 
 /* Ajuste para los iconos dentro del buscador o grupos de entrada */
-body.dark-mode .input-group-text {
+body .input-group-text {
     background-color: #2d3748 !important;
     border-color: #4a5568 !important;
     color: #cbd5e1 !important;
@@ -1515,7 +1515,7 @@ body.dark-mode .input-group-text {
 }
 
 /* Estilos para el modo oscuro manual y navbar */
-body.dark-mode {
+body {
     background-color: #1a1a1a;
     color: #e0e0e0;
 }
@@ -1524,7 +1524,7 @@ body.dark-mode {
     background-color: #2c3e50;
 }
 
-body.dark-mode .card {
+body .card {
     background-color: #2d2d2d;
     color: white;
     border: 1px solid #444;
@@ -1613,19 +1613,19 @@ body.dark-mode .card {
 /* ==========================================
    MODO OSCURO (SOBREESCRITURAS)
    ========================================== */
-body.dark-mode .custom-dropdown-menu {
+body .custom-dropdown-menu {
     background-color: #1e293b !important;
     border-color: #334155 !important;
 }
-body.dark-mode .custom-dropdown-item {
+body .custom-dropdown-item {
     color: #f8fafc !important;
 }
-body.dark-mode .custom-dropdown-item:hover {
+body .custom-dropdown-item:hover {
     background-color: #0f172a !important;
 }
 
 /* Colores de roles brillantes para que resalten en fondo oscuro */
-body.dark-mode .role-superadmin { background-color: rgba(109, 40, 217, 0.25); color: #c4b5fd; border: 1px solid rgba(255,255,255,0.1); }
-body.dark-mode .role-admin      { background-color: rgba(225, 29, 72, 0.25); color: #fda4af; border: 1px solid rgba(255,255,255,0.1); }
-body.dark-mode .role-proveedor  { background-color: rgba(15, 118, 110, 0.25); color: #5eead4; border: 1px solid rgba(255,255,255,0.1); }
-body.dark-mode .role-default    { background-color: rgba(71, 85, 105, 0.25); color: #cbd5e1; border: 1px solid rgba(255,255,255,0.1); }
+body .role-superadmin { background-color: rgba(109, 40, 217, 0.25); color: #c4b5fd; border: 1px solid rgba(255,255,255,0.1); }
+body .role-admin      { background-color: rgba(225, 29, 72, 0.25); color: #fda4af; border: 1px solid rgba(255,255,255,0.1); }
+body .role-proveedor  { background-color: rgba(15, 118, 110, 0.25); color: #5eead4; border: 1px solid rgba(255,255,255,0.1); }
+body .role-default    { background-color: rgba(71, 85, 105, 0.25); color: #cbd5e1; border: 1px solid rgba(255,255,255,0.1); }

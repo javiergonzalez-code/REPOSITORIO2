@@ -39,7 +39,6 @@
     {{-- Componente de alertas --}}
     <x-global-alerts />
 
-    {{-- Espacio para scripts específicos de cada vista --}}
     @stack('scripts')
 </body>
 </html>
