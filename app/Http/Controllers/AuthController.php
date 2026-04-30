@@ -8,7 +8,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\Validator;
-use App\Models\Log; // 🚨 Importamos el modelo Log
+use App\Models\Log;
 
 class AuthController extends Controller
 {
@@ -34,7 +34,7 @@ class AuthController extends Controller
 
         $validData = $validator->validated();
 
-        // AQUÍ ESTÁ LA MAGIA: Mapeamos el input 'email' del formulario a la columna 'E_Mail' de tu BD
+        //Mapeamos el input 'email' del formulario a la columna 'E_Mail' de tu BD
         $credentials = [
             'E_Mail'   => $validData['email'],
             'password' => $validData['password'],
