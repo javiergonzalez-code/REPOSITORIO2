@@ -1,0 +1,316 @@
+<?php
+use function Livewire\Volt\{state, computed, usesPagination};
+use App\Models\Log;
+use App\Models\User;
+
+usesPagination(theme: 'bootstrap');
+
+// Variables de estado para los filtros
+state(['search' => '', 'userFilter' => '', 'fecha' => '']);
+
+// Verificar si es proveedor por seguridad
+$esProveedor = computed(function () {
+    $user = auth()->user();
+    return $user->hasRole('proveedor') || $user->role === 'proveedor';
+});
+
+// Sugerencias para el dropdown flotante de usuarios
+$sugerencias_usuarios = computed(function () {
+    if ($this->esProveedor) {
+        return collect();
+    }
+
+    $query = User::select('CardName');
+
+    if (strlen($this->userFilter) > 0) {
+        $query->where('CardName', 'like', "%{$this->userFilter}%");
+    }
+
+    $sugerencias = $query->orderBy('CardName', 'asc')->take(50)->get();
+
+    if (strlen($this->userFilter) > 0 && $sugerencias->count() === 1 && strtolower($sugerencias->first()->CardName) === strtolower($this->userFilter)) {
+        return collect();
+    }
+
+    return $sugerencias;
+});
+
+// Consulta principal reactiva
+$errores = computed(function () {
+    $user = auth()->user();
+    
+    // Filtramos directamente para que solo traiga ERRORES
+    $query = Log::with('user')->where('modulo', 'ERRORES');
+
+    if ($this->esProveedor) {
+        $query->where('user_id', $user->CardCode);
+    }
+
+    // Filtro de búsqueda libre (por el detalle del error)
+    if ($this->search) {
+        $query->where('accion', 'like', "%{$this->search}%");
+    }
+
+    // Filtro por usuario
+    if ($this->userFilter && !$this->esProveedor) {
+        $query->whereHas('user', fn($q) => $q->where('CardName', 'like', "%{$this->userFilter}%"));
+    }
+
+    // Filtro por fecha exacta
+    if ($this->fecha) {
+        $query->whereDate('created_at', $this->fecha);
+    }
+
+    return $query->latest()->paginate(10);
+});
+
+// Función para eliminar
+$deleteError = function ($errorId) {
+    if ($this->esProveedor) {
+        return; // Bloqueo backend
+    }
+
+    $error = Log::where('modulo', 'ERRORES')->find($errorId);
+    if ($error) {
+        $error->delete();
+    }
+};
+?>
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-xl-11">
+
+            {{-- RECUADRO 1: TÍTULO --}}
+            <x-module-header icon="fas fa-bug" title="REGISTRO DE ERRORES" subtitle="MÓDULO DE MONITOREO DEL SISTEMA" />
+
+            <div class="mb-3 text-end" style="font-size: 0.8rem; color: #dc3545; font-weight: 700;">
+                <i class="fas fa-exclamation-circle me-1"></i> {{ $this->errores->total() }} EXCEPCIONES ENCONTRADAS
+            </div>
+
+            {{-- RECUADRO 2: FILTROS INTERACTIVOS --}}
+            <div class="card border-0 shadow-sm rounded-4 mb-4 bg-white custom-card" style="overflow: visible; z-index: 1050;">
+                <div class="card-header bg-transparent border-0 pt-4 px-4">
+                    <h6 class="text-uppercase fw-black mb-0 text-muted" style="font-size: 1rem; letter-spacing: 1px;">
+                        <i class="fas fa-filter me-2"></i> Filtros de búsqueda
+                    </h6>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-3 align-items-end">
+
+                        {{-- Búsqueda Libre --}}
+                        <div class="col-lg-4 col-md-6">
+                            <label class="form-label-custom text-uppercase x-small fw-bold">Detalle del Error</label>
+                            <div class="position-relative">
+                                <i class="fas fa-search text-muted position-absolute top-50 start-0 translate-middle-y ms-3"></i>
+                                <input type="text" wire:model.live.debounce.300ms="search" class="form-control ps-5" placeholder="Buscar en excepciones...">
+                            </div>
+                        </div>
+
+                        {{-- Filtro de Usuario con Dropdown Arreglado --}}
+                        @if (!$this->esProveedor)
+                            <div class="col-lg-4 col-md-6" x-data="{ showDropdown: false }" @click.outside="showDropdown = false">
+                                <label class="form-label-custom text-uppercase x-small fw-bold">Usuario Afectado</label>
+                                <div style="position: relative !important;">
+                                    <i class="fas fa-user text-muted position-absolute top-50 start-0 translate-middle-y ms-3" style="z-index: 10;"></i>
+                                    <input type="text" wire:model.live.debounce.300ms="userFilter" class="form-control ps-5"
+                                        placeholder="Seleccionar usuario..." autocomplete="off" @focus="showDropdown = true" @input="showDropdown = true">
+
+                                    {{-- LISTA DESPLEGABLE FLOTANTE --}}
+                                    @if (count($this->sugerencias_usuarios) > 0)
+                                        <div class="w-100 border rounded-3 shadow-lg" x-show="showDropdown" x-transition.opacity
+                                            style="display: none; position: absolute !important; top: 100% !important; left: 0 !important; margin-top: 5px !important; z-index: 10000 !important; overflow-y: auto; max-height: 250px; background-color: #ffffff !important;">
+                                            <ul class="list-unstyled mb-0">
+                                                @foreach ($this->sugerencias_usuarios as $sugerencia)
+                                                    <li>
+                                                        <button type="button" class="w-100 border-0 text-start px-3 py-2"
+                                                            style="font-size: 0.9rem; background-color: transparent; color: #1e293b; transition: all 0.2s;"
+                                                            wire:click="$set('userFilter', '{{ $sugerencia->CardName }}')"
+                                                            @click="showDropdown = false"
+                                                            onmouseover="this.style.backgroundColor='#f1f5f9'"
+                                                            onmouseout="this.style.backgroundColor='transparent'">
+                                                            <i class="fas fa-user-circle text-danger me-2"></i> {{ $sugerencia->CardName }}
+                                                        </button>
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        @endif
+
+                        {{-- Fecha --}}
+                        <div class="col-lg-2 col-md-6">
+                            <label class="form-label-custom text-uppercase x-small fw-bold">Fecha</label>
+                            <input type="date" wire:model.live="fecha" class="form-control">
+                        </div>
+
+                        {{-- Botón Limpiar --}}
+                        <div class="{{ $this->esProveedor ? 'col-lg-6' : 'col-lg-2' }} col-md-12">
+                            <button wire:click="$set('search', ''); $set('userFilter', ''); $set('fecha', '')"
+                                wire:loading.attr="disabled" class="btn btn-outline-secondary rounded-pill w-100 fw-bold">
+                                <span wire:loading.remove wire:target="$set">
+                                    <i class="fas fa-eraser me-1"></i> Limpiar
+                                </span>
+                                <span wire:loading wire:target="$set">
+                                    <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>...
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- RECUADRO 3: TABLA DE ERRORES (Mantenemos tu diseño visual) --}}
+            <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden custom-card">
+                
+                <div class="card-header bg-transparent border-0 pt-4 px-4 pb-2 d-flex justify-content-between align-items-center">
+                    <h6 class="text-uppercase fw-bold mb-0 text-danger" style="font-size: 0.9rem; letter-spacing: 1px;">
+                        <i class="fas fa-exclamation-triangle me-2"></i> Excepciones Detectadas
+                    </h6>
+                </div>
+
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0 border-top-0">
+                            <thead style="background: #fff5f5;">
+                                <tr class="text-muted text-uppercase" style="font-size: 0.85rem; letter-spacing: 0.5px;">
+                                    <th class="ps-4 py-3 border-0 rounded-start">Nivel / Estado</th>
+                                    <th class="py-3 border-0">Usuario Afectado</th>
+                                    <th class="py-3 border-0">Detalle del Error</th>
+                                    <th class="text-center py-3 border-0">Fecha y Hora</th>
+                                    <th class="text-center py-3 pe-4 border-0 rounded-end">Acciones</th>
+                                </tr>
+                            </thead>
+
+                            <tbody class="border-top-0">
+                                @forelse($this->errores as $error)
+                                    <tr style="transition: all 0.2s ease;" class="log-row">
+                                        
+                                        {{-- COLUMNA 1: Nivel de Error --}}
+                                        <td class="ps-4 py-3">
+                                            <div class="status-indicator status-error">
+                                                <span class="dot"></span> FALLO DEL SISTEMA
+                                            </div>
+                                        </td>
+                                        
+                                        {{-- COLUMNA 2: Usuario --}}
+                                        <td class="py-3">
+                                            <div class="d-flex align-items-center gap-3">
+                                                @if ($error->user)
+                                                    <div class="rounded-circle bg-danger bg-gradient text-white d-flex align-items-center justify-content-center fw-bold shadow-sm"
+                                                        style="width: 38px; height: 38px; font-size: 1rem; min-width: 38px;">
+                                                        {{ strtoupper(substr($error->user->name ?? ($error->user->CardName ?? 'U'), 0, 1)) }}
+                                                    </div>
+                                                    <div>
+                                                        <span class="d-block fw-bold mb-0" style="font-size: 0.9rem; color: inherit;">
+                                                            {{ $error->user->CardName ?? ($error->user->name ?? 'Usuario del Sistema') }}
+                                                        </span>
+                                                        <span class="text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px; color: #94a3b8;">
+                                                            {{ $error->user->role ?? 'superadmin' }}
+                                                        </span>
+                                                    </div>
+                                                @else
+                                                    <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center shadow-sm"
+                                                        style="width: 38px; height: 38px; font-size: 1rem; min-width: 38px;">
+                                                        <i class="fas fa-user-slash"></i>
+                                                    </div>
+                                                    <div>
+                                                        <span class="d-block fw-bold mb-0 text-muted" style="font-size: 0.9rem;">
+                                                            Usuario Eliminado
+                                                        </span>
+                                                        <span class="text-uppercase text-muted" style="font-size: 0.7rem; letter-spacing: 0.5px;">SISTEMA</span>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        </td>
+
+                                        {{-- COLUMNA 3: Detalle del Error --}}
+                                        <td class="py-3">
+                                            <div class="d-flex align-items-center">
+                                                <div class="bg-white rounded p-2 me-3 shadow-sm border border-danger-subtle">
+                                                    <i class="fas fa-exclamation-triangle text-danger"></i>
+                                                </div>
+                                                <div>
+                                                    <span class="d-block text-dark fw-medium text-truncate" style="max-width: 250px;" title="{{ $error->accion }}">
+                                                        {{ $error->accion ?? 'Error no especificado' }}
+                                                    </span>
+                                                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger-subtle mt-1">
+                                                        Módulo: {{ $error->modulo ?? 'Global' }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                        {{-- COLUMNA 4: Fecha y Hora --}}
+                                        <td class="text-center py-3">
+                                            <span class="d-block fw-bold text-dark" style="font-size: 0.85rem;">{{ $error->created_at->format('d/m/Y') }}</span>
+                                            <span class="text-muted font-monospace small">{{ $error->created_at->format('h:i A') }}</span>
+                                        </td>
+
+                                        {{-- COLUMNA 5: Acciones (Mismo SweetAlert Integrado en Alpine de tu primer código) --}}
+                                        <td class="text-center py-3 pe-4">
+                                            <div class="d-flex justify-content-center gap-2">
+                                                <a href="{{ route('errores.show', $error->id) }}" class="btn btn-sm btn-outline-primary rounded-circle" title="Ver Detalles">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+
+                                                @if (!$this->esProveedor)
+                                                    <button type="button" class="btn btn-sm btn-outline-danger rounded-circle" title="Eliminar Registro"
+                                                        @click="
+                                                            Swal.fire({
+                                                                title: '¿Estás seguro?',
+                                                                text: '¡No podrás revertir esto! El registro de error se eliminará permanentemente.',
+                                                                icon: 'warning',
+                                                                showCancelButton: true,
+                                                                confirmButtonColor: '#d33',
+                                                                cancelButtonColor: '#6c757d',
+                                                                confirmButtonText: '<i class=\'fas fa-trash me-1\'></i> Sí, eliminar',
+                                                                cancelButtonText: 'Cancelar',
+                                                                reverseButtons: true
+                                                            }).then((result) => {
+                                                                if (result.isConfirmed) {
+                                                                    $wire.deleteError({{ $error->id }});
+                                                                    Swal.fire({
+                                                                        title: '¡Eliminado!',
+                                                                        text: 'El reporte de error ha sido borrado.',
+                                                                        icon: 'success',
+                                                                        timer: 2000,
+                                                                        showConfirmButton: false
+                                                                    });
+                                                                }
+                                                            })
+                                                        ">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                @endif
+                                            </div>
+                                        </td>
+
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="text-center py-5 text-muted">
+                                            <div class="d-flex flex-column align-items-center">
+                                                <i class="fas fa-check-circle fs-1 text-success opacity-50 mb-3"></i>
+                                                <h5 class="fw-bold text-dark">No hay errores reportados</h5>
+                                                <p class="mb-0">El sistema funciona correctamente.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Paginación --}}
+            <div class="mt-4 d-flex justify-content-center">
+                {{ $this->errores->links('pagination::bootstrap-5') }}
+            </div>
+
+        </div>
+    </div>
+</div>

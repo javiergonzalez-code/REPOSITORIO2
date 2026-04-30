@@ -245,10 +245,9 @@ $deleteLog = function ($logId) {
                                     str_contains($accionUpper, 'CRÍTICO') ||
                                     str_contains($accionUpper, 'LEVE')
                                 ) {
-                                    $badgeStyle = 'status-error'; // Error genérico (solo el puntito rojo)
+                                    $badgeStyle = 'status-error';
                                 }
                             } else {
-                                // 👁️ VISTA ADMIN: Radiografía de colores detallada
                                 if (str_contains($accionUpper, 'CRÍTICO')) {
                                     $badgeStyle = 'status-error text-danger fw-bolder'; // Rojo intenso
                                 } elseif (str_contains($accionUpper, 'LEVE')) {
