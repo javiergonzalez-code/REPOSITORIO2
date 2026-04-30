@@ -43,39 +43,11 @@ class AuthController extends Controller
         // Intentamos el login con las credenciales mapeadas
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-
-
             return redirect()->route('home');
         }
 
         // Si las credenciales no coinciden
         Alert::error('Acceso Denegado', 'Las credenciales proporcionadas son incorrectas.');
         return back()->withInput($request->except('password'));
-    }
-
-    public function home()
-    {
-        // 1. Consultamos la tabla de configuraciones
-        $settings = \Illuminate\Support\Facades\DB::table('modulo_settings')->pluck('en_mantenimiento', 'nombre_modulo');
-
-        // 2. Obtenemos los estados (si el módulo no existe, por defecto es false)
-        $mantenimientoOC = $settings->get('oc', false);
-        $mantenimientoInputs = $settings->get('inputs', false);
-        $mantenimientoUsers = $settings->get('users', false);
-        $mantenimientoLogs = $settings->get('logs', false);
-
-        // NUEVOS:
-        $mantenimientoErrores = $settings->get('errores', false);
-        $mantenimientoSuperusuario = $settings->get('superuser', false);
-
-        // 3. Retornamos la vista enviando TODAS las variables
-        return view('home', compact(
-            'mantenimientoOC',
-            'mantenimientoInputs',
-            'mantenimientoUsers',
-            'mantenimientoLogs',
-            'mantenimientoErrores',
-            'mantenimientoSuperusuario'
-        ));
     }
 }
