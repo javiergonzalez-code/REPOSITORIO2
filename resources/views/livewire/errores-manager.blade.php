@@ -5,8 +5,8 @@ use App\Models\User;
 
 usesPagination(theme: 'bootstrap');
 
-// Variables de estado para los filtros
-state(['search' => '', 'userFilter' => '', 'fecha' => '']);
+// Variables de estado para los filtros (incluyendo 'accion')
+state(['search' => '', 'userFilter' => '', 'accion' => '', 'fecha' => '']);
 
 // Verificar si es proveedor por seguridad
 $esProveedor = computed(function () {
@@ -39,14 +39,14 @@ $sugerencias_usuarios = computed(function () {
 $errores = computed(function () {
     $user = auth()->user();
     
-    // Filtramos directamente para que solo traiga ERRORES
-    $query = Log::with('user')->where('modulo', 'ERRORES');
+    // Filtramos para traer los ERRORES y los fallos de SISTEMA
+    $query = Log::with('user')->whereIn('modulo', ['ERRORES', 'SISTEMA']);
 
     if ($this->esProveedor) {
         $query->where('user_id', $user->CardCode);
     }
 
-    // Filtro de búsqueda libre (por el detalle del error)
+    // Filtro de búsqueda libre
     if ($this->search) {
         $query->where('accion', 'like', "%{$this->search}%");
     }
@@ -54,6 +54,30 @@ $errores = computed(function () {
     // Filtro por usuario
     if ($this->userFilter && !$this->esProveedor) {
         $query->whereHas('user', fn($q) => $q->where('CardName', 'like', "%{$this->userFilter}%"));
+    }
+
+    // Filtro de Acción
+    if ($this->accion) {
+        $query->where(function ($q) {
+            switch (strtoupper($this->accion)) {
+                case 'CARGA':
+                    $q->whereRaw('LOWER(accion) LIKE ?', ['%subió%'])
+                        ->orWhereRaw('LOWER(accion) LIKE ?', ['%subio%'])
+                        ->orWhereRaw('LOWER(accion) LIKE ?', ['%carga%']);
+                    break;
+                case 'DESCARGA':
+                    $q->whereRaw('LOWER(accion) LIKE ?', ['%descarg%'])->orWhereRaw('LOWER(accion) LIKE ?', ['%download%']);
+                    break;
+                case 'ELIMINACION':
+                    $q->whereRaw('LOWER(accion) LIKE ?', ['%elimin%'])->orWhereRaw('LOWER(accion) LIKE ?', ['%borrad%']);
+                    break;
+                case 'LOGIN':
+                    $q->whereRaw('LOWER(accion) LIKE ?', ['%inicio%'])->orWhereRaw('LOWER(accion) LIKE ?', ['%login%']);
+                    break;
+                default:
+                    $q->whereRaw('LOWER(accion) LIKE ?', ['%' . strtolower($this->accion) . '%']);
+            }
+        });
     }
 
     // Filtro por fecha exacta
@@ -64,13 +88,13 @@ $errores = computed(function () {
     return $query->latest()->paginate(10);
 });
 
-// Función para eliminar
+// Función para eliminar el error desde Livewire
 $deleteError = function ($errorId) {
     if ($this->esProveedor) {
         return; // Bloqueo backend
     }
 
-    $error = Log::where('modulo', 'ERRORES')->find($errorId);
+    $error = Log::whereIn('modulo', ['ERRORES', 'SISTEMA'])->find($errorId);
     if ($error) {
         $error->delete();
     }
@@ -99,17 +123,17 @@ $deleteError = function ($errorId) {
                     <div class="row g-3 align-items-end">
 
                         {{-- Búsqueda Libre --}}
-                        <div class="col-lg-4 col-md-6">
+                        <div class="col-lg-3 col-md-6">
                             <label class="form-label-custom text-uppercase x-small fw-bold">Detalle del Error</label>
                             <div class="position-relative">
                                 <i class="fas fa-search text-muted position-absolute top-50 start-0 translate-middle-y ms-3"></i>
-                                <input type="text" wire:model.live.debounce.300ms="search" class="form-control ps-5" placeholder="Buscar en excepciones...">
+                                <input type="text" wire:model.live.debounce.300ms="search" class="form-control ps-5" placeholder="Buscar error...">
                             </div>
                         </div>
 
                         {{-- Filtro de Usuario con Dropdown Arreglado --}}
                         @if (!$this->esProveedor)
-                            <div class="col-lg-4 col-md-6" x-data="{ showDropdown: false }" @click.outside="showDropdown = false">
+                            <div class="col-lg-3 col-md-6" x-data="{ showDropdown: false }" @click.outside="showDropdown = false">
                                 <label class="form-label-custom text-uppercase x-small fw-bold">Usuario Afectado</label>
                                 <div style="position: relative !important;">
                                     <i class="fas fa-user text-muted position-absolute top-50 start-0 translate-middle-y ms-3" style="z-index: 10;"></i>
@@ -140,6 +164,18 @@ $deleteError = function ($errorId) {
                             </div>
                         @endif
 
+                        {{-- Acción --}}
+                        <div class="col-lg-2 col-md-6">
+                            <label class="form-label-custom text-uppercase x-small fw-bold">Acción Relacionada</label>
+                            <select wire:model.live="accion" class="form-control">
+                                <option value="">Todas</option>
+                                <option value="CARGA">Carga de Archivo</option>
+                                <option value="DESCARGA">Descarga</option>
+                                <option value="ELIMINACION">Eliminación</option>
+                                <option value="LOGIN">Acceso / Login</option>
+                            </select>
+                        </div>
+
                         {{-- Fecha --}}
                         <div class="col-lg-2 col-md-6">
                             <label class="form-label-custom text-uppercase x-small fw-bold">Fecha</label>
@@ -147,8 +183,8 @@ $deleteError = function ($errorId) {
                         </div>
 
                         {{-- Botón Limpiar --}}
-                        <div class="{{ $this->esProveedor ? 'col-lg-6' : 'col-lg-2' }} col-md-12">
-                            <button wire:click="$set('search', ''); $set('userFilter', ''); $set('fecha', '')"
+                        <div class="{{ $this->esProveedor ? 'col-lg-5' : 'col-lg-2' }} col-md-12">
+                            <button wire:click="$set('search', ''); $set('userFilter', ''); $set('accion', ''); $set('fecha', '')"
                                 wire:loading.attr="disabled" class="btn btn-outline-secondary rounded-pill w-100 fw-bold">
                                 <span wire:loading.remove wire:target="$set">
                                     <i class="fas fa-eraser me-1"></i> Limpiar
@@ -162,7 +198,7 @@ $deleteError = function ($errorId) {
                 </div>
             </div>
 
-            {{-- RECUADRO 3: TABLA DE ERRORES (Mantenemos tu diseño visual) --}}
+            {{-- RECUADRO 3: TABLA DE ERRORES --}}
             <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden custom-card">
                 
                 <div class="card-header bg-transparent border-0 pt-4 px-4 pb-2 d-flex justify-content-between align-items-center">
@@ -186,12 +222,47 @@ $deleteError = function ($errorId) {
 
                             <tbody class="border-top-0">
                                 @forelse($this->errores as $error)
+                                    @php
+                                        // 1. OBTENER EL TEXTO
+                                        $textoMostrar = $error->accion;
+                                        $accionUpper = strtoupper($textoMostrar);
+
+                                        // 2. ASIGNACIÓN DINÁMICA DE ETIQUETAS Y COLORES
+                                        $badgeStyle = 'status-general';
+                                        $badgeText  = 'ERROR DE SISTEMA';
+
+                                        if (str_contains($accionUpper, 'LOGIN') || str_contains($accionUpper, 'SESIÓN') || str_contains($accionUpper, 'CREDENCIALES')) {
+                                            $badgeStyle = 'status-auth';
+                                            $badgeText  = 'FALLO DE ACCESO';
+                                        } elseif (str_contains($accionUpper, 'VALIDACIÓN') || str_contains($accionUpper, 'LEVE') || str_contains($accionUpper, 'FORMATO')) {
+                                            $badgeStyle = 'status-warning';
+                                            $badgeText  = 'ADVERTENCIA';
+                                        } elseif (str_contains($accionUpper, 'CRÍTICO') || str_contains($accionUpper, 'FATAL') || str_contains($accionUpper, 'SQL')) {
+                                            $badgeStyle = 'status-error';
+                                            $badgeText  = 'ERROR CRÍTICO';
+                                        }
+
+                                        // 3. ENMASCARAMIENTO PARA PROVEEDORES
+                                        if ($this->esProveedor) {
+                                            if (
+                                                str_contains($textoMostrar, 'CRÍTICO') ||
+                                                str_contains($textoMostrar, 'Leve') ||
+                                                str_contains($textoMostrar, 'Validación/Seguridad')
+                                            ) {
+                                                $textoMostrar = 'Error: El formato o contenido del archivo no está permitido.';
+                                                $badgeStyle = 'status-warning'; // Para el proveedor, no asustarlo, se muestra en amarillo
+                                                $badgeText  = 'CARGA BLOQUEADA';
+                                            } elseif (str_contains($textoMostrar, 'IP:')) {
+                                                $textoMostrar = preg_replace('/\| IP: [0-9\.]+/', '', $textoMostrar);
+                                            }
+                                        }
+                                    @endphp
                                     <tr style="transition: all 0.2s ease;" class="log-row">
                                         
-                                        {{-- COLUMNA 1: Nivel de Error --}}
+                                        {{-- COLUMNA 1: Nivel de Error Dinámico --}}
                                         <td class="ps-4 py-3">
-                                            <div class="status-indicator status-error">
-                                                <span class="dot"></span> FALLO DEL SISTEMA
+                                            <div class="status-indicator {{ $badgeStyle }}">
+                                                <span class="dot"></span> {{ $badgeText }}
                                             </div>
                                         </td>
                                         
@@ -226,15 +297,15 @@ $deleteError = function ($errorId) {
                                             </div>
                                         </td>
 
-                                        {{-- COLUMNA 3: Detalle del Error --}}
+                                        {{-- COLUMNA 3: Detalle del Error (CON TEXTO ENMASCARADO) --}}
                                         <td class="py-3">
                                             <div class="d-flex align-items-center">
                                                 <div class="bg-white rounded p-2 me-3 shadow-sm border border-danger-subtle">
                                                     <i class="fas fa-exclamation-triangle text-danger"></i>
                                                 </div>
                                                 <div>
-                                                    <span class="d-block text-dark fw-medium text-truncate" style="max-width: 250px;" title="{{ $error->accion }}">
-                                                        {{ $error->accion ?? 'Error no especificado' }}
+                                                    <span class="d-block text-dark fw-medium text-truncate" style="max-width: 250px;" title="{{ $textoMostrar }}">
+                                                        {{ $textoMostrar ?? 'Error no especificado' }}
                                                     </span>
                                                     <span class="badge bg-danger bg-opacity-10 text-danger border border-danger-subtle mt-1">
                                                         Módulo: {{ $error->modulo ?? 'Global' }}
@@ -249,7 +320,7 @@ $deleteError = function ($errorId) {
                                             <span class="text-muted font-monospace small">{{ $error->created_at->format('h:i A') }}</span>
                                         </td>
 
-                                        {{-- COLUMNA 5: Acciones (Mismo SweetAlert Integrado en Alpine de tu primer código) --}}
+                                        {{-- COLUMNA 5: Acciones --}}
                                         <td class="text-center py-3 pe-4">
                                             <div class="d-flex justify-content-center gap-2">
                                                 <a href="{{ route('errores.show', $error->id) }}" class="btn btn-sm btn-outline-primary rounded-circle" title="Ver Detalles">

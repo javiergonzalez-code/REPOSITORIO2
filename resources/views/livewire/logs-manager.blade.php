@@ -245,7 +245,7 @@ $deleteLog = function ($logId) {
                                     str_contains($accionUpper, 'CRÍTICO') ||
                                     str_contains($accionUpper, 'LEVE')
                                 ) {
-                                    $badgeStyle = 'status-error';
+                                    $badgeStyle = 'status-error'; // Error genérico (solo el puntito rojo)
                                 }
                             } else {
                                 if (str_contains($accionUpper, 'CRÍTICO')) {

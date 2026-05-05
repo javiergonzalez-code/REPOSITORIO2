@@ -27,7 +27,7 @@
                                 Usuario
                             </label>
                             {{-- Aplicamos p-3, gap-3 y h-100 igual que en los logs --}}
-                            <div class="d-flex align-items-center p-3 bg-white rounded-3 border gap-3 h-100">
+                            <div class="d-flex align-items-center p-3 bg-dark rounded-3 border gap-3 h-100">
                                 @if($error->user)
                                     {{-- 1. Círculo del Avatar unificado (42px) --}}
                                     <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold shadow-sm"
@@ -67,7 +67,7 @@
                             <label class="text-muted fw-bold text-uppercase x-small d-block mb-2" style="font-size: 0.7rem; letter-spacing: 0.5px;">
                                 Fecha y Hora del Evento
                             </label>
-                            <div class="p-3 bg-white rounded-3 border d-flex flex-column justify-content-center h-100">
+                            <div class="p-3 bg-dark rounded-3 border d-flex flex-column justify-content-center h-100">
                                 <span class="fw-bold text-dark d-block mb-1">
                                     <i class="far fa-calendar-alt me-2 text-danger"></i> {{ $error->created_at->format('d / m / Y') }}
                                 </span>
@@ -82,7 +82,7 @@
                             <label class="text-muted fw-bold text-uppercase x-small d-block mb-2" style="font-size: 0.7rem; letter-spacing: 0.5px;">
                                 Módulo Afectado
                             </label>
-                            <span class="badge bg-white text-dark border fw-bold px-3 py-2 shadow-sm" style="font-size: 0.85rem;">
+                            <span class="badge bg-dark text-dark border fw-bold px-3 py-2 shadow-sm" style="font-size: 0.85rem;">
                                 <i class="fas fa-cube me-1 text-danger"></i> {{ $error->modulo ?? 'N/A' }}
                             </span>
                         </div>

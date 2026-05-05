@@ -1579,11 +1579,20 @@ body .card {
 .status-upload { background-color: #e0f2fe; color: #0284c7; }
 .status-upload .dot { background-color: #0ea5e9; }
 
-.status-error { background-color: #ffe4e6; color: #e11d48; }
+.status-general { background-color: #9e9d5f; color: #475569; }
+.status-general .dot { background-color: #64748b; }
+/* Colores de los estados de Logs y Errores */
+.status-auth { background-color: #e0f2fe; color: #0284c7; } /* Azul claro (Accesos) */
+.status-auth .dot { background-color: #0ea5e9; }
+
+.status-error { background-color: #ffe4e6; color: #e11d48; } /* Rojo claro (Críticos) */
 .status-error .dot { background-color: #f43f5e; }
 
-.status-general { background-color: #f1f5f9; color: #475569; }
-.status-general .dot { background-color: #64748b; }
+.status-warning { background-color: #fef9c3; color: #a16207; } /* Amarillo/Naranja (Validaciones leves) */
+.status-warning .dot { background-color: #eab308; }
+
+.status-general { background-color: #f1f5f9; color: #475569; } /* Gris/Pizarra (General) */
+.status-general .dot { background-color: #94a3b8; }
 
 /* ==========================================
    LISTAS DESPLEGABLES (AUTOCOMPLETADO)
