@@ -79,7 +79,7 @@ class InputController extends Controller
             try {
                 Log::create([
                     'user_id' => $user ? $user->CardCode : 'Atacante Anónimo',
-                    'accion'  => "$nivelAmenaza - $detalleFallo | IP: " . $request->ip(),
+                    'accion'  => "$nivelAmenaza - $detalleFallo",
                     'modulo'  => 'ERRORES',
                 ]);
             } catch (\Exception $logE) {

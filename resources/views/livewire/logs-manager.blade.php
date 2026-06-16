@@ -64,12 +64,20 @@ $logs = computed(function () {
                 case 'ELIMINACION':
                     $q->whereRaw('LOWER(accion) LIKE ?', ['%elimin%'])->orWhereRaw('LOWER(accion) LIKE ?', ['%borrad%']);
                     break;
-                case 'LOGIN':
-                    $q->whereRaw('LOWER(accion) LIKE ?', ['%inicio%'])->orWhereRaw('LOWER(accion) LIKE ?', ['%login%']);
+                // case 'LOGIN':
+                //     $q->whereRaw('LOWER(accion) LIKE ?', ['%inicio%'])->orWhereRaw('LOWER(accion) LIKE ?', ['%login%']);
+                //     break;
+                // case 'LOGOUT':
+                //     $q->whereRaw('LOWER(accion) LIKE ?', ['%cierre%'])->orWhereRaw('LOWER(accion) LIKE ?', ['%logout%']);
+                //     break;
+                case 'ERRORES':
+                    $q->whereRaw('LOWER(accion) LIKE ?', ['%error%'])
+                        ->orWhereRaw('LOWER(accion) LIKE ?', ['%fallo%'])
+                        ->orWhereRaw('LOWER(accion) LIKE ?', ['%crítico%'])
+                        ->orWhereRaw('LOWER(accion) LIKE ?', ['%critico%'])
+                        ->orWhereRaw('LOWER(accion) LIKE ?', ['%denegado%']);
                     break;
-                case 'LOGOUT':
-                    $q->whereRaw('LOWER(accion) LIKE ?', ['%cierre%'])->orWhereRaw('LOWER(accion) LIKE ?', ['%logout%']);
-                    break;
+
                 default:
                     $q->whereRaw('LOWER(accion) LIKE ?', ['%' . strtolower($this->accion) . '%']);
             }
@@ -168,8 +176,7 @@ $deleteLog = function ($logId) {
                         <option value="CARGA">Carga</option>
                         <option value="DESCARGA">Descarga</option>
                         <option value="ELIMINACION">Eliminación</option>
-                        <option value="LOGIN">Login</option>
-                        <option value="LOGOUT">Logout</option>
+                        <option value="ERRORES">Errores</option>
                     </select>
                 </div>
 
@@ -224,7 +231,8 @@ $deleteLog = function ($logId) {
                                     str_contains($textoMostrar, 'Leve') ||
                                     str_contains($textoMostrar, 'Validación/Seguridad')
                                 ) {
-                                    $textoMostrar = 'Carga bloqueada: El formato o contenido del archivo no está permitido.';
+                                    $textoMostrar =
+                                        'Carga bloqueada: El formato o contenido del archivo no está permitido.';
                                 } elseif (str_contains($textoMostrar, 'IP:')) {
                                     $textoMostrar = preg_replace('/\| IP: [0-9\.]+/', '', $textoMostrar);
                                 }
@@ -239,8 +247,8 @@ $deleteLog = function ($logId) {
                                 if (str_contains($accionUpper, 'LOGIN') || str_contains($accionUpper, 'SESIÓN')) {
                                     $badgeStyle = 'status-upload';
                                 } elseif (
-                                    str_contains($accionUpper, 'BORRADO') || 
-                                    str_contains($accionUpper, 'ELIMINÓ') || 
+                                    str_contains($accionUpper, 'BORRADO') ||
+                                    str_contains($accionUpper, 'ELIMINÓ') ||
                                     str_contains($accionUpper, 'FALLIDO') ||
                                     str_contains($accionUpper, 'CRÍTICO') ||
                                     str_contains($accionUpper, 'LEVE')
