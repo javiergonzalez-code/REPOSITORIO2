@@ -9,14 +9,18 @@ use Illuminate\Validation\Rule;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log; // Facade para errores de sistema
+use Illuminate\Support\Facades\Log; 
 
 class UserController extends Controller
 {
+    /**
+     * Filtra los roles que el usuario actual puede asignar a otros
+     */
     private function getRolesPermitidos()
     {
         $user = auth()->user();
 
+        // Superadmin maneja todo, Admin normal no puede crear ni asignar otros Superadmins
         if ($user->hasRole('superadmin') || $user->role === 'superadmin') {
             return ['superadmin', 'admin', 'proveedor'];
         }
@@ -39,10 +43,10 @@ class UserController extends Controller
     {
         $rolesPermitidos = $this->getRolesPermitidos();
 
-        // 1. CAMBIO: Se actualizan las llaves de validación a los nombres reales de la BD
+        // Validación campos
         $validatedData = $request->validate([
             'CardName'   => ['required', 'string', 'max:255'],
-            'LicTradNum' => ['nullable', 'string', 'max:13', Rule::unique('users', 'LicTradNum')],
+            'LicTradNum' => ['nullable', 'string', 'max:13', Rule::unique('users', 'LicTradNum')], // RFC
             'E_Mail'     => ['required', 'email', Rule::unique('users', 'E_Mail')],
             'Cellular'   => ['nullable', 'string', 'max:20'],
             'role'       => ['required', Rule::in($rolesPermitidos)],
@@ -55,10 +59,9 @@ class UserController extends Controller
         try {
             DB::transaction(function () use ($validatedData) {
                 
-                // 🚨 GENERAMOS EL CARDCODE AUTOMÁTICAMENTE (Ej: U20260423123045)
+                // Prefijo 'U' + Timestamp para emular el formato de códigos de SAP
                 $nuevoCardCode = 'U' . date('YmdHis');
 
-                // 2. CAMBIO: Asignamos usando el $validatedData con los nuevos nombres
                 $user = new User([
                     'CardCode'   => $nuevoCardCode,
                     'CardName'   => $validatedData['CardName'],
@@ -71,6 +74,7 @@ class UserController extends Controller
                 $user->role = $validatedData['role'];
                 $user->save();
 
+                // Asignación de rol tanto nativo como Spatie Roles
                 $user->assignRole($validatedData['role']);
 
                 \App\Models\Log::create([
@@ -78,13 +82,13 @@ class UserController extends Controller
                     'accion'  => 'CARGA - Registró con éxito al usuario: ' . $user->CardName, 
                     'modulo'  => 'USUARIOS',
                 ]);
-            });
+        });
 
             Alert::success('¡Usuario Creado!', 'El usuario ha sido registrado exitosamente en el sistema.');
             return redirect()->route('users.index');
         } catch (\Exception $e) {
+            // Plan de respaldo: si falla el Log en BD, escribe directo en laravel.log
             try {
-                // 🚨 ENVIAMOS EL FALLO AL MÓDULO 'ERRORES'
                 \App\Models\Log::create([
                     'user_id' => auth()->user()->CardCode, 
                     'accion'  => Str::limit('ERROR DE REGISTRO - Falló al crear usuario: ' . $e->getMessage(), 250),
@@ -94,13 +98,14 @@ class UserController extends Controller
                 Log::error('Fallo al guardar log de creación de usuario: ' . $logError->getMessage());
             }
 
-            Alert::error('Error Crítico', 'Ocurrió un error al registrar los datos. Verifica que la información sea correcta.');
+            Alert::error('Error Crítico', 'Ocurrió un error al registrar los datos.');
             return back()->withInput();
         }
     }
 
     public function show($id)
     {
+        // Búsqueda por CardCode
         $user = User::where('CardCode', $id)->firstOrFail();
         return view('users.show', compact('user'));
     }
@@ -116,19 +121,20 @@ class UserController extends Controller
         $user = User::where('CardCode', $id)->firstOrFail();
         $rolesPermitidos = $this->getRolesPermitidos();
 
+        // Un Admin normal no puede editar ni quitarle el rol a un Superadmin
         if ($user->role === 'superadmin' && !in_array('superadmin', $rolesPermitidos)) {
             Alert::error('Acceso Denegado', 'No tienes permisos para modificar a un Superusuario.');
             return redirect()->route('users.index');
         }
 
-        // 3. CAMBIO: Validaciones actualizadas para el método Update
+        // Validación ignorando el CardCode actual para evitar colisiones de Unique
         $validatedData = $request->validate([
             'CardName'   => ['required', 'string', 'max:255'],
             'LicTradNum' => ['nullable', 'string', 'max:13', Rule::unique('users', 'LicTradNum')->ignore($user->CardCode, 'CardCode')],
             'E_Mail'     => ['required', 'email', Rule::unique('users', 'E_Mail')->ignore($user->CardCode, 'CardCode')],
             'Cellular'   => ['nullable', 'string', 'max:20'],
             'role'       => ['required', Rule::in($rolesPermitidos)],
-            'password'   => ['nullable', 'string', 'min:8', 'confirmed'],
+            'password'   => ['nullable', 'string', 'min:8', 'confirmed'], // Nullable por si no cambian contraseña
         ], [
             'LicTradNum.max' => 'El RFC no puede tener más de 13 caracteres.',
             'E_Mail.unique' => 'Este correo ya está registrado por otro usuario.',
@@ -137,7 +143,6 @@ class UserController extends Controller
         try {
             DB::transaction(function () use ($request, $user, $validatedData) {
                 
-                // 4. CAMBIO: Asignación de variables limpia y directa
                 $user->CardName   = $validatedData['CardName'];
                 $user->LicTradNum = $validatedData['LicTradNum'] ?? null;
                 $user->E_Mail     = $validatedData['E_Mail'];
@@ -150,6 +155,7 @@ class UserController extends Controller
                 $user->role = $validatedData['role'];
                 $user->save();
 
+                // Reemplaza el rol anterior por el nuevo en Spatie Roles
                 $user->syncRoles([$validatedData['role']]);
 
                 \App\Models\Log::create([
@@ -157,7 +163,7 @@ class UserController extends Controller
                     'accion'  => 'ACTUALIZACIÓN - Modificó los datos del usuario: ' . $user->CardName, 
                     'modulo'  => 'USUARIOS',
                 ]);
-            });
+        });
 
             Alert::success('¡Actualización Exitosa!', 'Los datos del usuario han sido modificados correctamente.');
             return redirect()->route('users.index');
@@ -172,7 +178,7 @@ class UserController extends Controller
                 Log::error('Fallo al guardar log de actualización de usuario: ' . $logError->getMessage());
             }
 
-            Alert::error('Revisa la información', 'Parece que algunos datos son demasiado largos o tienen un formato incorrecto (ej. el RFC).');
+            Alert::error('Revisa la información', 'Parece que algunos datos son incorrectos.');
             return back()->withInput();
         }
     }
@@ -181,11 +187,13 @@ class UserController extends Controller
     {
         $user = User::where('CardCode', $id)->firstOrFail();
 
+        // Evita que el usuario logueado se revoque del sistema
         if (auth()->user()->CardCode === $user->CardCode) {
             Alert::error('Operación Denegada', 'No puedes revocar tu propio acceso del sistema.');
             return back();
         }
 
+        // Solo un superadmin puede borrar a otro superadmin
         if ($user->role === 'superadmin' && auth()->user()->role !== 'superadmin') {
             Alert::error('Acceso Denegado', 'No tienes permisos para eliminar a un Superusuario.');
             return back();
@@ -194,7 +202,7 @@ class UserController extends Controller
         try {
             $nombreOriginal = $user->CardName; 
             
-            // Eliminación permanente directa
+            // Borrado en la tabla
             $user->delete();
 
             \App\Models\Log::create([

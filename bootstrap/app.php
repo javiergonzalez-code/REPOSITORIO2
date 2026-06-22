@@ -4,7 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Exceptions\PostTooLargeException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException; // 🚨 Importación nueva
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException; 
 use Illuminate\Http\Request;
 use App\Models\Log;
 use Illuminate\Support\Facades\Auth;
@@ -16,13 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        
-
-
     })
     ->withExceptions(function (Exceptions $exceptions) {
         
-        // 🚨 ESCENARIO 1 RESUELTO: Mostrar el ataque de archivos pesados en el panel
+        // Captura el error de PHP cuando un archivo supera el límite antes de que rompa la app
         $exceptions->renderable(function (PostTooLargeException $e, Request $request) {
             
             $userCode = Auth::check() ? Auth::user()->CardCode : 'DESCONOCIDO';
@@ -31,21 +28,23 @@ return Application::configure(basePath: dirname(__DIR__))
                 Log::create([
                     'user_id' => $userCode, 
                     'accion'  => 'Ataque/Error: Archivo colosal bloqueado por el servidor | IP: ' . $request->ip(),
-                    'modulo'  => 'ERRORES' // Cambiado a ERRORES para que se vea en la UI
+                    'modulo'  => 'ERRORES'
                 ]);
             } catch (\Exception $ex) {
+                // Respaldo físico si la Base de Datos está caída o saturada
                 \Illuminate\Support\Facades\Log::error('Archivo colosal bloqueado | IP: ' . $request->ip());
             }
 
+            // Regresa al usuario a la pantalla anterior con un mensaje flash de error
             return redirect()->back()->with('error', 'El archivo es demasiado colosal. El servidor web bloqueó la subida antes de procesarla.');
         });
 
-        // 🚨 ESCENARIO 4 RESUELTO: Detector de bots y escaneos de vulnerabilidades
+        // Captura todos los errores 404 para analizar si están buscando rutas sospechosas
         $exceptions->renderable(function (NotFoundHttpException $e, Request $request) {
             
             $path = strtolower($request->path());
             
-            // Si buscan estas rutas, definitivamente es un atacante o bot
+            // Si la ruta buscada contiene palabras clave de hackeo o carpetas comunes de WordPress/PHP
             if (str_contains($path, 'env') || str_contains($path, 'phpmyadmin') || str_contains($path, 'admin/login') || str_contains($path, 'wp-admin')) {
                 
                 $userCode = Auth::check() ? Auth::user()->CardCode : 'BOT/HACKER';
@@ -61,7 +60,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 }
             }
             
-            return null; // Dejamos que Laravel muestre su vista 404 normal pero ya lo registramos
+            return null; 
         });
 
     })->create();

@@ -25,7 +25,6 @@
         });
     }
 
-    // Asegurarnos de que funcione con la navegación reactiva de Livewire
     document.addEventListener('livewire:navigated', initSweetAlertDelete);
     document.addEventListener('livewire:load', initSweetAlertDelete);
     document.addEventListener('livewire:update', initSweetAlertDelete);

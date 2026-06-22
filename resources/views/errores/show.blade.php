@@ -26,35 +26,35 @@
                             <label class="text-muted fw-bold text-uppercase x-small d-block mb-2" style="font-size: 0.7rem; letter-spacing: 0.5px;">
                                 Usuario
                             </label>
-                            {{-- Aplicamos p-3, gap-3 y h-100 igual que en los logs --}}
-                            <div class="d-flex align-items-center p-3 bg-dark rounded-3 border gap-3 h-100">
+                            {{-- CORRECCIÓN: Se cambió bg-dark por bg-light para que el texto sea legible --}}
+                            <div class="d-flex align-items-center p-3 bg-light rounded-3 border gap-3 h-100">
                                 @if($error->user)
-                                    {{-- 1. Círculo del Avatar unificado (42px) --}}
+                                    {{-- 1. Círculo del Avatar --}}
                                     <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold shadow-sm"
                                         style="width: 42px; height: 42px; font-size: 1.1rem; min-width: 42px;">
-                                        {{ strtoupper(substr($error->user->name ?? ($error->user->CardName ?? 'U'), 0, 1)) }}
+                                        {{ strtoupper(substr($error->user->CardName ?? ($error->user->name ?? 'U'), 0, 1)) }}
                                     </div>
 
                                     {{-- 2. Información de Nombre y Rol/Email --}}
                                     <div>
-                                        <span class="d-block fw-bold mb-1" style="font-size: 0.95rem; color: inherit;">
-                                            {{ $error->user->CardName ?? $error->user->name ?? 'Usuario sin nombre' }}
+                                        <span class="d-block fw-bold mb-1 text-dark" style="font-size: 0.95rem;">
+                                            {{ $error->user->CardName ?? ($error->user->name ?? 'Usuario sin nombre') }}
                                         </span>
-                                        <span class="text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px; color: #94a3b8;">
-                                            {{ $error->user->role ?? $error->user->email ?? 'Sin rol' }}
+                                        <span class="text-uppercase text-muted" style="font-size: 0.75rem; letter-spacing: 0.5px;">
+                                            {{ $error->user->role ?? ($error->user->E_Mail ?? 'Sin rol') }}
                                         </span>
                                     </div>
                                 @else
-                                    {{-- Avatar para Sistema/Desconocido con las mismas dimensiones --}}
+                                    {{-- Avatar para Sistema/Desconocido --}}
                                     <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center shadow-sm" 
                                          style="width: 42px; height: 42px; font-size: 1.1rem; min-width: 42px;">
                                         <i class="fas fa-user-slash"></i>
                                     </div>
                                     <div>
-                                        <span class="d-block fw-bold mb-1" style="font-size: 0.95rem; color: inherit;">
+                                        <span class="d-block fw-bold mb-1 text-dark" style="font-size: 0.95rem;">
                                             Sistema / Desconocido
                                         </span>
-                                        <span class="text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px; color: #94a3b8;">
+                                        <span class="text-uppercase text-muted" style="font-size: 0.75rem; letter-spacing: 0.5px;">
                                             Automático
                                         </span>
                                     </div>
@@ -67,7 +67,8 @@
                             <label class="text-muted fw-bold text-uppercase x-small d-block mb-2" style="font-size: 0.7rem; letter-spacing: 0.5px;">
                                 Fecha y Hora del Evento
                             </label>
-                            <div class="p-3 bg-dark rounded-3 border d-flex flex-column justify-content-center h-100">
+                            {{-- CORRECCIÓN: Se cambió bg-dark por bg-light para evitar el camuflaje de texto --}}
+                            <div class="p-3 bg-light rounded-3 border d-flex flex-column justify-content-center h-100">
                                 <span class="fw-bold text-dark d-block mb-1">
                                     <i class="far fa-calendar-alt me-2 text-danger"></i> {{ $error->created_at->format('d / m / Y') }}
                                 </span>
@@ -78,12 +79,13 @@
                         </div>
 
                         {{-- Módulo --}}
-                        <div class="col-md-4">
+                        <div class="col-md-12"> {{-- CORRECCIÓN: Se cambió a col-md-12 para que no quede huérfano a la izquierda --}}
                             <label class="text-muted fw-bold text-uppercase x-small d-block mb-2" style="font-size: 0.7rem; letter-spacing: 0.5px;">
                                 Módulo Afectado
                             </label>
-                            <span class="badge bg-dark text-dark border fw-bold px-3 py-2 shadow-sm" style="font-size: 0.85rem;">
-                                <i class="fas fa-cube me-1 text-danger"></i> {{ $error->modulo ?? 'N/A' }}
+                            {{-- CORRECCIÓN: Se limpió el choque de bg-dark con text-dark. Ahora usa colores de alerta sutiles --}}
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle fw-bold px-3 py-2 shadow-sm" style="font-size: 0.85rem;">
+                                <i class="fas fa-cube me-1"></i> {{ $error->modulo ?? 'N/A' }}
                             </span>
                         </div>
 
@@ -92,7 +94,8 @@
                             <label class="text-muted fw-bold text-uppercase x-small d-block mb-2" style="font-size: 0.7rem; letter-spacing: 0.5px;">
                                 Descripción Completa de la Excepción
                             </label>
-                            <div class="p-4 bg-dark text-light rounded-3 shadow-inner" style="font-family: 'Courier New', Courier, monospace; overflow-x: auto; border-left: 5px solid #dc3545;">
+                            {{-- NOTA: Aquí el bg-dark SÍ sirve porque emula una consola de comandos (código ligero) --}}
+                            <div class="p-4 bg-dark text-white rounded-3 shadow-inner" style="font-family: 'Courier New', Courier, monospace; overflow-x: auto; border-left: 5px solid #dc3545;">
                                 {{ $error->accion ?? 'No hay detalles de la acción registrados.' }}
                             </div>
                         </div>
@@ -105,7 +108,7 @@
                             <i class="fas fa-arrow-left me-1"></i> Regresar
                         </a>
 
-                        {{-- Formulario interceptado con SweetAlert 2 (Mismo formato que en logs) --}}
+                        {{-- Formulario con SweetAlert 2 --}}
                         <form action="{{ route('errores.destroy', $error->id) }}" method="POST" class="d-inline">
                             @csrf
                             @method('DELETE')
@@ -117,7 +120,7 @@
                                         text: '¡No podrás revertir esto! El registro de error se eliminará permanentemente.',
                                         icon: 'warning',
                                         showCancelButton: true,
-                                        confirmButtonColor: '#d33',
+                                        confirmButtonColor: '#dc3545',
                                         cancelButtonColor: '#6c757d',
                                         confirmButtonText: '<i class=\'fas fa-trash me-1\'></i> Sí, eliminar',
                                         cancelButtonText: 'Cancelar',
@@ -142,7 +145,7 @@
 
 <style>
     .shadow-inner {
-        box-shadow: inset 0 2px 4px rgba(0, 0, 0, .08);
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, .2);
     }
 </style>
 @endsection

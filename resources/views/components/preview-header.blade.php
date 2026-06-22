@@ -31,7 +31,6 @@
                 <i class="fas fa-download me-2"></i> DESCARGAR
             </a>
 
-            {{-- OJO AQUÍ: Usamos la clase form-eliminar-registro del componente global --}}
             <form action="{{ route('oc.destroy', $oc->id) }}" method="POST" class="m-0 p-0 form-eliminar-registro">
                 @csrf
                 @method('DELETE')

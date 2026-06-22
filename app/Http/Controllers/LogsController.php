@@ -18,27 +18,25 @@ class LogsController extends Controller
      */
     public function show($id)
     {
-        // 1. Buscamos el log con la información del usuario
+        // Buscamos el log con la información del usuario
         $log = \App\Models\Log::with('user')->findOrFail($id);
 
-        // 2. Seguridad: Si es proveedor, validar que el log sea suyo
+        // Seguridad: Si es proveedor, validar que el log sea suyo
         $user = auth()->user();
         $esProveedor = $user->hasRole('proveedor') || $user->role === 'proveedor';
 
         if ($esProveedor) {
-            // Verifica contra CardCode (o id, dependiendo de cómo guardes user_id en logs)
             if ($log->user_id != $user->CardCode && $log->user_id != $user->id) {
                 abort(403, 'No tienes permiso para ver este registro de auditoría.');
             }
         }
 
-        // 3. Retornamos la vista que creamos pasándole los datos
         return view('logs.show', compact('log'));
     }
 
     public function destroy($id)
     {
-        // 1. SEGURIDAD BACKEND: Evitar borrado por Postman/cURL de usuarios no autorizados
+        // Evitar borrado de usuarios no autorizados
         $user = auth()->user();
         $esProveedor = $user->hasRole('proveedor') || $user->role === 'proveedor';
 

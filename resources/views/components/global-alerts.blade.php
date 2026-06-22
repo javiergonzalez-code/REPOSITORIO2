@@ -1,7 +1,6 @@
 {{-- Directiva para las alertas que vienen desde el Controlador --}}
 @include('sweetalert::alert')
 
-{{-- Capturador global de errores de validación nativos de Laravel --}}
 @if ($errors->any())
     <script>
         document.addEventListener('DOMContentLoaded', function() {

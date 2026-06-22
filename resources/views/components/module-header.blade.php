@@ -1,7 +1,7 @@
 @props([
     'icon', 
     'title', 
-    'subtitle' => 'MÓDULO INTERACTIVO', 
+    'subtitle' => 'MÓDULO OC', 
     'backRoute' => null
 ])
 

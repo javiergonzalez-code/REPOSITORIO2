@@ -15,10 +15,10 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
-        // 0. Limpiar caché (Spatie)
+        // Limpiar caché Spatie
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // 1. Crear Permisos (Oficiales del sistema)
+        // Crear Permisos 
         $permissions = [
             'manage roles',
             'manage permissions',
@@ -36,22 +36,22 @@ class DatabaseSeeder extends Seeder
             Permission::firstOrCreate(['name' => $permission]);
         }
 
-        // 2. Crear Roles Oficiales
+        // Crear Roles
         $roleSuperAdmin = Role::firstOrCreate(['name' => 'superadmin']);
         $roleAdmin = Role::firstOrCreate(['name' => 'admin']);
         $roleProveedor = Role::firstOrCreate(['name' => 'proveedor']);
 
-        // 3. Asignar permisos a los roles
+        // Asignar permisos a los roles
         $roleSuperAdmin->syncPermissions(Permission::all());
         $roleAdmin->syncPermissions(Permission::all());
         $roleProveedor->syncPermissions(['list archivos', 'upload archivos']);
 
-        // 4. Crear a tu usuario personal (Super Admin) - ADAPTADO A SQL SERVER
+        // Crear Super Admin
         $myUser = User::updateOrCreate(
-            ['E_Mail' => 'admin@ragon.com'], // Se busca por la nueva columna de correo
+            ['E_Mail' => 'admin@ragon.com'], 
             [
-                'CardCode' => 'SUPERADMIN01', // CRÍTICO: Debemos enviarle la llave primaria manualmente (máx 15 chars)
-                'CardName' => 'Administrador Principal', // Sustituye a 'name'
+                'CardCode' => 'SUPERADMIN01', 
+                'CardName' => 'Administrador Principal',
                 'password' => bcrypt('holamundo1234'),
                 'role'     => 'superadmin',
             ]

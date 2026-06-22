@@ -10,19 +10,17 @@ class ErroresController extends Controller
 {
     public function index()
     {
-        // ¡SUPER LIMPIO!
-        // Livewire Volt se encarga de extraer los datos y filtrar.
-        // Solo retornamos la vista base vacía.
+        // El listado, filtros y paginación se hacen en la vista con Livewire Volt
         return view('errores.index');
     }
 
     public function show($id)
     {
-        // Este se queda igual, ya que muestra el detalle en otra pantalla
+        // Busca el log sólo en los módulos permitidos
         $error = Log::whereIn('modulo', ['ERRORES', 'SISTEMA'])->findOrFail($id);
         $user = Auth::user();
 
-        // Seguridad: Si es proveedor, solo ve sus propios errores
+        // Bloqueo: Los proveedores sólo pueden ver sus propios errores
         if ($user->role === 'proveedor' && $error->user_id !== $user->CardCode) {
             abort(403, 'No tienes permiso para ver este error.');
         }
@@ -32,11 +30,11 @@ class ErroresController extends Controller
 
     public function destroy($id)
     {
-        // Este se queda igual, por si borras desde la vista de "show" (Detalle)
+        // Se queda aquí por si borran desde la vista de detalle (show)
         $error = Log::whereIn('modulo', ['ERRORES', 'SISTEMA'])->findOrFail($id);
         $user = Auth::user();
 
-        // Seguridad: Si es proveedor, no puede borrar
+        // Bloqueo: Un proveedor jamás puede borrar logs
         if ($user->role === 'proveedor') {
             abort(403, 'No tienes permiso para eliminar este registro.');
         }

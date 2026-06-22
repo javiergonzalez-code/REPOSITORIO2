@@ -20,14 +20,12 @@
                                 {{ $loop->iteration }} </td>
 
                             @if (is_iterable($row))
-                                {{-- If $row is an array/object, loop through its cells --}}
                                 @foreach ($row as $cell)
                                     <td class="p-3 border-end text-main" style="min-width: 150px">
                                         {{ is_array($cell) ? json_encode($cell) : $cell }}
                                     </td>
                                 @endforeach
                             @else
-                                {{-- If $row is just a string or number, print it directly in one cell --}}
                                 <td class="p-3 border-end text-main" style="min-width: 150px">
                                     {{ $row }}
                                 </td>

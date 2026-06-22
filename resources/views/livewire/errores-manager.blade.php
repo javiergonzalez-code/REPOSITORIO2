@@ -107,7 +107,7 @@ $deleteError = function ($errorId) {
     <div class="row justify-content-center">
         <div class="col-12 col-xl-11">
 
-            <x-module-header icon="fas fa-bug" title="REGISTRO DE ERRORES" subtitle="MÓDULO DE MONITOREO DEL SISTEMA" />
+            <x-module-header icon="fas fa-bug" title="REGISTRO DE ERRORES" subtitle="MÓDULO DE ERRORES" />
 
             <div class="mb-3 text-end" style="font-size: 0.8rem; color: #dc3545; font-weight: 700;">
                 <i class="fas fa-exclamation-circle me-1"></i> {{ $this->errores->total() }} EXCEPCIONES ENCONTRADAS

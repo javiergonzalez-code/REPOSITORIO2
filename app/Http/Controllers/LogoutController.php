@@ -10,7 +10,6 @@ class LogoutController extends Controller
 {
     public function destroy(Request $request) 
     {
-        // 🚨 1. Extraemos explícitamente el CardCode (String) ANTES de cerrar sesión
         $userCode = Auth::check() ? Auth::user()->CardCode : null;
 
         Auth::logout();

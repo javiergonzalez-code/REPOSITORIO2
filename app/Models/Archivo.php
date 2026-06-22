@@ -10,10 +10,10 @@ use Spatie\Activitylog\LogOptions;
 class Archivo extends Model
 {
     use HasFactory;
-    use LogsActivity;
+    use LogsActivity; 
 
     protected $fillable = [
-        'user_id', // 🚨 Ahora guardará el CardCode (String) en lugar del id numérico
+        'user_id', //Guarda el CardCode 
         'nombre_original',
         'nombre_sistema',
         'tipo_archivo',
@@ -21,31 +21,46 @@ class Archivo extends Model
         'ruta'
     ];
 
+    /**
+     * Configuración del historial de cambios 
+     */
     public function getActivitylogOptions(): \Spatie\Activitylog\LogOptions
     {
         return LogOptions::defaults()
+            // Define qué columnas queremos vigilar e historiar
             ->logOnly(['nombre_original', 'nombre_sistema', 'tipo_archivo', 'modulo', 'ruta'])
+            
+            // Solo guarda registro si el dato realmente cambió
             ->logOnlyDirty()
+            
+            // Si le dieron "Guardar" pero no le movieron a nada, no escribe nada en el log
             ->dontSubmitEmptyLogs()
+            
+            // Nombre del canal de logs en la BD
             ->useLogName('archivo')
+            
+            // Traduce los eventos nativos de Eloquent a español para la vista del Admin
             ->setDescriptionForEvent(fn(string $eventName) => match ($eventName) {
                 'created' => 'Creación',
                 'updated' => 'Actualización',
                 'deleted' => 'Eliminación',
-                default => $eventName,
+                default   => $eventName,
             });
     }
 
+    /**
+     * Relación con el modelo de Usuarios.
+     */
     public function user()
     {
-        // 🚨 MUY IMPORTANTE: Hacemos la relación explícita para SQL Server
-        // Le indicamos que el 'user_id' de esta tabla se conecta con el 'CardCode' de la tabla User
         return $this->belongsTo(User::class, 'user_id', 'CardCode');
     }
 
+    /**
+     * Te permite usar $archivo->ruta_url directamente en las vistas.
+     */
     public function getRutaUrlAttribute()
     {
-        // El ID del archivo sí sigue siendo numérico y autoincrementable, por lo que esto se queda igual
         return route('archivos.download', $this->id);
     }
 }

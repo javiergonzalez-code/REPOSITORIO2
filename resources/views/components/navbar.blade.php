@@ -20,9 +20,7 @@
                     @if (in_array(Auth::user()->role, ['superadmin', 'admin']))
                         <li class="nav-item">
                             <a class="nav-link {{ request()->is('users*') ? 'active' : '' }}"
-                                href="{{ route('users.index') }}">
-                                <i class="fas me-1"></i> Usuarios
-                            </a>
+                                href="{{ route('users.index') }}">Usuarios</a>
                         </li>
                     @endif
 
@@ -49,9 +47,7 @@
             </ul>
 
             <div class="d-flex align-items-center gap-3">
-
                 @auth
-                    {{-- Menú Desplegable del Perfil Refactorizado --}}
                     <div class="dropdown">
                         <a class="text-decoration-none dropdown-toggle-nocaret d-flex align-items-center" 
                            href="#" 
@@ -60,13 +56,11 @@
                            aria-expanded="false">
                             
                             <div class="d-flex align-items-center gap-2">
-                                {{-- 1. Círculo con Inicial (Usa CardName) --}}
                                 <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold shadow-sm"
                                     style="width: 35px; height: 35px; font-size: 0.9rem; min-width: 35px; border: 1.5px solid rgba(255,255,255,0.2);">
                                     {{ strtoupper(substr(Auth::user()->CardName ?? 'U', 0, 1)) }}
                                 </div>
 
-                                {{-- 2. Texto del Usuario (Usa CardName) --}}
                                 <div class="text-start lh-1" style="min-width: 100px;">
                                     <span class="d-block fw-bold text-white mb-0" style="font-size: 0.85rem;">
                                         {{ Auth::user()->CardName ?? 'Usuario' }}
@@ -78,10 +72,7 @@
                             </div>
                         </a>
 
-                        {{-- 3. Opciones del Dropdown --}}
                         <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 mt-2">
-
-                            <li><hr class="dropdown-divider opacity-50"></li>
                             <li>
                                 <a class="dropdown-item d-flex align-items-center py-2 text-danger"
                                     href="{{ route('logout') }}"

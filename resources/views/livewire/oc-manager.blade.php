@@ -166,36 +166,36 @@ $ordenes = computed(function () {
                                     <span class="dot"></span> RECIBIDO
                                 </span>
                             </td>
-<td class="ps-4 py-3">
-    <div class="d-flex align-items-center gap-3">
+                            <td class="ps-4 py-3">
+                                <div class="d-flex align-items-center gap-3">
 
-        {{-- 1. Círculo del Avatar dinámico --}}
-        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold shadow-sm"
-            style="width: 38px; height: 38px; font-size: 1rem; min-width: 38px;">
-            @php
-                // Usamos $oc->user para obtener los datos del dueño del archivo
-                $nombreParaAvatar = $oc->user->CardName ?? ($oc->user->name ?? 'U');
-                $inicial = strtoupper(substr($nombreParaAvatar, 0, 1));
-            @endphp
-            {{ $inicial }}
-        </div>
+                                    {{-- 1. Círculo del Avatar dinámico --}}
+                                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold shadow-sm"
+                                        style="width: 38px; height: 38px; font-size: 1rem; min-width: 38px;">
+                                        @php
+                                            // Usamos $oc->user para obtener los datos del dueño del archivo
+                                            $nombreParaAvatar = $oc->user->CardName ?? ($oc->user->name ?? 'U');
+                                            $inicial = strtoupper(substr($nombreParaAvatar, 0, 1));
+                                        @endphp
+                                        {{ $inicial }}
+                                    </div>
 
-        {{-- 2. Información de Nombre y Rol --}}
-        <div>
-            {{-- Nombre real del usuario o proveedor --}}
-            <span class="d-block fw-bold mb-0" style="font-size: 0.9rem; color: inherit;">
-                {{ $oc->user->CardName ?? 'Usuario Desconocido' }}
-            </span>
+                                    {{-- 2. Información de Nombre y Rol --}}
+                                    <div>
+                                        {{-- Nombre real del usuario o proveedor --}}
+                                        <span class="d-block fw-bold mb-0" style="font-size: 0.9rem; color: inherit;">
+                                            {{ $oc->user->CardName ?? 'Usuario Desconocido' }}
+                                        </span>
 
-            {{-- Rol o Nivel de acceso --}}
-            <span class="text-uppercase"
-                style="font-size: 0.7rem; letter-spacing: 0.5px; color: #94a3b8;">
-                {{ $oc->user->role ?? 'N/A' }}
-            </span>
-        </div>
+                                        {{-- Rol o Nivel de acceso --}}
+                                        <span class="text-uppercase"
+                                            style="font-size: 0.7rem; letter-spacing: 0.5px; color: #94a3b8;">
+                                            {{ $oc->user->role ?? 'N/A' }}
+                                        </span>
+                                    </div>
 
-    </div>
-</td>
+                                </div>
+                            </td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     @php $ext = pathinfo($oc->nombre_original, PATHINFO_EXTENSION); @endphp
